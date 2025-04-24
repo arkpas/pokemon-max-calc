@@ -1,0 +1,115 @@
+<div class="container">
+  <div class="left-container">
+    <form [formGroup]="maxForm" (ngSubmit)="onSubmit()">
+      <div class="title">
+        <span>Provide Max Boss data</span>
+      </div>
+
+      <div>
+        <mat-form-field appearance="outline">
+          <mat-label>Name</mat-label>
+          <input
+            matInput
+            placeholder="Name"
+            id="name"
+            type="text"
+            formControlName="name"
+          />
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field appearance="outline">
+          <mat-label>CPM</mat-label>
+          <input
+            matInput
+            placeholder="CPM"
+            id="cpm"
+            type="number"
+            formControlName="cpm"
+          />
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field appearance="outline">
+          <mat-label>Attack modificator</mat-label>
+          <input
+            matInput
+            placeholder="Attack modificator"
+            id="atkMod"
+            type="number"
+            formControlName="atkMod"
+          />
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field appearance="outline">
+          <mat-label>Defense modificator</mat-label>
+          <input
+            matInput
+            placeholder="Defense modificator"
+            id="defMod"
+            type="number"
+            formControlName="defMod"
+          />
+        </mat-form-field>
+      </div>
+      <button mat-flat-button type="submit">Calculate</button>
+    </form>
+  </div>
+  <div class="right-container">
+    <mat-tab-group>
+      <mat-tab label="Attackers">
+        <div class="mat-elevation-z8">
+          <table mat-table [dataSource]="attackers" matSort>
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+              <td mat-cell *matCellDef="let row">{{ row.attacker.name }}</td>
+            </ng-container>
+
+            <!-- Move Column -->
+            <ng-container matColumnDef="move">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Move</th>
+              <td mat-cell *matCellDef="let row">{{ row.move }}</td>
+            </ng-container>
+
+            <!-- Power Column -->
+            <ng-container matColumnDef="power">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Power</th>
+              <td mat-cell *matCellDef="let row">{{ row.power }}</td>
+            </ng-container>
+
+            <!-- Damage Column -->
+            <ng-container matColumnDef="damage">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Damage</th>
+              <td mat-cell *matCellDef="let row">{{ row.damage }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="attackersColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: attackersColumns"></tr>
+          </table>
+
+          <mat-paginator
+            [pageSizeOptions]="[10, 20, 50, 100]"
+            aria-label="Select page of users"
+          ></mat-paginator>
+        </div>
+      </mat-tab>
+      <mat-tab label="Tanks">
+        <app-pokemon-card *ngFor="let tank of tanks"
+          [name]="tank.name"
+          [hp]="tank.hp"
+          [def]="tank.def"
+          [avgDamage]="tank.avgDamage"
+          [avgDamagePercentage]="tank.avgDamagePercentage"
+          [damageDetails]="tank.damageDetails"
+          [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + tank.pokedexNumber + '.png'"
+          [primaryType]="tank.primaryType"
+          [secondaryType]="tank.secondaryType"
+        >
+        </app-pokemon-card>
+      </mat-tab>
+      <mat-tab label="Healers"></mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

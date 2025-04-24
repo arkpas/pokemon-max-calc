@@ -1,0 +1,39 @@
+.left-container {
+    grid-area: left-container;
+}
+
+.right-container{
+    grid-area: right-container;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 25% 75%;
+    grid-template-rows: auto;
+    grid-template-areas:
+        "left-container right-container";
+}
+
+:host {
+    margin: 1em;
+    display: block;
+}
+
+.title {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.card {
+    max-width: 400px;
+  }
+  
+  .card-footer {
+    padding: 16px;
+  }
+
+  mat-header-row {
+    font-weight: bold;
+    background-color: #de0d8750;
+  }
