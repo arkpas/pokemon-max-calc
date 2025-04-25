@@ -6,7 +6,7 @@ import { DamageDetails, Type } from '../../types/types';
   selector: 'app-pokemon-card',
   templateUrl: './pokemon-card.component.html',
   styleUrls: ['./pokemon-card.component.scss'],
-  imports: [CommonModule]
+  imports: [CommonModule],
 })
 export class PokemonCardComponent {
   @Input() name!: string;
@@ -15,6 +15,8 @@ export class PokemonCardComponent {
   @Input() def!: number;
   @Input() avgDamage!: number;
   @Input() avgDamagePercentage!: number;
+  @Input() heal!: number;
+  @Input() unhealedDamagePercentage!: number;
   @Input() imageUrl!: string;
   @Input() damageDetails: DamageDetails[] = [];
   @Input() primaryType!: Type;
@@ -41,7 +43,7 @@ export class PokemonCardComponent {
       Dark: '#705848',
       Steel: '#b8b8d0',
       Fairy: '#ee99ac',
-      Normal: '#a8a878'
+      Normal: '#a8a878',
     };
     return map[type] || '#cccccc'; // domyślny kolor
   }
@@ -56,12 +58,18 @@ export class PokemonCardComponent {
 
   getDamagePercentageColor(damagePercentage: number): string {
     switch (true) {
-      case (damagePercentage < 25): return "green";
-      case (damagePercentage >= 25 && damagePercentage < 50): return "#007eff";
-      case (damagePercentage >= 50 && damagePercentage < 75): return "#ff8100";
-      case (damagePercentage >= 75 && damagePercentage < 100): return "red";
-      case (damagePercentage >= 100): return "darkred";
-      default: return "black";
+      case damagePercentage < 25:
+        return 'green';
+      case damagePercentage >= 25 && damagePercentage < 50:
+        return '#007eff';
+      case damagePercentage >= 50 && damagePercentage < 75:
+        return '#ff8100';
+      case damagePercentage >= 75 && damagePercentage < 100:
+        return 'red';
+      case damagePercentage >= 100:
+        return 'darkred';
+      default:
+        return 'black';
     }
   }
 }

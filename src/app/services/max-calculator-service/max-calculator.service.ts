@@ -215,6 +215,9 @@ export class MaxCalculatorService {
 
     return {
       name: pokemon.name,
+      pokedexNumber: pokemon.pokedexNumber,
+      primaryType: pokemon.primaryType,
+      secondaryType: pokemon.secondaryType,
       def: pokemon.def,
       hp: pokemon.hp,
       heal: heal,

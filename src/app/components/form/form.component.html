@@ -126,7 +126,26 @@
           </app-pokemon-card>
         </div>
       </mat-tab>
-      <mat-tab label="Healers"></mat-tab>
+      <mat-tab label="Healers">
+        <div *ngFor="let healer of healers">
+          <app-pokemon-card
+            [name]="healer.name"
+            [hp]="healer.hp"
+            [def]="healer.def"
+            [heal]="healer.heal"
+            [unhealedDamagePercentage]="healer.totalUnhealedDamagePercentage"
+            [damageDetails]="healer.damageDetails"
+            [imageUrl]="
+              'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' +
+              healer.pokedexNumber +
+              '.png'
+            "
+            [primaryType]="healer.primaryType"
+            [secondaryType]="healer.secondaryType"
+          >
+          </app-pokemon-card>
+        </div>
+      </mat-tab>
     </mat-tab-group>
   </div>
 </div>
