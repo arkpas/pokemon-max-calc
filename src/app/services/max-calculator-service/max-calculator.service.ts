@@ -9,6 +9,7 @@ import {
   HealerCandidate,
 } from '../../types/types';
 import { ImportServiceService } from '../import-service/import-service.service';
+import { Moment } from 'moment';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +17,7 @@ import { ImportServiceService } from '../import-service/import-service.service';
 export class MaxCalculatorService {
   constructor(private importService: ImportServiceService) {}
 
-  public calculate(pokemons: Pokemon[], boss: Pokemon) {
+  public calculate(pokemons: Pokemon[], boss: Pokemon, date: Moment) {
     const attackers: DamageConfiguration[] = [];
     const tanks: TankCandidate[] = [];
     const healers: HealerCandidate[] = [];
@@ -25,18 +26,19 @@ export class MaxCalculatorService {
       // Attackers
       const pokemonDamageConfigurations = this.createDamageConfigurations(
         pokemon,
-        boss
+        boss,
+        date
       );
       attackers.push(...pokemonDamageConfigurations);
 
       // Tanks
-      const tankCandidate = this.candidateForTank(pokemon, boss);
+      const tankCandidate = this.candidateForTank(pokemon, boss, date);
       if (tankCandidate) {
         tanks.push(tankCandidate);
       }
 
       // Healers
-      const healerCandidate = this.candidateForHealer(pokemon, boss);
+      const healerCandidate = this.candidateForHealer(pokemon, boss, date);
       if (healerCandidate) {
         healers.push(healerCandidate);
       }
@@ -57,12 +59,16 @@ export class MaxCalculatorService {
     return result;
   }
 
-  private createDamageConfigurations(pokemon: Pokemon, boss: Pokemon) {
+  private createDamageConfigurations(
+    pokemon: Pokemon,
+    boss: Pokemon,
+    date: Moment
+  ) {
     const damageConfigurations: DamageConfiguration[] = [];
     const attackerBaseStats = this.getPokemonBaseStats(pokemon);
     const defenderBaseStats = this.getPokemonBaseStats(boss);
 
-    if (pokemon.isGigantamax) {
+    if (pokemon.gigantamaxDate.isBefore(date)) {
       const gigantamaxDamageConfiguration = {
         attacker: attackerBaseStats,
         defender: defenderBaseStats,
@@ -79,7 +85,7 @@ export class MaxCalculatorService {
       damageConfigurations.push(gigantamaxDamageConfiguration);
     }
 
-    if (pokemon.isDynamax) {
+    if (pokemon.dynamaxDate.isBefore(date)) {
       pokemon.fastAttacks.forEach((fastAttack) => {
         const dynamaxDamageConfiguration = {
           attacker: attackerBaseStats,
@@ -105,9 +111,12 @@ export class MaxCalculatorService {
     return damageConfigurations;
   }
 
-  private candidateForTank(pokemon: Pokemon, boss: Pokemon) {
+  private candidateForTank(pokemon: Pokemon, boss: Pokemon, date: Moment) {
     // No DMax or GMax = we can't use this pokemon yet
-    if (!pokemon.isDynamax && !pokemon.isGigantamax) {
+    if (
+      !pokemon.dynamaxDate.isBefore(date) &&
+      !pokemon.gigantamaxDate.isBefore(date)
+    ) {
       return;
     }
 
@@ -168,9 +177,12 @@ export class MaxCalculatorService {
     return tankCandidate;
   }
 
-  private candidateForHealer(pokemon: Pokemon, boss: Pokemon) {
+  private candidateForHealer(pokemon: Pokemon, boss: Pokemon, date: Moment) {
     // No DMax or GMax = we can't use this pokemon yet
-    if (!pokemon.isDynamax && !pokemon.isGigantamax) {
+    if (
+      !pokemon.dynamaxDate.isBefore(date) &&
+      !pokemon.gigantamaxDate.isBefore(date)
+    ) {
       return;
     }
 

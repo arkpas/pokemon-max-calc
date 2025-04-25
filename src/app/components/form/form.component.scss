@@ -1,14 +1,15 @@
 .left-container {
     grid-area: left-container;
+    padding: 1em;
 }
 
-.right-container{
+.right-container {
     grid-area: right-container;
 }
 
 .container {
     display: grid;
-    grid-template-columns: 25% 75%;
+    grid-template-columns: 300px 600px;
     grid-template-rows: auto;
     grid-template-areas:
         "left-container right-container";
@@ -27,13 +28,19 @@
 
 .card {
     max-width: 400px;
-  }
-  
-  .card-footer {
-    padding: 16px;
-  }
+}
 
-  mat-header-row {
+.card-footer {
+    padding: 16px;
+}
+
+mat-header-row {
     font-weight: bold;
     background-color: #de0d8750;
-  }
+}
+
+.max-form {
+    mat-form-field {
+        width: 100%;
+    }
+}

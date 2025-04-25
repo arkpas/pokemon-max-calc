@@ -1,3 +1,5 @@
+import { Moment } from 'moment';
+
 export type Attack = {
   name: string;
   type: Type;
@@ -17,8 +19,8 @@ export type Pokemon = PokemonBaseStats & {
   pokedexNumber: string;
   primaryType: string;
   secondaryType: string;
-  isDynamax: boolean;
-  isGigantamax: boolean;
+  dynamaxDate: Moment;
+  gigantamaxDate: Moment;
   gigantamaxType: Type;
   hasHalfSecondAttack: boolean;
   fastAttacks: Attack[];

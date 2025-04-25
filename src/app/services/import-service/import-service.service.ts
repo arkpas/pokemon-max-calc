@@ -1,24 +1,25 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, defaultIfEmpty, firstValueFrom } from 'rxjs';
-import { Attack, Pokemon, Type} from '../../types/types'
+import { Attack, Pokemon, Type } from '../../types/types';
+import moment from 'moment';
 
 type DefendingTypeEffectiveness = { [k: string]: number };
 
 const HEADERS_MAPPING = {
-  name: "Name",
-  pokedexNumber: "Pokedex Nr.",
-  primaryType: "Primary type",
-  secondaryType: "Secondary type",
-  isDynamax: "Dynamax",
-  isGigantamax: "Gigantamax",
-  gigantamaxType: "Gigantamax type",
-  fastAttacks: "Fast attacks",
-  chargedAttacks: "Charged attacks",
-  atk: "Attack",
-  def: "Defense",
-  hp: "HP"
-}
+  name: 'Name',
+  pokedexNumber: 'Pokedex Nr.',
+  primaryType: 'Primary type',
+  secondaryType: 'Secondary type',
+  dynamax: 'Dynamax',
+  gigantamax: 'Gigantamax',
+  gigantamaxType: 'Gigantamax type',
+  fastAttacks: 'Fast attacks',
+  chargedAttacks: 'Charged attacks',
+  atk: 'Attack',
+  def: 'Defense',
+  hp: 'HP',
+};
 
 @Injectable({
   providedIn: 'root',
@@ -27,12 +28,15 @@ export class ImportServiceService {
   public typesMap: Map<String, DefendingTypeEffectiveness> = new Map();
   public pokemons: Pokemon[] = [];
 
-  constructor(private http: HttpClient) {
-  }
+  constructor(private http: HttpClient) {}
 
   public async initialize(): Promise<void> {
-    const typesCsv = await firstValueFrom(this.http.get("types.csv", { responseType: 'text' }));
-    const pokemonsTsv = await firstValueFrom(this.http.get("pokemons.tsv", { responseType: 'text' }));
+    const typesCsv = await firstValueFrom(
+      this.http.get('types.csv', { responseType: 'text' })
+    );
+    const pokemonsTsv = await firstValueFrom(
+      this.http.get('pokemons.tsv', { responseType: 'text' })
+    );
 
     this.typesMap = this.createTypesMap(typesCsv);
     this.pokemons = this.convertToPokemons(pokemonsTsv);
@@ -42,13 +46,22 @@ export class ImportServiceService {
   }
 
   public async getTypes() {
-    const typesCsv = await firstValueFrom(this.http.get("types.csv", { responseType: 'text' }));
+    const typesCsv = await firstValueFrom(
+      this.http.get('types.csv', { responseType: 'text' })
+    );
 
     return this.createTypesMap(typesCsv);
   }
 
   public getPokemons(): Pokemon[] {
-    return JSON.parse(JSON.stringify(this.pokemons)) as Pokemon[];
+    // Copy the pokemons and return them, so we still have "clean" version of them in service
+    const pokemons = JSON.parse(JSON.stringify(this.pokemons)) as Pokemon[];
+    pokemons.forEach((pokemon) => {
+      pokemon.gigantamaxDate = moment(pokemon.gigantamaxDate);
+      pokemon.dynamaxDate = moment(pokemon.dynamaxDate);
+    });
+
+    return pokemons;
   }
 
   /**
@@ -81,93 +94,108 @@ export class ImportServiceService {
     return map;
   }
 
-  
-/**
- * Converts pokemon data from TSV into array of objects
- *
- * @param {*} tsv
- * @returns
- */
-public convertToPokemons(tsv: string) {
-	if (!tsv) {
-		throw new Error(`Bad TSV input: ${tsv}`);
-	}
+  /**
+   * Converts pokemon data from TSV into array of objects
+   *
+   * @param {*} tsv
+   * @returns
+   */
+  public convertToPokemons(tsv: string) {
+    if (!tsv) {
+      throw new Error(`Bad TSV input: ${tsv}`);
+    }
 
-	const lines = tsv.split("\r\n");
-	const actualHeaders = lines[0].split("	");
-	const headerMap = new Map();
+    const lines = tsv.split('\r\n');
+    const actualHeaders = lines[0].split('	');
+    const headerMap = new Map();
 
-  // Validate if all needed headers are present in TSV file
-  for (let [key, value] of Object.entries(HEADERS_MAPPING)) {
-		const index = actualHeaders.indexOf(value);
+    // Validate if all needed headers are present in TSV file
+    for (let [key, value] of Object.entries(HEADERS_MAPPING)) {
+      const index = actualHeaders.indexOf(value);
 
-		if (index < 0) {
-			throw new Error(`Required header [${value}] not found in TSV file!`);
-		}
+      if (index < 0) {
+        throw new Error(`Required header [${value}] not found in TSV file!`);
+      }
 
-    headerMap.set(key, index);
-	};
+      headerMap.set(key, index);
+    }
 
-	const result : Pokemon[] = [];
+    const result: Pokemon[] = [];
 
-	for (let i = 1; i < lines.length; i++) {
-		let obj: Record<string, any> = {};
-		let currentline = lines[i].split("	");
+    for (let i = 1; i < lines.length; i++) {
+      let obj: Record<string, any> = {};
+      let currentline = lines[i].split('	');
 
-		headerMap.forEach((value, key) => {
-			obj[key] = currentline[value];
-		});
+      headerMap.forEach((value, key) => {
+        obj[key] = currentline[value];
+      });
 
-		obj['isDynamax'] = obj['isDynamax'] === "TRUE" ? true : false;
-		obj['isGigantamax'] = obj['isGigantamax'] === "TRUE" ? true : false;
-		obj['fastAttacks'] = this.convertAttacks(obj['fastAttacks']);
-		obj['chargedAttacks'] = this.convertAttacks(obj['chargedAttacks']);
-		obj['atk'] = parseInt(obj['atk']);
-		obj['def'] = parseInt(obj['def']);
-		obj['hp'] = parseInt(obj['hp']);
-		obj['hasHalfSecondAttack'] = this.hasHalfSecondAttack(obj['fastAttacks']);
-    obj['primaryType'] = Type[obj['primaryType'] as keyof typeof Type];
-    obj['secondaryType'] = Type[obj['secondaryType'] as keyof typeof Type];
+      obj['dynamaxDate'] = this.convertToDate(obj['dynamax']);
+      obj['gigantamaxDate'] = this.convertToDate(obj['gigantamax']);
+      obj['fastAttacks'] = this.convertAttacks(obj['fastAttacks']);
+      obj['chargedAttacks'] = this.convertAttacks(obj['chargedAttacks']);
+      obj['atk'] = parseInt(obj['atk']);
+      obj['def'] = parseInt(obj['def']);
+      obj['hp'] = parseInt(obj['hp']);
+      obj['hasHalfSecondAttack'] = this.hasHalfSecondAttack(obj['fastAttacks']);
+      obj['primaryType'] = Type[obj['primaryType'] as keyof typeof Type];
+      obj['secondaryType'] = Type[obj['secondaryType'] as keyof typeof Type];
 
-		result.push(obj as Pokemon);
-	}
+      result.push(obj as Pokemon);
+    }
 
-	return result;
-}
+    return result;
+  }
 
-/**
- * Convert attack string from TSV that comes in form of:
- * "Name [Type Power Duration Special] | Name2 [Type2 Power2 Duration2 Special2]"
- *
- * @param {*} attacksString string from TSV
- * @returns object with attack data
- */
-private convertAttacks(attacksString: string): Attack[] {
-	if (!attacksString) return [];
+  /**
+   * Convert attack string from TSV that comes in form of:
+   * "Name [Type Power Duration Special] | Name2 [Type2 Power2 Duration2 Special2]"
+   *
+   * @param {*} attacksString string from TSV
+   * @returns object with attack data
+   */
+  private convertAttacks(attacksString: string): Attack[] {
+    if (!attacksString) return [];
 
-	const result: Attack[] = [];
-	const attacksSplit = attacksString.split(" | ");
+    const result: Attack[] = [];
+    const attacksSplit = attacksString.split(' | ');
 
-	attacksSplit.forEach((attack) => {
-		const openBracket = attack.indexOf("[");
-		const closeBracket = attack.indexOf("]");
-		const attackStats = attack
-			.slice(openBracket + 1, closeBracket)
-			.split(" ");
+    attacksSplit.forEach((attack) => {
+      const openBracket = attack.indexOf('[');
+      const closeBracket = attack.indexOf(']');
+      const attackStats = attack
+        .slice(openBracket + 1, closeBracket)
+        .split(' ');
 
-		result.push({
-			name: attack.slice(0, openBracket - 1),
-			type: Type[attackStats[0] as keyof typeof Type],
-			power: parseInt(attackStats[1]),
-			duration: parseFloat(attackStats[2]),
-			special: attackStats.length >= 4 ? attackStats[3] : undefined,
-		});
-	});
+      result.push({
+        name: attack.slice(0, openBracket - 1),
+        type: Type[attackStats[0] as keyof typeof Type],
+        power: parseInt(attackStats[1]),
+        duration: parseFloat(attackStats[2]),
+        special: attackStats.length >= 4 ? attackStats[3] : undefined,
+      });
+    });
 
-	return result;
-}
+    return result;
+  }
 
-private hasHalfSecondAttack(attacks: Attack[]) {
-	return attacks.findIndex((attack) => attack.duration === 0.5) >= 0;
-}
+  private hasHalfSecondAttack(attacks: Attack[]) {
+    return attacks.findIndex((attack) => attack.duration === 0.5) >= 0;
+  }
+
+  private convertToDate(dateOrBool: string) {
+    if (!dateOrBool) {
+      throw new Error(
+        `Bad value, expected boolean or date, got: ${dateOrBool}}`
+      );
+    }
+
+    if (dateOrBool.toLowerCase() === 'true') {
+      return moment('01.01.1970', 'DD.MM.YYYY');
+    } else if (dateOrBool.toLocaleLowerCase() === 'false') {
+      return moment('01.01.9999', 'DD.MM.YYYY');
+    } else {
+      return moment(dateOrBool, 'DD.MM.YYYY');
+    }
+  }
 }
