@@ -1,8 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, defaultIfEmpty, firstValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { Attack, Pokemon, Type } from '../../types/types';
 import moment, { Moment } from 'moment';
+
+export type Cpm = {
+  value: number;
+  description: string;
+};
 
 type DefendingTypeEffectiveness = { [k: string]: number };
 
@@ -20,6 +25,25 @@ const HEADERS_MAPPING = {
   def: 'Defense',
   hp: 'HP',
 };
+
+export const CPMS: Cpm[] = [
+  {
+    value: 0.6,
+    description: 'T4 Dynamax',
+  },
+  {
+    value: 0.7,
+    description: 'T5 Dynamax (Legendary)',
+  },
+  {
+    value: 0.8,
+    description: 'T5 Dynamax (Raikou)',
+  },
+  {
+    value: 0.85,
+    description: 'T6 Gigantamax',
+  },
+];
 
 @Injectable({
   providedIn: 'root',
@@ -196,7 +220,7 @@ export class ImportServiceService {
     if (date.isValid()) {
       return date;
     }
-    // Otherwise check if value is "true", so we know that the pokemon had premiere 
+    // Otherwise check if value is "true", so we know that the pokemon had premiere
     // in max battles and we can set the date to some old value
     else if (dateOrBool.toLowerCase() === 'true') {
       return moment('01.01.1970', 'DD.MM.YYYY');

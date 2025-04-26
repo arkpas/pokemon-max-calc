@@ -14,11 +14,11 @@
             placeholder="Select raid boss"
             matInput
             formControlName="name"
-            [matAutocomplete]="auto"
-            (input)="filter()"
-            (focus)="filter()"
+            [matAutocomplete]="raidBossAuto"
+            (input)="filterPokemonNames()"
+            (focus)="filterPokemonNames()"
           />
-          <mat-autocomplete requireSelection #auto="matAutocomplete">
+          <mat-autocomplete requireSelection #raidBossAuto="matAutocomplete">
             @for (option of filteredPokemonOptions; track option) {
             <mat-option [value]="option">{{ option }}</mat-option>
             }
@@ -28,13 +28,15 @@
       <div>
         <mat-form-field appearance="outline">
           <mat-label>CPM</mat-label>
-          <input
-            matInput
-            placeholder="CPM"
-            id="cpm"
-            type="number"
-            formControlName="cpm"
-          />
+          <input matInput [matAutocomplete]="cpmAuto" formControlName="cpm" />
+          <mat-autocomplete #cpmAuto="matAutocomplete">
+            @for (cpm of filteredCpms | async; track cpm) {
+            <mat-option [value]="cpm.value">
+              <span>{{ cpm.value }}</span> |
+              <small>{{ cpm.description }}</small>
+            </mat-option>
+            }
+          </mat-autocomplete>
         </mat-form-field>
       </div>
       <div>

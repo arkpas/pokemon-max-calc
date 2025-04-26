@@ -1,7 +1,11 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MaxCalculatorService } from '../../services/max-calculator-service/max-calculator.service';
-import { ImportServiceService } from '../../services/import-service/import-service.service';
+import {
+  Cpm,
+  CPMS,
+  ImportServiceService,
+} from '../../services/import-service/import-service.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -19,6 +23,8 @@ import { CommonModule } from '@angular/common';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import moment from 'moment';
+import { map, startWith } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-form',
@@ -58,16 +64,25 @@ export class FormComponent {
 
   pokemonOptions: string[] = [];
   filteredPokemonOptions: string[];
+  cpms: Cpm[] = CPMS;
+  filteredCpms: Observable<Cpm[]>;
 
   constructor(
     private importService: ImportServiceService,
     private maxCalculatorService: MaxCalculatorService,
     private formBuilder: FormBuilder
   ) {
+    // Pokemon names
     this.pokemonOptions = this.importService
       .getPokemons()
       .map((pokemon) => pokemon.name);
     this.filteredPokemonOptions = this.pokemonOptions.slice();
+
+    // Cpms
+    this.filteredCpms = this.maxForm.controls.cpm.valueChanges.pipe(
+      startWith(''),
+      map((cpm) => (cpm ? this._filterCpms(cpm) : this.cpms.slice()))
+    );
   }
 
   onSubmit(): void {
@@ -126,11 +141,19 @@ export class FormComponent {
     }
   }
 
-  filter(): void {
+  filterPokemonNames(): void {
     const filterValue =
       this.raidBossNameInput.nativeElement.value.toLowerCase();
     this.filteredPokemonOptions = this.pokemonOptions.filter((o) =>
       o.toLowerCase().includes(filterValue)
+    );
+  }
+
+  private _filterCpms(value: string): Cpm[] {
+    const filterValue = value.toLowerCase();
+
+    return this.cpms.filter((cpm) =>
+      cpm.value.toString().toLowerCase().includes(filterValue)
     );
   }
 }
