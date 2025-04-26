@@ -56,7 +56,6 @@ export class FormComponent {
   tanks: TankCandidate[] = [];
   healers: HealerCandidate[] = [];
 
-  pokemons: Pokemon[] = [];
   pokemonOptions: string[] = [];
   filteredPokemonOptions: string[];
 
@@ -65,8 +64,9 @@ export class FormComponent {
     private maxCalculatorService: MaxCalculatorService,
     private formBuilder: FormBuilder
   ) {
-    this.pokemons = this.importService.getPokemons();
-    this.pokemonOptions = this.pokemons.map((pokemon) => pokemon.name);
+    this.pokemonOptions = this.importService
+      .getPokemons()
+      .map((pokemon) => pokemon.name);
     this.filteredPokemonOptions = this.pokemonOptions.slice();
   }
 
@@ -75,12 +75,11 @@ export class FormComponent {
       return;
     }
 
+    const pokemons = this.importService.getPokemons();
     // Read values
     const raidBoss = JSON.parse(
       JSON.stringify(
-        this.pokemons.find(
-          (pokemon) => pokemon.name === this.maxForm.value.name
-        )
+        pokemons.find((pokemon) => pokemon.name === this.maxForm.value.name)
       )
     ) as Pokemon;
     const bossCpm = this.maxForm.value.cpm
@@ -105,7 +104,7 @@ export class FormComponent {
       const defenseIV = 15;
       const hpIV = 15;
 
-      this.pokemons.forEach((pokemon) => {
+      pokemons.forEach((pokemon) => {
         pokemon.atk = (pokemon.atk + attackIV) * cpm;
         pokemon.def = (pokemon.def + defenseIV) * cpm;
         pokemon.hp = Math.floor((pokemon.hp + hpIV) * cpm);
@@ -117,7 +116,7 @@ export class FormComponent {
       }
 
       const result = this.maxCalculatorService.calculate(
-        this.pokemons,
+        pokemons,
         raidBoss,
         date
       );
