@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MaxCalculatorService } from '../../services/max-calculator-service/max-calculator.service';
 import { ImportServiceService } from '../../services/import-service/import-service.service';
@@ -17,6 +17,7 @@ import { MatTableModule } from '@angular/material/table';
 import { PokemonCardComponent } from '../pokemon-card/pokemon-card.component';
 import { CommonModule } from '@angular/common';
 import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import moment from 'moment';
 
 @Component({
@@ -34,10 +35,14 @@ import moment from 'moment';
     PokemonCardComponent,
     CommonModule,
     MatDatepickerModule,
+    MatAutocompleteModule,
   ],
   standalone: true,
 })
 export class FormComponent {
+  @ViewChild('raidBossNameInput')
+  raidBossNameInput!: ElementRef<HTMLInputElement>;
+
   maxForm = this.formBuilder.group({
     name: '',
     cpm: '',
@@ -51,19 +56,31 @@ export class FormComponent {
   tanks: TankCandidate[] = [];
   healers: HealerCandidate[] = [];
 
+  pokemons: Pokemon[] = [];
+  pokemonOptions: string[] = [];
+  filteredPokemonOptions: string[];
+
   constructor(
     private importService: ImportServiceService,
     private maxCalculatorService: MaxCalculatorService,
     private formBuilder: FormBuilder
-  ) {}
+  ) {
+    this.pokemons = this.importService.getPokemons();
+    this.pokemonOptions = this.pokemons.map((pokemon) => pokemon.name);
+    this.filteredPokemonOptions = this.pokemonOptions.slice();
+  }
 
   onSubmit(): void {
-    const pokemons = this.importService.getPokemons();
+    if (!this.maxForm.value.name) {
+      return;
+    }
 
     // Read values
     const raidBoss = JSON.parse(
       JSON.stringify(
-        pokemons.find((pokemon) => pokemon.name === this.maxForm.value.name)
+        this.pokemons.find(
+          (pokemon) => pokemon.name === this.maxForm.value.name
+        )
       )
     ) as Pokemon;
     const bossCpm = this.maxForm.value.cpm
@@ -88,7 +105,7 @@ export class FormComponent {
       const defenseIV = 15;
       const hpIV = 15;
 
-      pokemons.forEach((pokemon) => {
+      this.pokemons.forEach((pokemon) => {
         pokemon.atk = (pokemon.atk + attackIV) * cpm;
         pokemon.def = (pokemon.def + defenseIV) * cpm;
         pokemon.hp = Math.floor((pokemon.hp + hpIV) * cpm);
@@ -100,7 +117,7 @@ export class FormComponent {
       }
 
       const result = this.maxCalculatorService.calculate(
-        pokemons,
+        this.pokemons,
         raidBoss,
         date
       );
@@ -108,5 +125,13 @@ export class FormComponent {
       this.tanks = result.tanks;
       this.healers = result.healers;
     }
+  }
+
+  filter(): void {
+    const filterValue =
+      this.raidBossNameInput.nativeElement.value.toLowerCase();
+    this.filteredPokemonOptions = this.pokemonOptions.filter((o) =>
+      o.toLowerCase().includes(filterValue)
+    );
   }
 }

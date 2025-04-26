@@ -7,14 +7,22 @@
 
       <div>
         <mat-form-field appearance="outline">
-          <mat-label>Name</mat-label>
+          <mat-label>Raid boss</mat-label>
           <input
-            matInput
-            placeholder="Name"
-            id="name"
+            #raidBossNameInput
             type="text"
+            placeholder="Select raid boss"
+            matInput
             formControlName="name"
+            [matAutocomplete]="auto"
+            (input)="filter()"
+            (focus)="filter()"
           />
+          <mat-autocomplete requireSelection #auto="matAutocomplete">
+            @for (option of filteredPokemonOptions; track option) {
+            <mat-option [value]="option">{{ option }}</mat-option>
+            }
+          </mat-autocomplete>
         </mat-form-field>
       </div>
       <div>
