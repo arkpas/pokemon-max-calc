@@ -1,18 +1,17 @@
 .left-container {
-    grid-area: left-container;
     padding: 1em;
+    max-width: 300px;
 }
 
 .right-container {
-    grid-area: right-container;
+    padding: 1em;
+    max-width: 600px;
+    width: 100%;
 }
 
 .container {
-    display: grid;
-    grid-template-columns: 300px 600px;
-    grid-template-rows: auto;
-    grid-template-areas:
-        "left-container right-container";
+    display: flex;
+    flex-wrap: wrap;
 }
 
 :host {
