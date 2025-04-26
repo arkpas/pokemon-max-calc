@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, defaultIfEmpty, firstValueFrom } from 'rxjs';
 import { Attack, Pokemon, Type } from '../../types/types';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 
 type DefendingTypeEffectiveness = { [k: string]: number };
 
@@ -130,8 +130,8 @@ export class ImportServiceService {
         obj[key] = currentline[value];
       });
 
-      obj['dynamaxDate'] = this.convertToDate(obj['dynamax']);
-      obj['gigantamaxDate'] = this.convertToDate(obj['gigantamax']);
+      obj['dynamaxDate'] = this.convertToPremiereDate(obj['dynamax']);
+      obj['gigantamaxDate'] = this.convertToPremiereDate(obj['gigantamax']);
       obj['fastAttacks'] = this.convertAttacks(obj['fastAttacks']);
       obj['chargedAttacks'] = this.convertAttacks(obj['chargedAttacks']);
       obj['atk'] = parseInt(obj['atk']);
@@ -183,19 +183,28 @@ export class ImportServiceService {
     return attacks.findIndex((attack) => attack.duration === 0.5) >= 0;
   }
 
-  private convertToDate(dateOrBool: string) {
+  private convertToPremiereDate(dateOrBool: string): Moment {
     if (!dateOrBool) {
       throw new Error(
         `Bad value, expected boolean or date, got: ${dateOrBool}}`
       );
     }
 
-    if (dateOrBool.toLowerCase() === 'true') {
+    const date = moment(dateOrBool, 'DD.MM.YYYY');
+
+    // If the field had actual date, we take it and return as premiere date
+    if (date.isValid()) {
+      return date;
+    }
+    // Otherwise check if value is "true", so we know that the pokemon had premiere 
+    // in max battles and we can set the date to some old value
+    else if (dateOrBool.toLowerCase() === 'true') {
       return moment('01.01.1970', 'DD.MM.YYYY');
-    } else if (dateOrBool.toLocaleLowerCase() === 'false') {
+    }
+    // If nothing above works, assume the pokemon did not have premiere in max battles yet
+    // and set the date to far future
+    else {
       return moment('01.01.9999', 'DD.MM.YYYY');
-    } else {
-      return moment(dateOrBool, 'DD.MM.YYYY');
     }
   }
 }
