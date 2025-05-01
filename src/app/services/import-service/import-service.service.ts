@@ -195,7 +195,8 @@ export class ImportServiceService {
         name: attack.slice(0, openBracket - 1),
         type: Type[attackStats[0] as keyof typeof Type],
         power: parseInt(attackStats[1]),
-        duration: parseFloat(attackStats[2]),
+        energy: parseInt(attackStats[2]),
+        duration: parseFloat(attackStats[3]),
         special: attackStats.length >= 4 ? attackStats[3] : undefined,
       });
     });

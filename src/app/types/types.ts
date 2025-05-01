@@ -4,6 +4,7 @@ export type Attack = {
   name: string;
   type: Type;
   power: number;
+  energy: number;
   duration: number;
   special: string | undefined;
 };
