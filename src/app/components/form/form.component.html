@@ -91,13 +91,13 @@
             <!-- Move Column -->
             <ng-container matColumnDef="move">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Move</th>
-              <td mat-cell *matCellDef="let row">{{ row.move }}</td>
+              <td mat-cell *matCellDef="let row">{{ row.move.name }}</td>
             </ng-container>
 
             <!-- Power Column -->
             <ng-container matColumnDef="power">
               <th mat-header-cell *matHeaderCellDef mat-sort-header>Power</th>
-              <td mat-cell *matCellDef="let row">{{ row.power }}</td>
+              <td mat-cell *matCellDef="let row">{{ row.move.power }}</td>
             </ng-container>
 
             <!-- Damage Column -->

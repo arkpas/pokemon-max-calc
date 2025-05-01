@@ -52,14 +52,32 @@ export enum Type {
 export type DamageConfiguration = {
   attacker: PokemonBaseStats;
   defender: PokemonBaseStats;
-  power: number;
-  move: string;
-  moveType: string;
+  move: Attack;
   typeEffectiveness: number;
   stab: number;
   damage: number;
   damagePercentage: number;
   unhealedDamagePercentage: number;
+  maxEnergy: number;
+  dphs: number;
+  mephs: number;
+};
+
+export type ComboDamageConfiguration = {
+  pokemon: string;
+  faName: string;
+  faDmg: number;
+  faMaxEnergy: number;
+  faCount: number;
+  caName: string;
+  caDmg: number;
+  caMaxEnergy: number;
+  caCount: number;
+  totalMaxEnergy: number;
+  totalDmg: number;
+  totalDuration: number;
+  dphs: number;
+  mephs: number;
 };
 
 export type DamageDetails = {
