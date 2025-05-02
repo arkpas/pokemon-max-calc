@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "pokemon-max-calc-frontend": {
+    "pokemon-max-calc": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/pokemon-max-calc-frontend",
+            "outputPath": "dist/pokemon-max-calc",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": ["zone.js"],
@@ -60,10 +60,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "pokemon-max-calc-frontend:build:production"
+              "buildTarget": "pokemon-max-calc:build:production"
             },
             "development": {
-              "buildTarget": "pokemon-max-calc-frontend:build:development"
+              "buildTarget": "pokemon-max-calc:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -90,7 +90,7 @@
         "deploy": {
           "builder": "angular-cli-ghpages:deploy",
           "options": {
-            "buildTarget": "pokemon-max-calc-frontend:build:production"
+            "buildTarget": "pokemon-max-calc:build:production"
           }
         }
       }
