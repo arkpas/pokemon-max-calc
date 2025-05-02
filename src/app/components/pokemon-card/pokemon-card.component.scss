@@ -1,0 +1,308 @@
+.pokemon-card {
+    width: 520px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+    line-height: 1.4;
+    position: relative; // Umożliwia pozycjonowanie pseudoelementu
+    border-radius: 12px; // Zaokrąglenie rogów karty
+    margin: 10px 5px;
+    color: black;
+
+    // Pseudoelement na ramkę
+    &.single-type::before {
+        content: '';
+        position: absolute;
+        top: -3px;
+        bottom: -3px;
+        left: -3px;
+        right: -3px;
+        background-color: var(--primary-type-color);
+        border-radius: 12px; // Zaokrąglenie rogów ramki
+        z-index: -1; // Umieszczamy pseudoelement pod główną kartą
+    }
+
+    // Pseudoelement na gradientową ramkę
+    &.dual-type::before {
+        content: '';
+        position: absolute;
+        top: -3px;
+        bottom: -3px;
+        left: -3px;
+        right: -3px;
+        background: linear-gradient(90deg, var(--primary-type-color), var(--secondary-type-color));
+        border-radius: 12px; // Zaokrąglenie rogów ramki
+        z-index: -1; // Umieszczamy pseudoelement pod główną kartą
+    }
+
+    .header-inline {
+        display: flex;
+        align-items: center;
+        gap: 0px 10px;
+        font-size: 15px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 4px;
+        background-color: #FFFFFF50;
+        border-radius: 12px;
+        padding: 5px;
+
+        .sprite {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .name {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .header-stats {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 0px 6px;
+
+            .stat {
+                display: flex;
+                align-items: center;
+
+                strong {
+                    margin-left: 4px;
+                    font-weight: 600;
+                }
+            }
+        }
+
+        .icon-button {
+            background-color: rgba(0, 0, 0, 0.04);
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.1);
+            }
+
+            &:focus {
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.3);
+            }
+        }
+    }
+
+    .damage-section {
+        h3 {
+            font-size: 14px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .damage-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            .damage-summary {
+                display: grid;
+                grid-template-columns: 150px 50px 75px 45px 120px;
+                gap: 8px;
+                align-items: center;
+                padding: 4px 8px;
+                font-size: 0.9rem;
+                background-color: rgb(239, 239, 239, 0.75);
+                border-radius: 4px;
+
+                .col {
+                    font-size: 14px;
+                    font-weight: bold;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    text-align: left;
+
+                    &.damage-stats {
+                        font-weight: 500;
+                    }
+                }
+
+                .attack-name {
+                    text-align: center;
+                    font-weight: bolder;
+                    padding: 2px 8px;
+                    border-radius: 4px;
+                    color: #fff;
+                    max-width: 150px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+    }
+
+    .type-badge {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 10px;
+        font-weight: 600;
+        color: white;
+        text-transform: uppercase;
+    }
+
+    // Kolory typów – używane tylko do nazwy ataku
+    .type-bg.bug {
+        background-color: #92c92b;
+    }
+
+    .type-bg.dark {
+        background-color: #575467;
+    }
+
+    .type-bg.dragon {
+        background-color: #0566bc;
+    }
+
+    .type-bg.electric {
+        background-color: #ffce3e;
+    }
+
+    .type-bg.fairy {
+        background-color: #eb8ee2;
+    }
+
+    .type-bg.fighting {
+        background-color: #d23c50;
+    }
+
+    .type-bg.fire {
+        background-color: #f09516;
+    }
+
+    .type-bg.flying {
+        background-color: #90aadc;
+    }
+
+    .type-bg.ghost {
+        background-color: #776bb6;
+    }
+
+    .type-bg.grass {
+        background-color: #35ab5d;
+    }
+
+    .type-bg.ground {
+        background-color: #d97845;
+    }
+
+    .type-bg.ice {
+        background-color: #96d9d6;
+    }
+
+    .type-bg.normal {
+        background-color: #9d9fa0;
+    }
+
+    .type-bg.poison {
+        background-color: #d24fbb;
+    }
+
+    .type-bg.psychic {
+        background-color: #f76e73;
+    }
+
+    .type-bg.rock {
+        background-color: #cdba6c;
+    }
+
+    .type-bg.steel {
+        background-color: #538b9f;
+    }
+
+    .type-bg.water {
+        background-color: #5092d5;
+    }
+}
+
+@media (max-width: 600px) {
+    .pokemon-card {
+        width: 400px;
+
+        .header-inline {
+            flex-wrap: wrap;
+        }
+
+        .damage-section {
+            .damage-list {
+                .damage-summary {
+                    grid-template-columns: 150px 50px 120px;
+
+                    .col {
+                        display: none;
+
+                        &.damage-stats,
+                        &.power {
+                            display: block;
+                        }
+                    }
+
+                    .attack-name {
+                        display: block;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 479px) {
+    .pokemon-card {
+        width: 300px;
+
+        .header-inline {
+            .header-stats {
+                .stat {
+
+                    &.atk,
+                    &.def,
+                    &.hp {
+                        display: none;
+                    }
+                }
+            }
+        }
+
+        .damage-section {
+            .damage-list {
+                .damage-summary {
+                    grid-template-columns: 110px 120px;
+
+                    .col {
+                        &.power {
+                            display: none;
+                        }
+                    }
+
+                    .attack-name {
+                        max-width: 100px;
+                        text-wrap: wrap;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 379px) {
+    .pokemon-card {
+        width: 250px;
+        padding: 12px 6px;
+    }
+}

@@ -1,0 +1,92 @@
+<div
+  class="pokemon-card"
+  [ngClass]="{ 'single-type': !secondaryType, 'dual-type': !!secondaryType }"
+  [ngStyle]="{
+    '--primary-type-color': getTypeColor(primaryType),
+    '--secondary-type-color': getTypeColor(secondaryType)
+  }"
+>
+  <div class="header-inline">
+    <img class="sprite" [src]="imageUrl" alt="sprite" />
+    <h2 class="name">{{ name }}</h2>
+
+    <div class="header-stats">
+      <div
+        *ngIf="avgDamage"
+        class="stat"
+        title="Średnie obrażenia (bazowe + procentowe)"
+      >
+        💥
+        <strong
+          >{{ avgDamage.toFixed(1) }} ({{
+            avgDamagePercentage.toFixed(1)
+          }}%)</strong
+        >
+      </div>
+
+      <div *ngIf="heal" class="stat" title="Leczenie (3x Max Heal)">
+        🩹 <strong>{{ heal.toFixed(0) }}</strong>
+      </div>
+
+      <div
+        *ngIf="unhealedDamagePercentage != undefined"
+        class="stat"
+        title="Ile procentowo obrażeń nie będzie w stanie wyleczyć przeciwko wszystkim atakom bossa"
+      >
+        🩸 <strong>{{ unhealedDamagePercentage.toFixed(2) }}</strong>
+      </div>
+
+      <div *ngIf="hp" class="stat hp" title="Punkty życia (HP)">
+        ❤️ <strong>{{ hp }}</strong>
+      </div>
+
+      <div *ngIf="atk" class="stat atk" title="Atak fizyczny (ATK)">
+        ⚔️ <strong>{{ atk }}</strong>
+      </div>
+
+      <div *ngIf="def" class="stat def" title="Obrona fizyczna (DEF)">
+        🛡️ <strong>{{ def.toFixed(0) }}</strong>
+      </div>
+
+      <div class="damage-toggle" style="margin-left: auto">
+        <button
+          (click)="toggleDetails()"
+          class="icon-button"
+          title="Pokaż/ukryj szczegóły obrażeń"
+        >
+          {{ showDetails ? "🚫" : "👁️" }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="damage-section" *ngIf="showDetails">
+    <div class="damage-list">
+      <details *ngFor="let entry of damageDetails" class="damage-row">
+        <summary class="damage-summary">
+          <span
+            class="col attack-name type-bg {{ entry.moveType.toLowerCase() }}"
+          >
+            {{ entry.move }}
+          </span>
+          <span class="col power"
+            >⚡ <strong>{{ entry.power }}</strong></span
+          >
+          <span class="col typeEffectiveness"
+            >🎯 {{ (entry.typeEffectiveness * 100).toFixed(1) }}%
+          </span>
+          <span class="col stab">🧬 {{ entry.stab }}</span>
+          <span
+            class="col damage-stats"
+            [ngStyle]="{
+              color: getDamagePercentageColor(entry.damagePercentage)
+            }"
+            >💥 {{ entry.damage.toFixed(1) }} (<strong
+              >{{ entry.damagePercentage.toFixed(1) }}%</strong
+            >)</span
+          >
+        </summary>
+      </details>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,56 @@
+.left-container {
+    padding: 1em;
+    max-width: 300px;
+}
+
+.right-container {
+    padding: 1em;
+    max-width: 600px;
+    width: 100%;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+:host {
+    margin: 1em;
+    display: block;
+}
+
+.title {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.card {
+    max-width: 400px;
+}
+
+.card-footer {
+    padding: 16px;
+}
+
+mat-header-row {
+    font-weight: bold;
+    background-color: #de0d8750;
+}
+
+.max-form {
+    mat-form-field {
+        width: 100%;
+    }
+}
+
+.pokemon-cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    .pokemon-card {
+        margin: 0px 10px;
+    }
+}
