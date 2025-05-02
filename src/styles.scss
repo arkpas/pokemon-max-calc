@@ -2,9 +2,10 @@
 
 html {
   color-scheme: light dark;
-  @include mat.theme((
-    color: mat.$violet-palette,
-  ));
+  font-family: "Roboto", sans-serif;
+  font-optical-sizing: auto;
+  @include mat.theme((color: mat.$violet-palette,
+    ));
 }
 
 *,
