@@ -4,11 +4,6 @@ import { firstValueFrom } from 'rxjs';
 import { Attack, Pokemon, Type } from '../../types/types';
 import moment, { Moment } from 'moment';
 
-export type Cpm = {
-  value: number;
-  description: string;
-};
-
 type DefendingTypeEffectiveness = { [k: string]: number };
 
 const HEADERS_MAPPING = {
@@ -25,25 +20,6 @@ const HEADERS_MAPPING = {
   def: 'Defense',
   hp: 'HP',
 };
-
-export const CPMS: Cpm[] = [
-  {
-    value: 0.6,
-    description: 'T4 Dynamax',
-  },
-  {
-    value: 0.7,
-    description: 'T5 Dynamax (Legendary)',
-  },
-  {
-    value: 0.8,
-    description: 'T5 Dynamax (Raikou)',
-  },
-  {
-    value: 0.85,
-    description: 'T6 Gigantamax',
-  },
-];
 
 @Injectable({
   providedIn: 'root',

@@ -2,8 +2,6 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MaxCalculatorService } from '../../services/max-calculator-service/max-calculator.service';
 import {
-  Cpm,
-  CPMS,
   ImportServiceService,
 } from '../../services/import-service/import-service.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -25,6 +23,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import moment from 'moment';
 import { map, startWith } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { Cpm, CPMS, POKEMON_CPMS } from '../../constants/cpm.constants';
 
 @Component({
   selector: 'app-form',
@@ -52,6 +51,7 @@ export class FormComponent {
   maxForm = this.formBuilder.group({
     name: '',
     cpm: '',
+    pokemonCpm: '',
     atkMod: '',
     defMod: '',
     date: '',
@@ -66,6 +66,8 @@ export class FormComponent {
   filteredPokemonOptions: string[];
   cpms: Cpm[] = CPMS;
   filteredCpms: Observable<Cpm[]>;
+  pokemonCpms: Cpm[] = POKEMON_CPMS;
+  filteredPokemonCpms: Observable<Cpm[]>;
 
   constructor(
     private importService: ImportServiceService,
@@ -83,6 +85,13 @@ export class FormComponent {
       startWith(''),
       map((cpm) => (cpm ? this._filterCpms(cpm) : this.cpms.slice()))
     );
+
+    // Pokemon Cpms
+    this.filteredPokemonCpms =
+      this.maxForm.controls.pokemonCpm.valueChanges.pipe(
+        startWith(''),
+        map((cpm) => (cpm ? this._filterPokemonCpms(cpm) : this.pokemonCpms.slice()))
+      );
   }
 
   onSubmit(): void {
@@ -114,15 +123,17 @@ export class FormComponent {
       raidBoss.atk = (raidBoss.atk + bossAttackIV) * bossCpm * bossAtkMod;
       raidBoss.def = (raidBoss.def + bossDefenseIV) * bossCpm * bossDefMod;
 
-      const cpm = 0.7903;
+      const pokemonCpm = this.maxForm.value.pokemonCpm
+        ? parseFloat(this.maxForm.value.pokemonCpm)
+        : 0.7903;
       const attackIV = 15;
       const defenseIV = 15;
       const hpIV = 15;
 
       pokemons.forEach((pokemon) => {
-        pokemon.atk = (pokemon.atk + attackIV) * cpm;
-        pokemon.def = (pokemon.def + defenseIV) * cpm;
-        pokemon.hp = Math.floor((pokemon.hp + hpIV) * cpm);
+        pokemon.atk = (pokemon.atk + attackIV) * pokemonCpm;
+        pokemon.def = (pokemon.def + defenseIV) * pokemonCpm;
+        pokemon.hp = Math.floor((pokemon.hp + hpIV) * pokemonCpm);
       });
 
       let date = moment(this.maxForm.value.date);
@@ -153,6 +164,14 @@ export class FormComponent {
     const filterValue = value.toLowerCase();
 
     return this.cpms.filter((cpm) =>
+      cpm.value.toString().toLowerCase().includes(filterValue)
+    );
+  }
+
+  private _filterPokemonCpms(value: string): Cpm[] {
+    const filterValue = value.toLowerCase();
+
+    return this.pokemonCpms.filter((cpm) =>
       cpm.value.toString().toLowerCase().includes(filterValue)
     );
   }

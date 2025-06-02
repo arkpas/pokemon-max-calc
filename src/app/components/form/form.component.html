@@ -74,6 +74,20 @@
           <mat-datepicker #picker></mat-datepicker>
         </mat-form-field>
       </div>
+      <div>
+        <mat-form-field appearance="outline">
+          <mat-label>Pokemon LVL</mat-label>
+          <input matInput [matAutocomplete]="pokemonCpmAuto" formControlName="pokemonCpm" />
+          <mat-autocomplete #pokemonCpmAuto="matAutocomplete">
+            @for (pokemonCpm of filteredPokemonCpms | async; track pokemonCpms) {
+            <mat-option [value]="pokemonCpm.value">
+              <span>{{ pokemonCpm.value }}</span> |
+              <small>{{ pokemonCpm.description }}</small>
+            </mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
       <button mat-flat-button type="submit">Calculate</button>
     </form>
   </div>
