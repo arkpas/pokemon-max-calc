@@ -37,11 +37,15 @@ export const CPMS: Cpm[] = [
   },
   {
     value: 0.72,
-    description: 'T6 Gigantamax (Machamp)',
+    description: 'T6 Gigantamax (Machamp, Cinderace)',
   },
   {
     value: 0.765,
     description: 'T6 Gigantamax (Tox, Gengar, Kingler, Lapras, Snorlax)',
+  },
+    {
+    value: 0.81,
+    description: 'T6 Gigantamax (Inteleon)',
   },
   {
     value: 0.85,
