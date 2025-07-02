@@ -1,20 +1,20 @@
 import { Moment } from 'moment';
 
-export type Attack = {
+export interface Attack {
   name: string;
   type: Type;
   power: number;
   energy: number;
   duration: number;
   special: string | undefined;
-};
+}
 
-export type PokemonBaseStats = {
+export interface PokemonBaseStats {
   name: string;
   atk: number;
   def: number;
   hp: number;
-};
+}
 
 export type Pokemon = PokemonBaseStats & {
   pokedexNumber: string;
@@ -49,7 +49,7 @@ export enum Type {
   Fairy = 'Fairy',
 }
 
-export type DamageConfiguration = {
+export interface DamageConfiguration {
   attacker: PokemonBaseStats;
   defender: PokemonBaseStats;
   move: Attack;
@@ -61,9 +61,9 @@ export type DamageConfiguration = {
   maxEnergy: number;
   dphs: number;
   mephs: number;
-};
+}
 
-export type ComboDamageConfiguration = {
+export interface ComboDamageConfiguration {
   pokemon: string;
   faName: string;
   faDmg: number;
@@ -78,9 +78,9 @@ export type ComboDamageConfiguration = {
   totalDuration: number;
   dphs: number;
   mephs: number;
-};
+}
 
-export type DamageDetails = {
+export interface DamageDetails {
   power: number;
   move: string;
   moveType: Type;
@@ -88,9 +88,9 @@ export type DamageDetails = {
   stab: number;
   damage: number;
   damagePercentage: number;
-};
+}
 
-export type Candidate = {
+export interface Candidate {
   name: string;
   pokedexNumber: string;
   primaryType: Type;
@@ -100,7 +100,7 @@ export type Candidate = {
   attacker: PokemonBaseStats;
 
   damageDetails: DamageDetails[];
-};
+}
 
 export type TankCandidate = Candidate & {
   avgDamage: number;

@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { Attack, Pokemon, Type } from '../../types/types';
 import moment, { Moment } from 'moment';
 
-type DefendingTypeEffectiveness = { [k: string]: number };
+type DefendingTypeEffectiveness = Record<string, number>;
 
 const HEADERS_MAPPING = {
   name: 'Name',
@@ -25,18 +25,14 @@ const HEADERS_MAPPING = {
   providedIn: 'root',
 })
 export class ImportServiceService {
-  public typesMap: Map<String, DefendingTypeEffectiveness> = new Map();
+  private http = inject(HttpClient);
+
+  public typesMap = new Map<string, DefendingTypeEffectiveness>();
   public pokemons: Pokemon[] = [];
 
-  constructor(private http: HttpClient) {}
-
   public async initialize(): Promise<void> {
-    const typesCsv = await firstValueFrom(
-      this.http.get('types.csv', { responseType: 'text' })
-    );
-    const pokemonsTsv = await firstValueFrom(
-      this.http.get('pokemons.tsv', { responseType: 'text' })
-    );
+    const typesCsv = await firstValueFrom(this.http.get('types.csv', { responseType: 'text' }));
+    const pokemonsTsv = await firstValueFrom(this.http.get('pokemons.tsv', { responseType: 'text' }));
 
     this.typesMap = this.createTypesMap(typesCsv);
     this.pokemons = this.convertToPokemons(pokemonsTsv);
@@ -46,9 +42,7 @@ export class ImportServiceService {
   }
 
   public async getTypes() {
-    const typesCsv = await firstValueFrom(
-      this.http.get('types.csv', { responseType: 'text' })
-    );
+    const typesCsv = await firstValueFrom(this.http.get('types.csv', { responseType: 'text' }));
 
     return this.createTypesMap(typesCsv);
   }
@@ -56,7 +50,7 @@ export class ImportServiceService {
   public getPokemons(): Pokemon[] {
     // Copy the pokemons and return them, so we still have "clean" version of them in service
     const pokemons = JSON.parse(JSON.stringify(this.pokemons)) as Pokemon[];
-    pokemons.forEach((pokemon) => {
+    pokemons.forEach(pokemon => {
       pokemon.gigantamaxDate = moment(pokemon.gigantamaxDate);
       pokemon.dynamaxDate = moment(pokemon.dynamaxDate);
     });
@@ -69,16 +63,16 @@ export class ImportServiceService {
    * @param csv csv in string form
    * @returns map with type effectiveness, where key is attacking type and values are defending types along with the effectiveness value
    */
-  public createTypesMap(csv: string): Map<String, DefendingTypeEffectiveness> {
+  public createTypesMap(csv: string): Map<string, DefendingTypeEffectiveness> {
     const lines = csv.split('\n');
-    const map = new Map<String, DefendingTypeEffectiveness>();
+    const map = new Map<string, DefendingTypeEffectiveness>();
     const headers = lines[0].split(',');
 
     // Go through the lines skipping header
     for (let i = 1; i < lines.length; i++) {
       // Define type effectiveness object in form of: { Water: 1.6 }
-      let obj: DefendingTypeEffectiveness = {};
-      let currentline = lines[i].split(',');
+      const obj: DefendingTypeEffectiveness = {};
+      const currentline = lines[i].split(',');
 
       for (let j = 1; j < headers.length; j++) {
         // Put all type effectiveness into object
@@ -110,7 +104,7 @@ export class ImportServiceService {
     const headerMap = new Map();
 
     // Validate if all needed headers are present in TSV file
-    for (let [key, value] of Object.entries(HEADERS_MAPPING)) {
+    for (const [key, value] of Object.entries(HEADERS_MAPPING)) {
       const index = actualHeaders.indexOf(value);
 
       if (index < 0) {
@@ -123,8 +117,8 @@ export class ImportServiceService {
     const result: Pokemon[] = [];
 
     for (let i = 1; i < lines.length; i++) {
-      let obj: Record<string, any> = {};
-      let currentline = lines[i].split('	');
+      const obj: Record<string, any> = {};
+      const currentline = lines[i].split('	');
 
       headerMap.forEach((value, key) => {
         obj[key] = currentline[value];
@@ -160,12 +154,10 @@ export class ImportServiceService {
     const result: Attack[] = [];
     const attacksSplit = attacksString.split(' | ');
 
-    attacksSplit.forEach((attack) => {
+    attacksSplit.forEach(attack => {
       const openBracket = attack.indexOf('[');
       const closeBracket = attack.indexOf(']');
-      const attackStats = attack
-        .slice(openBracket + 1, closeBracket)
-        .split(' ');
+      const attackStats = attack.slice(openBracket + 1, closeBracket).split(' ');
 
       result.push({
         name: attack.slice(0, openBracket - 1),
@@ -181,14 +173,12 @@ export class ImportServiceService {
   }
 
   private hasHalfSecondAttack(attacks: Attack[]) {
-    return attacks.findIndex((attack) => attack.duration === 0.5) >= 0;
+    return attacks.findIndex(attack => attack.duration === 0.5) >= 0;
   }
 
   private convertToPremiereDate(dateOrBool: string): Moment {
     if (!dateOrBool) {
-      throw new Error(
-        `Bad value, expected boolean or date, got: ${dateOrBool}}`
-      );
+      throw new Error(`Bad value, expected boolean or date, got: ${dateOrBool}}`);
     }
 
     const date = moment(dateOrBool, 'DD.MM.YYYY');

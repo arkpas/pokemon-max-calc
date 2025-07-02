@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   Pokemon,
   PokemonBaseStats,
@@ -18,7 +18,7 @@ const TURN_DURATION = 0.5;
   providedIn: 'root',
 })
 export class MaxCalculatorService {
-  constructor(private importService: ImportServiceService) {}
+  private importService = inject(ImportServiceService);
 
   public calculate(pokemons: Pokemon[], boss: Pokemon, date: Moment) {
     const attackers: DamageConfiguration[] = [];
@@ -26,19 +26,14 @@ export class MaxCalculatorService {
     const healers: HealerCandidate[] = [];
     const onFielders: ComboDamageConfiguration[] = [];
 
-    pokemons.forEach((pokemon) => {
+    pokemons.forEach(pokemon => {
       // On fielders
-      const onFieldDamageConfigurations =
-        this.createOnFieldDamageConfigurations(pokemon, boss, date);
+      const onFieldDamageConfigurations = this.createOnFieldDamageConfigurations(pokemon, boss, date);
 
       onFielders.push(...onFieldDamageConfigurations);
 
       // Attackers
-      const pokemonDamageConfigurations = this.createDamageConfigurations(
-        pokemon,
-        boss,
-        date
-      );
+      const pokemonDamageConfigurations = this.createDamageConfigurations(pokemon, boss, date);
       attackers.push(...pokemonDamageConfigurations);
 
       // Tanks
@@ -72,16 +67,9 @@ export class MaxCalculatorService {
     return result;
   }
 
-  private createOnFieldDamageConfigurations(
-    pokemon: Pokemon,
-    boss: Pokemon,
-    date: Moment
-  ): ComboDamageConfiguration[] {
+  private createOnFieldDamageConfigurations(pokemon: Pokemon, boss: Pokemon, date: Moment): ComboDamageConfiguration[] {
     // No DMax or GMax = we can't use this pokemon yet
-    if (
-      !pokemon.dynamaxDate.isBefore(date) &&
-      !pokemon.gigantamaxDate.isBefore(date)
-    ) {
+    if (!pokemon.dynamaxDate.isBefore(date) && !pokemon.gigantamaxDate.isBefore(date)) {
       return [];
     }
 
@@ -90,58 +78,48 @@ export class MaxCalculatorService {
     const attackerBaseStats = this.getPokemonBaseStats(pokemon);
     const defenderBaseStats = this.getPokemonBaseStats(boss);
 
-    pokemon.fastAttacks.forEach((fastAttack) => {
+    pokemon.fastAttacks.forEach(fastAttack => {
       const damageConfiguration = {
         attacker: attackerBaseStats,
         defender: defenderBaseStats,
         move: fastAttack,
-        typeEffectiveness: this.calculateTypeEffectiveness(
-          fastAttack.type,
-          boss
-        ),
+        typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, boss),
         stab: this.calculateStab(fastAttack.type, pokemon),
       } as DamageConfiguration;
 
       faDamageConfigurations.push(damageConfiguration);
     });
 
-    pokemon.chargedAttacks.forEach((chargedAttack) => {
+    pokemon.chargedAttacks.forEach(chargedAttack => {
       const damageConfiguration = {
         attacker: attackerBaseStats,
         defender: defenderBaseStats,
         move: chargedAttack,
-        typeEffectiveness: this.calculateTypeEffectiveness(
-          chargedAttack.type,
-          boss
-        ),
+        typeEffectiveness: this.calculateTypeEffectiveness(chargedAttack.type, boss),
         stab: this.calculateStab(chargedAttack.type, pokemon),
       } as DamageConfiguration;
 
       caDamageConfigurations.push(damageConfiguration);
     });
 
-    faDamageConfigurations.forEach((damageConfiguration) => {
+    faDamageConfigurations.forEach(damageConfiguration => {
       this.calculateDamageConfiguration(damageConfiguration);
     });
 
-    caDamageConfigurations.forEach((damageConfiguration) => {
+    caDamageConfigurations.forEach(damageConfiguration => {
       this.calculateDamageConfiguration(damageConfiguration);
     });
 
     const comboDamageConfigurations: ComboDamageConfiguration[] = [];
 
-    faDamageConfigurations.forEach((faDamageConfiguration) => {
-      caDamageConfigurations.forEach((caDamageConfiguration) => {
-        const comboDamageConfiguration = this.calculateComboDamageConfiguration(
-          faDamageConfiguration,
-          caDamageConfiguration
-        );
+    faDamageConfigurations.forEach(faDamageConfiguration => {
+      caDamageConfigurations.forEach(caDamageConfiguration => {
+        const comboDamageConfiguration = this.calculateComboDamageConfiguration(faDamageConfiguration, caDamageConfiguration);
 
         comboDamageConfigurations.push(comboDamageConfiguration);
       });
 
-      const faOnlyComboDamageConfiguration =
-        this.calculateComboDamageConfiguration(faDamageConfiguration);
+      const faOnlyComboDamageConfiguration = this.calculateComboDamageConfiguration(faDamageConfiguration);
       comboDamageConfigurations.push(faOnlyComboDamageConfiguration);
     });
 
@@ -150,20 +128,15 @@ export class MaxCalculatorService {
     return comboDamageConfigurations;
   }
 
-  private calculateDamageConfiguration(
-    damageConfiguration: DamageConfiguration
-  ) {
+  private calculateDamageConfiguration(damageConfiguration: DamageConfiguration) {
     damageConfiguration.damage = this.calculateDamage(damageConfiguration);
     // Damage per half a second (dphs)
-    damageConfiguration.dphs =
-      damageConfiguration.damage /
-      (damageConfiguration.move.duration / TURN_DURATION);
+    damageConfiguration.dphs = damageConfiguration.damage / (damageConfiguration.move.duration / TURN_DURATION);
 
     // Energy per half a second (ephs)
     // Each 0.5% HP of boss damage you deal is 1 Max Energy
     // First we calculate how much percent of damage we do
-    const damagePercentage =
-      (damageConfiguration.damage / damageConfiguration.defender.hp) * 100;
+    const damagePercentage = (damageConfiguration.damage / damageConfiguration.defender.hp) * 100;
     // Then we multiply it by 2 to get amount of energy: 0.5%HP * 2 = 1 energy, 1%HP * 2 = 2 energy etc.
     // and we cut off the decimal place digits by using `Math.floor()`
     const maxEnergyCalculated = Math.floor(damagePercentage * 2);
@@ -171,9 +144,7 @@ export class MaxCalculatorService {
     // because you can never generate less than 1 energy per attack
     damageConfiguration.maxEnergy = Math.max(maxEnergyCalculated, 1);
     // And now divide it by duration of the move
-    damageConfiguration.mephs =
-      damageConfiguration.maxEnergy /
-      (damageConfiguration.move.duration / TURN_DURATION);
+    damageConfiguration.mephs = damageConfiguration.maxEnergy / (damageConfiguration.move.duration / TURN_DURATION);
   }
 
   private calculateComboDamageConfiguration(
@@ -201,22 +172,13 @@ export class MaxCalculatorService {
     }
 
     // First we need to find out how many FAs and CAs we should do to finish with 0 energy (full energy cycle)
-    const comboCycleEnergy = this.lcm(
-      faDamageConfiguration.move.energy,
-      caDamageConfiguration.move.energy
-    );
+    const comboCycleEnergy = this.lcm(faDamageConfiguration.move.energy, caDamageConfiguration.move.energy);
     const faCount = comboCycleEnergy / faDamageConfiguration.move.energy;
     const caCount = comboCycleEnergy / caDamageConfiguration.move.energy;
 
-    const totalMaxEnergy =
-      faCount * faDamageConfiguration.maxEnergy +
-      caCount * caDamageConfiguration.maxEnergy;
-    const totalDamage =
-      faCount * faDamageConfiguration.damage +
-      caCount * caDamageConfiguration.damage;
-    const totalDuration =
-      faCount * faDamageConfiguration.move.duration +
-      caCount * caDamageConfiguration.move.duration;
+    const totalMaxEnergy = faCount * faDamageConfiguration.maxEnergy + caCount * caDamageConfiguration.maxEnergy;
+    const totalDamage = faCount * faDamageConfiguration.damage + caCount * caDamageConfiguration.damage;
+    const totalDuration = faCount * faDamageConfiguration.move.duration + caCount * caDamageConfiguration.move.duration;
     const totalTurns = totalDuration / TURN_DURATION;
     const mephs = totalMaxEnergy / totalTurns;
     const dphs = totalDamage / totalTurns;
@@ -257,10 +219,7 @@ export class MaxCalculatorService {
     return (a * b) / this.gcd(a, b);
   }
 
-  private sortComboDamageConfigurations(
-    a: ComboDamageConfiguration,
-    b: ComboDamageConfiguration
-  ) {
+  private sortComboDamageConfigurations(a: ComboDamageConfiguration, b: ComboDamageConfiguration) {
     const mephsCompare = b.mephs - a.mephs;
     // const mephsCompare = 0;
 
@@ -271,11 +230,7 @@ export class MaxCalculatorService {
     return mephsCompare;
   }
 
-  private createDamageConfigurations(
-    pokemon: Pokemon,
-    boss: Pokemon,
-    date: Moment
-  ) {
+  private createDamageConfigurations(pokemon: Pokemon, boss: Pokemon, date: Moment) {
     const damageConfigurations: DamageConfiguration[] = [];
     const attackerBaseStats = this.getPokemonBaseStats(pokemon);
     const defenderBaseStats = this.getPokemonBaseStats(boss);
@@ -291,10 +246,7 @@ export class MaxCalculatorService {
           energy: 0,
           duration: 0,
         },
-        typeEffectiveness: this.calculateTypeEffectiveness(
-          pokemon.gigantamaxType,
-          boss
-        ),
+        typeEffectiveness: this.calculateTypeEffectiveness(pokemon.gigantamaxType, boss),
         stab: this.calculateStab(pokemon.gigantamaxType, pokemon),
       } as DamageConfiguration;
 
@@ -302,7 +254,7 @@ export class MaxCalculatorService {
     }
 
     if (pokemon.dynamaxDate.isBefore(date)) {
-      pokemon.fastAttacks.forEach((fastAttack) => {
+      pokemon.fastAttacks.forEach(fastAttack => {
         const dynamaxDamageConfiguration = {
           attacker: attackerBaseStats,
           defender: defenderBaseStats,
@@ -313,10 +265,7 @@ export class MaxCalculatorService {
             energy: 0,
             duration: 0,
           },
-          typeEffectiveness: this.calculateTypeEffectiveness(
-            fastAttack.type,
-            boss
-          ),
+          typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, boss),
           stab: this.calculateStab(fastAttack.type, pokemon),
         } as DamageConfiguration;
 
@@ -324,7 +273,7 @@ export class MaxCalculatorService {
       });
     }
 
-    damageConfigurations.forEach((damageConfiguration) => {
+    damageConfigurations.forEach(damageConfiguration => {
       damageConfiguration.damage = this.calculateDamage(damageConfiguration);
     });
 
@@ -333,10 +282,7 @@ export class MaxCalculatorService {
 
   private candidateForTank(pokemon: Pokemon, boss: Pokemon, date: Moment) {
     // No DMax or GMax = we can't use this pokemon yet
-    if (
-      !pokemon.dynamaxDate.isBefore(date) &&
-      !pokemon.gigantamaxDate.isBefore(date)
-    ) {
+    if (!pokemon.dynamaxDate.isBefore(date) && !pokemon.gigantamaxDate.isBefore(date)) {
       return;
     }
 
@@ -345,10 +291,7 @@ export class MaxCalculatorService {
       return;
     }
 
-    const tankDamageConfigurations = this.createBossDamageConfigurations(
-      boss,
-      pokemon
-    );
+    const tankDamageConfigurations = this.createBossDamageConfigurations(boss, pokemon);
 
     // We do not want our tank to get one-shotted, right? Reject them
     // if (isOneShotted(tankDamageConfigurations)) {
@@ -357,9 +300,7 @@ export class MaxCalculatorService {
 
     tankDamageConfigurations.sort((a, b) => a.damage - b.damage);
 
-    const avgDamage =
-      tankDamageConfigurations.reduce((a, b) => a + b.damage, 0) /
-      tankDamageConfigurations.length;
+    const avgDamage = tankDamageConfigurations.reduce((a, b) => a + b.damage, 0) / tankDamageConfigurations.length;
     // const worstCaseAvgDamage =
     //   (tankDamageConfigurations[tankDamageConfigurations.length - 1].damage +
     //     tankDamageConfigurations[tankDamageConfigurations.length - 2].damage) /
@@ -380,7 +321,7 @@ export class MaxCalculatorService {
       avgDamage: avgDamage,
       avgDamagePercentage: (avgDamage / pokemon.hp) * 100,
       damageDetails: [
-        ...tankDamageConfigurations.map((configuration) => {
+        ...tankDamageConfigurations.map(configuration => {
           return {
             power: configuration.move.power,
             move: configuration.move.name,
@@ -399,10 +340,7 @@ export class MaxCalculatorService {
 
   private candidateForHealer(pokemon: Pokemon, boss: Pokemon, date: Moment) {
     // No DMax or GMax = we can't use this pokemon yet
-    if (
-      !pokemon.dynamaxDate.isBefore(date) &&
-      !pokemon.gigantamaxDate.isBefore(date)
-    ) {
+    if (!pokemon.dynamaxDate.isBefore(date) && !pokemon.gigantamaxDate.isBefore(date)) {
       return;
     }
 
@@ -411,15 +349,9 @@ export class MaxCalculatorService {
       return;
     }
 
-    const healersDamageConfigurations = this.createBossDamageConfigurations(
-      boss,
-      pokemon
-    );
-    healersDamageConfigurations.forEach((configuration) => {
-      configuration.unhealedDamagePercentage = Math.max(
-        configuration.damagePercentage - 48,
-        0
-      );
+    const healersDamageConfigurations = this.createBossDamageConfigurations(boss, pokemon);
+    healersDamageConfigurations.forEach(configuration => {
+      configuration.unhealedDamagePercentage = Math.max(configuration.damagePercentage - 48, 0);
     });
 
     // We do not want our healer to get one-shotted, right? Reject them
@@ -427,9 +359,7 @@ export class MaxCalculatorService {
     // 	return;
     // }
 
-    healersDamageConfigurations.sort(
-      (a, b) => a.damagePercentage - b.damagePercentage
-    );
+    healersDamageConfigurations.sort((a, b) => a.damagePercentage - b.damagePercentage);
 
     const heal = pokemon.hp * 0.48;
 
@@ -441,12 +371,9 @@ export class MaxCalculatorService {
       def: pokemon.def,
       hp: pokemon.hp,
       heal: heal,
-      totalUnhealedDamagePercentage: healersDamageConfigurations.reduce(
-        (a, b) => a + b.unhealedDamagePercentage,
-        0
-      ),
+      totalUnhealedDamagePercentage: healersDamageConfigurations.reduce((a, b) => a + b.unhealedDamagePercentage, 0),
       damageDetails: [
-        ...healersDamageConfigurations.map((configuration) => {
+        ...healersDamageConfigurations.map(configuration => {
           return {
             power: configuration.move.power,
             move: configuration.move.name,
@@ -467,7 +394,7 @@ export class MaxCalculatorService {
     const attackerBaseStats = this.getPokemonBaseStats(boss);
     const defenderBaseStats = this.getPokemonBaseStats(pokemon);
 
-    boss.chargedAttacks.forEach((attack) => {
+    boss.chargedAttacks.forEach(attack => {
       const damageConfiguration = {
         attacker: attackerBaseStats,
         defender: defenderBaseStats,
@@ -478,20 +405,16 @@ export class MaxCalculatorService {
           energy: 0,
           duration: 0,
         },
-        typeEffectiveness: this.calculateTypeEffectiveness(
-          attack.type,
-          pokemon
-        ),
+        typeEffectiveness: this.calculateTypeEffectiveness(attack.type, pokemon),
         stab: this.calculateStab(attack.type, boss),
       } as DamageConfiguration;
 
       damageConfigurations.push(damageConfiguration);
     });
 
-    damageConfigurations.forEach((configuration) => {
+    damageConfigurations.forEach(configuration => {
       configuration.damage = this.calculateDamage(configuration);
-      configuration.damagePercentage =
-        this.calculateDamagePercentage(configuration);
+      configuration.damagePercentage = this.calculateDamagePercentage(configuration);
     });
 
     return damageConfigurations;
@@ -513,16 +436,11 @@ export class MaxCalculatorService {
       throw new Error(`Type ${type} not found in type effectiveness map!`);
     }
 
-    return (
-      defendingTypeEffectiveness[defendingPokemon.primaryType] *
-      (defendingTypeEffectiveness[defendingPokemon.secondaryType] ?? 1)
-    );
+    return defendingTypeEffectiveness[defendingPokemon.primaryType] * (defendingTypeEffectiveness[defendingPokemon.secondaryType] ?? 1);
   }
 
   private calculateStab(type: Type, pokemon: Pokemon) {
-    return type === pokemon.primaryType || type === pokemon.secondaryType
-      ? 1.2
-      : 1;
+    return type === pokemon.primaryType || type === pokemon.secondaryType ? 1.2 : 1;
   }
 
   private calculateDamage(damageConfiguration: DamageConfiguration) {
@@ -537,8 +455,7 @@ export class MaxCalculatorService {
       Math.floor(
         0.5 *
           damageConfiguration.move.power *
-          (damageConfiguration.attacker.atk /
-            damageConfiguration.defender.def) *
+          (damageConfiguration.attacker.atk / damageConfiguration.defender.def) *
           damageConfiguration.typeEffectiveness *
           damageConfiguration.stab *
           weather *
@@ -564,8 +481,7 @@ export class MaxCalculatorService {
   }
 
   private sortHealers(a: HealerCandidate, b: HealerCandidate) {
-    const totalUnhealedDamagePercentageDiff =
-      a.totalUnhealedDamagePercentage - b.totalUnhealedDamagePercentage;
+    const totalUnhealedDamagePercentageDiff = a.totalUnhealedDamagePercentage - b.totalUnhealedDamagePercentage;
 
     if (totalUnhealedDamagePercentageDiff == 0) {
       return b.heal - a.heal;

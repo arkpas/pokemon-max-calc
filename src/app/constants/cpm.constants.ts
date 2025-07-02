@@ -1,7 +1,7 @@
-export type Cpm = {
+export interface Cpm {
   value: number;
   description: string;
-};
+}
 
 // TODO: update with
 // Dynamax Boss          | Tier     | Category | CPM     | HP        | Atk Mult | Def Mult
@@ -43,7 +43,7 @@ export const CPMS: Cpm[] = [
     value: 0.765,
     description: 'T6 Gigantamax (Tox, Gengar, Kingler, Lapras, Snorlax)',
   },
-    {
+  {
     value: 0.81,
     description: 'T6 Gigantamax (Inteleon)',
   },
