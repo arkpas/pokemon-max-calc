@@ -4,7 +4,7 @@ html {
   color-scheme: light dark;
   font-family: "Roboto", sans-serif;
   font-optical-sizing: auto;
-  @include mat.theme((color: mat.$violet-palette,
+  @include mat.theme((color: mat.$magenta-palette,
     ));
 }
 
