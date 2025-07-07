@@ -35,36 +35,34 @@
     <mat-tab class="pokemon-tab" label="Tanks">
       <div class="mat-elevation-z8"></div>
       <div class="pokemon-cards">
-        <div class="pokemon-card" *ngFor="let tank of tanks">
-          <app-pokemon-card
-            [name]="tank.name"
-            [hp]="tank.hp"
-            [def]="tank.def"
-            [avgDamage]="tank.avgDamage"
-            [avgDamagePercentage]="tank.avgDamagePercentage"
-            [damageDetails]="tank.damageDetails"
-            [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + tank.pokedexNumber + '.png'"
-            [primaryType]="tank.primaryType"
-            [secondaryType]="tank.secondaryType">
-          </app-pokemon-card>
-        </div>
+        <app-pokemon-card
+          *ngFor="let tank of tanks"
+          [name]="tank.name"
+          [hp]="tank.hp"
+          [def]="tank.def"
+          [avgDamage]="tank.avgDamage"
+          [avgDamagePercentage]="tank.avgDamagePercentage"
+          [damageDetails]="tank.damageDetails"
+          [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + tank.pokedexNumber + '.png'"
+          [primaryType]="tank.primaryType"
+          [secondaryType]="tank.secondaryType">
+        </app-pokemon-card>
       </div>
     </mat-tab>
     <mat-tab label="Healers">
       <div class="pokemon-cards">
-        <div class="pokemon-card" *ngFor="let healer of healers">
-          <app-pokemon-card
-            [name]="healer.name"
-            [hp]="healer.hp"
-            [def]="healer.def"
-            [heal]="healer.heal"
-            [unhealedDamagePercentage]="healer.totalUnhealedDamagePercentage"
-            [damageDetails]="healer.damageDetails"
-            [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + healer.pokedexNumber + '.png'"
-            [primaryType]="healer.primaryType"
-            [secondaryType]="healer.secondaryType">
-          </app-pokemon-card>
-        </div>
+        <app-pokemon-card
+          *ngFor="let healer of healers"
+          [name]="healer.name"
+          [hp]="healer.hp"
+          [def]="healer.def"
+          [heal]="healer.heal"
+          [unhealedDamagePercentage]="healer.totalUnhealedDamagePercentage"
+          [damageDetails]="healer.damageDetails"
+          [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + healer.pokedexNumber + '.png'"
+          [primaryType]="healer.primaryType"
+          [secondaryType]="healer.secondaryType">
+        </app-pokemon-card>
       </div>
     </mat-tab>
   </mat-tab-group>
