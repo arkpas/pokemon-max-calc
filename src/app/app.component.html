@@ -1,2 +1,4 @@
-<app-menu (configurationSubmitEvent)="pushConfiguration($event)"></app-menu>
-<app-results [battleConfiguration]="battleConfiguration$"></app-results>
+<div class="main-container">
+  <app-menu (configurationSubmitEvent)="pushConfiguration($event)" class="menu"></app-menu>
+  <app-results [battleConfiguration]="battleConfiguration$" class="results"></app-results>
+</div>

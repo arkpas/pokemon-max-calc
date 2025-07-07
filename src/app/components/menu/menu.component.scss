@@ -6,10 +6,10 @@
     top: 0;
     bottom: 0;
     left: 0;
-    padding: 0.75rem;
     overflow-y: scroll;
     background: $background-color;
     z-index: 10;
+    padding: 1rem;
 
 
     &.menu-collapsed {
@@ -19,6 +19,8 @@
         left: auto;
         right: 0;
         top: auto;
+        padding: 0.25rem;
+
 
         form {
             display: none;
@@ -26,12 +28,12 @@
     }
 
     .menu-button {
-        width: 1.8rem;
-        height: 1.8rem;
+        width: 2rem;
+        height: 2rem;
         display: flex;
         justify-content: center;
         align-items: center;
-        border: 1px solid $dmax-color;
+        border: 1px solid $dmax-color-dark;
         border-radius: 50%;
         background-color: $dmax-color;
 
@@ -77,6 +79,7 @@
         width: 100%;
         display: flex;
         position: relative;
+        overflow-y: hidden;
 
         .menu-button {
             display: none;
@@ -84,8 +87,8 @@
 
         &.menu-collapsed {
             width: 100%;
-            overflow-y: scroll;
             background: $background-color;
+            padding: 1rem;
 
             form {
                 display: block;
