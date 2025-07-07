@@ -16,6 +16,9 @@
         width: auto;
         background: transparent;
         overflow-y: hidden;
+        left: auto;
+        right: 0;
+        top: auto;
 
         form {
             display: none;
@@ -55,6 +58,12 @@
                 font-size: 1.3rem;
                 font-weight: bold;
             }
+        }
+
+        .bottom-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         mat-form-field {

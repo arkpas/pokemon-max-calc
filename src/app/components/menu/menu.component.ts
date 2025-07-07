@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, inject, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,18 +24,18 @@ export class MenuComponent {
 
   @Output() configurationSubmitEvent = new EventEmitter<BattleConfiguration>();
 
-  @ViewChild('raidBossNameInput')
-  raidBossNameInput!: ElementRef<HTMLInputElement>;
-
   isCollapsed = false;
   isSubmittedAtLeastOnce = false;
 
   battleConfigurationForm = this.formBuilder.group({
+    // TODO: validate if opponent with that name exists
     opponentName: ['', Validators.required],
+    // TODO: validate if number
     opponentCpm: [0.8, Validators.required],
     opponentAtkMod: [1, Validators.required],
     opponentDefMod: [1, Validators.required],
     date: [new Date(), Validators.required],
+    // TODO: validate if number
     allyCpm: [0.7903, Validators.required],
     allyAtkIV: [15, Validators.required],
     allyDefIV: [15, Validators.required],
@@ -52,8 +52,6 @@ export class MenuComponent {
   constructor() {
     // Pokemon names
     this.pokemonOptions = this.importService.getPokemons().map(pokemon => pokemon.name);
-
-    // Opponent CPMs
     this.filteredPokemonOptions = this.battleConfigurationForm.controls.opponentName.valueChanges.pipe(
       map(name => (name ? this.filterPokemonNames(name) : this.pokemonOptions.slice()))
     );
@@ -74,18 +72,6 @@ export class MenuComponent {
   filterPokemonNames(name: string): string[] {
     const filterValue = name.toLowerCase();
     return this.pokemonOptions.filter(o => o.toLowerCase().includes(filterValue));
-  }
-
-  attemptClose(): void {
-    // First attempt to submit and close the form in legit way
-    // This may however end with failure if there are errors in form
-    this.submit();
-
-    // So if form was at least once submitted successfully, we can just close the window
-    // and show previous results
-    if (this.isSubmittedAtLeastOnce) {
-      this.collapseForm();
-    }
   }
 
   submit(): void {
@@ -110,7 +96,6 @@ export class MenuComponent {
   }
 
   private _filterCpms(value: number): Cpm[] {
-    console.log('Filtering!');
     const filterValue = value.toString().toLowerCase();
 
     return this.cpms.filter(cpm => cpm.value.toString().toLowerCase().includes(filterValue));

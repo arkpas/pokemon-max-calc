@@ -8,22 +8,17 @@
       <div class="title">
         <span>Max Calculator</span>
       </div>
-      <div class="menu-button">
-        <button (click)="attemptClose()">X</button>
-      </div>
     </div>
 
     <div>
       <mat-form-field appearance="outline" (click)="this.battleConfigurationForm.controls.opponentName.setValue(null)">
         <mat-label>Boss</mat-label>
         <input
-          #raidBossNameInput
-          type="text"
           placeholder="Select opponent"
           matInput
           [formControl]="battleConfigurationForm.controls.opponentName"
           [matAutocomplete]="raidBossAuto" />
-        <mat-autocomplete requireSelection #raidBossAuto="matAutocomplete">
+        <mat-autocomplete #raidBossAuto="matAutocomplete">
           @for (option of filteredPokemonOptions | async; track option) {
             <mat-option [value]="option">{{ option }}</mat-option>
           }
