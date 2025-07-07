@@ -5,7 +5,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { BattleConfiguration, DamageConfiguration, HealerCandidate, TankCandidate } from '../../types/types';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
-import { PokemonCardComponent } from '../pokemon-card/pokemon-card.component';
+import { PokemonCardComponent } from './pokemon-card/pokemon-card.component';
 import { CommonModule } from '@angular/common';
 import { Observable, Subscription } from 'rxjs';
 
