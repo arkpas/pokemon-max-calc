@@ -1,0 +1,74 @@
+<div class="container">
+  <div class="right-container">
+    <mat-tab-group>
+      <mat-tab label="Attackers">
+        <div class="mat-elevation-z8">
+          <table mat-table [dataSource]="attackers" matSort>
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+              <td mat-cell *matCellDef="let row">{{ row.attacker.name }}</td>
+            </ng-container>
+
+            <!-- Move Column -->
+            <ng-container matColumnDef="move">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Move</th>
+              <td mat-cell *matCellDef="let row">{{ row.move.name }}</td>
+            </ng-container>
+
+            <!-- Power Column -->
+            <ng-container matColumnDef="power">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Power</th>
+              <td mat-cell *matCellDef="let row">{{ row.move.power }}</td>
+            </ng-container>
+
+            <!-- Damage Column -->
+            <ng-container matColumnDef="damage">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>Damage</th>
+              <td mat-cell *matCellDef="let row">{{ row.damage }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="attackersColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: attackersColumns"></tr>
+          </table>
+
+          <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]" aria-label="Select page of users"></mat-paginator>
+        </div>
+      </mat-tab>
+      <mat-tab class="pokemon-tab" label="Tanks">
+        <div class="pokemon-cards">
+          <div class="pokemon-card" *ngFor="let tank of tanks">
+            <app-pokemon-card
+              [name]="tank.name"
+              [hp]="tank.hp"
+              [def]="tank.def"
+              [avgDamage]="tank.avgDamage"
+              [avgDamagePercentage]="tank.avgDamagePercentage"
+              [damageDetails]="tank.damageDetails"
+              [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + tank.pokedexNumber + '.png'"
+              [primaryType]="tank.primaryType"
+              [secondaryType]="tank.secondaryType">
+            </app-pokemon-card>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab label="Healers">
+        <div class="pokemon-cards">
+          <div class="pokemon-card" *ngFor="let healer of healers">
+            <app-pokemon-card
+              [name]="healer.name"
+              [hp]="healer.hp"
+              [def]="healer.def"
+              [heal]="healer.heal"
+              [unhealedDamagePercentage]="healer.totalUnhealedDamagePercentage"
+              [damageDetails]="healer.damageDetails"
+              [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + healer.pokedexNumber + '.png'"
+              [primaryType]="healer.primaryType"
+              [secondaryType]="healer.secondaryType">
+            </app-pokemon-card>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

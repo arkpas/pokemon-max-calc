@@ -1,0 +1,86 @@
+@use "../../../variables.scss" as *;
+
+.menu {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    padding: 0.75rem;
+    overflow-y: scroll;
+    background: $background-color;
+    z-index: 10;
+
+
+    &.menu-collapsed {
+        width: auto;
+        background: transparent;
+        overflow-y: hidden;
+
+        form {
+            display: none;
+        }
+    }
+
+    .menu-button {
+        width: 1.8rem;
+        height: 1.8rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid $dmax-color;
+        border-radius: 50%;
+        background-color: $dmax-color;
+
+        button {
+            background-color: transparent;
+            border: 0;
+            line-height: 1rem;
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: #FFF;
+        }
+    }
+
+    form {
+        width: 100%;
+
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2rem;
+
+            .title {
+                font-size: 1.3rem;
+                font-weight: bold;
+            }
+        }
+
+        mat-form-field {
+            width: 100%;
+        }
+    }
+}
+
+@media (min-width: 769px) {
+    .menu {
+        width: 100%;
+        display: flex;
+        position: relative;
+
+        .menu-button {
+            display: none;
+        }
+
+        &.menu-collapsed {
+            width: 100%;
+            overflow-y: scroll;
+            background: $background-color;
+
+            form {
+                display: block;
+            }
+        }
+    }
+}

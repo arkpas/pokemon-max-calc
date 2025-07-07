@@ -1,0 +1,89 @@
+<div [ngClass]="isCollapsed ? 'menu menu-collapsed' : 'menu'">
+  <div *ngIf="isCollapsed" class="menu-button">
+    <button (click)="showForm()">☰</button>
+  </div>
+
+  <form [formGroup]="battleConfigurationForm" (ngSubmit)="submit()">
+    <div class="top-row">
+      <div class="title">
+        <span>Max Calculator</span>
+      </div>
+      <div class="menu-button">
+        <button (click)="attemptClose()">X</button>
+      </div>
+    </div>
+
+    <div>
+      <mat-form-field appearance="outline" (click)="this.battleConfigurationForm.controls.opponentName.setValue(null)">
+        <mat-label>Boss</mat-label>
+        <input
+          #raidBossNameInput
+          type="text"
+          placeholder="Select opponent"
+          matInput
+          [formControl]="battleConfigurationForm.controls.opponentName"
+          [matAutocomplete]="raidBossAuto" />
+        <mat-autocomplete requireSelection #raidBossAuto="matAutocomplete">
+          @for (option of filteredPokemonOptions | async; track option) {
+            <mat-option [value]="option">{{ option }}</mat-option>
+          }
+        </mat-autocomplete>
+        <mat-error *ngIf="battleConfigurationForm.controls.opponentName.invalid"> Please provide valid Pokemon name! </mat-error>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field appearance="outline" (click)="this.battleConfigurationForm.controls.opponentCpm.setValue(null)">
+        <mat-label>CPM</mat-label>
+        <input matInput [matAutocomplete]="cpmAuto" [formControl]="battleConfigurationForm.controls.opponentCpm" />
+        <mat-autocomplete #cpmAuto="matAutocomplete">
+          @for (cpm of filteredCpms | async; track cpm.description) {
+            <mat-option [value]="cpm.value">
+              <span>{{ cpm.value }}</span> |
+              <small>{{ cpm.description }}</small>
+            </mat-option>
+          }
+        </mat-autocomplete>
+        <mat-error *ngIf="battleConfigurationForm.controls.opponentCpm.invalid"> Please provide valid CPM value! </mat-error>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field appearance="outline" (click)="this.battleConfigurationForm.controls.opponentAtkMod.setValue(null)">
+        <mat-label>Attack modificator</mat-label>
+        <input matInput placeholder="Attack modificator" id="atkMod" type="number" [formControl]="battleConfigurationForm.controls.opponentAtkMod" />
+        <mat-error *ngIf="battleConfigurationForm.controls.opponentAtkMod.invalid"> Please provide valid attack modificator value! </mat-error>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field appearance="outline" (click)="this.battleConfigurationForm.controls.opponentDefMod.setValue(null)">
+        <mat-label>Defense modificator</mat-label>
+        <input matInput placeholder="Defense modificator" id="defMod" type="number" [formControl]="battleConfigurationForm.controls.opponentDefMod" />
+        <mat-error *ngIf="battleConfigurationForm.controls.opponentDefMod.invalid"> Please provide valid defense modificator value! </mat-error>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field appearance="outline">
+        <mat-label>Date of max battle</mat-label>
+        <input matInput [matDatepicker]="picker" [formControl]="battleConfigurationForm.controls.date" />
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-error *ngIf="battleConfigurationForm.controls.date.invalid"> Please provide valid date! </mat-error>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field appearance="outline" (click)="this.battleConfigurationForm.controls.allyCpm.setValue(null)">
+        <mat-label>Pokemon LVL</mat-label>
+        <input matInput [matAutocomplete]="pokemonCpmAuto" [formControl]="battleConfigurationForm.controls.allyCpm" />
+        <mat-autocomplete #pokemonCpmAuto="matAutocomplete">
+          @for (pokemonCpm of filteredPokemonCpms | async; track pokemonCpm.description) {
+            <mat-option [value]="pokemonCpm.value">
+              <span>{{ pokemonCpm.value }}</span> |
+              <small>{{ pokemonCpm.description }}</small>
+            </mat-option>
+          }
+        </mat-autocomplete>
+        <mat-error *ngIf="battleConfigurationForm.controls.allyCpm.invalid"> Please provide valid CPM value! </mat-error>
+      </mat-form-field>
+    </div>
+    <button mat-flat-button type="submit">Calculate</button>
+  </form>
+</div>

@@ -49,13 +49,17 @@ export class ImportServiceService {
 
   public getPokemons(): Pokemon[] {
     // Copy the pokemons and return them, so we still have "clean" version of them in service
-    const pokemons = JSON.parse(JSON.stringify(this.pokemons)) as Pokemon[];
-    pokemons.forEach(pokemon => {
-      pokemon.gigantamaxDate = moment(pokemon.gigantamaxDate);
-      pokemon.dynamaxDate = moment(pokemon.dynamaxDate);
-    });
+    return this.pokemons.map(pokemon => this.deepCopyPokemon(pokemon));
+  }
 
-    return pokemons;
+  public findPokemon(name: string): Pokemon {
+    const wantedPokemon = this.pokemons.find(pokemon => pokemon.name === name);
+
+    if (!wantedPokemon) {
+      throw new Error(`Pokemon with name ${name} was not found!`);
+    }
+
+    return this.deepCopyPokemon(wantedPokemon);
   }
 
   /**
@@ -197,5 +201,14 @@ export class ImportServiceService {
     else {
       return moment('01.01.9999', 'DD.MM.YYYY');
     }
+  }
+
+  private deepCopyPokemon(sourcePokemon: Pokemon): Pokemon {
+    const copiedPokemon = JSON.parse(JSON.stringify(sourcePokemon)) as Pokemon;
+
+    copiedPokemon.gigantamaxDate = moment(copiedPokemon.gigantamaxDate);
+    copiedPokemon.dynamaxDate = moment(copiedPokemon.dynamaxDate);
+
+    return copiedPokemon;
   }
 }

@@ -1,11 +1,5 @@
-.left-container {
-    padding: 1em;
-    max-width: 300px;
-}
-
 .right-container {
     padding: 1em;
-    max-width: 600px;
     width: 100%;
 }
 
@@ -48,7 +42,9 @@ mat-header-row {
 .pokemon-cards {
     display: flex;
     justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
+    flex-direction: column;
 
     .pokemon-card {
         margin: 0px 10px;
