@@ -235,6 +235,7 @@ export class MaxCalculatorService {
     const attackerBaseStats = this.getPokemonBaseStats(pokemon);
     const defenderBaseStats = this.getPokemonBaseStats(boss);
 
+    // Standard G-MAX
     if (pokemon.gigantamaxDate.isBefore(date)) {
       const gigantamaxDamageConfiguration = {
         attacker: attackerBaseStats,
@@ -253,7 +254,8 @@ export class MaxCalculatorService {
       damageConfigurations.push(gigantamaxDamageConfiguration);
     }
 
-    if (pokemon.dynamaxDate.isBefore(date)) {
+    // Standard D-MAX
+    if (pokemon.dynamaxDate.isBefore(date) && !pokemon.gigantamaxType) {
       pokemon.fastAttacks.forEach(fastAttack => {
         const dynamaxDamageConfiguration = {
           attacker: attackerBaseStats,
@@ -271,6 +273,25 @@ export class MaxCalculatorService {
 
         damageConfigurations.push(dynamaxDamageConfiguration);
       });
+    }
+
+    // D-MAX with fixed attack type (like Zacian or Zamazenta)
+    if (pokemon.dynamaxDate.isBefore(date) && pokemon.gigantamaxType) {
+      const specialDynamaxDamageConfiguration = {
+        attacker: attackerBaseStats,
+        defender: defenderBaseStats,
+        move: {
+          name: 'G-' + pokemon.gigantamaxType,
+          type: pokemon.gigantamaxType,
+          power: 350,
+          energy: 0,
+          duration: 0,
+        },
+        typeEffectiveness: this.calculateTypeEffectiveness(pokemon.gigantamaxType, boss),
+        stab: this.calculateStab(pokemon.gigantamaxType, pokemon),
+      } as DamageConfiguration;
+
+      damageConfigurations.push(specialDynamaxDamageConfiguration);
     }
 
     damageConfigurations.forEach(damageConfiguration => {
