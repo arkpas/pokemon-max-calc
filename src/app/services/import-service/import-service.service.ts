@@ -182,7 +182,7 @@ export class ImportServiceService {
 
   private convertToPremiereDate(dateOrBool: string): Moment {
     if (!dateOrBool) {
-      throw new Error(`Bad value, expected boolean or date, got: ${dateOrBool}}`);
+      throw new Error(`Bad value, expected boolean or date, got: ${dateOrBool}`);
     }
 
     const date = moment(dateOrBool, 'DD.MM.YYYY');
