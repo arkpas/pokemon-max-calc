@@ -48,13 +48,14 @@
 
   <div class="damage-section" *ngIf="showDetails">
     <div class="damage-list">
+      <span class="damage-list-name">🛡️ Defense</span>
       <details *ngFor="let entry of damageDetails" class="damage-row">
         <summary class="damage-summary">
           <span class="col attack-name type-bg {{ entry.moveType.toLowerCase() }}">
             {{ entry.move }}
           </span>
           <span class="col power"
-            >⚡ <strong>{{ entry.power }}</strong></span
+            >💪 <strong>{{ entry.power }}</strong></span
           >
           <span class="col typeEffectiveness">🎯 {{ (entry.typeEffectiveness * 100).toFixed(1) }}% </span>
           <span class="col stab">🧬 {{ entry.stab }}</span>
@@ -63,8 +64,25 @@
             [ngStyle]="{
               color: getDamagePercentageColor(entry.damagePercentage),
             }"
-            >💥 {{ entry.damage.toFixed(1) }} (<strong>{{ entry.damagePercentage.toFixed(1) }}%</strong>)</span
+            >💥 {{ entry.damage.toFixed(0) }} (<strong>{{ entry.damagePercentage.toFixed(1) }}%</strong>)</span
           >
+        </summary>
+      </details>
+    </div>
+    <div class="damage-list">
+      <span class="damage-list-name">⚔️ Offense</span>
+
+      <details *ngFor="let entry of fastAttacks" class="damage-row">
+        <summary class="damage-summary">
+          <span class="col attack-name type-bg {{ entry.moveType.toLowerCase() }}">
+            {{ entry.move }}
+          </span>
+          <span class="col power"
+            >💪 <strong>{{ entry.power }}</strong></span
+          >
+          <span class="col typeEffectiveness">🎯 {{ (entry.typeEffectiveness * 100).toFixed(1) }}% </span>
+          <span class="col stab">🧬 {{ entry.stab }}</span>
+          <span class="col damage-stats">💥 {{ entry.damage.toFixed(0) }} </span>
         </summary>
       </details>
     </div>

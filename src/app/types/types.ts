@@ -96,6 +96,7 @@ export interface DamageDetails {
   power: number;
   move: string;
   moveType: Type;
+  duration: number;
   typeEffectiveness: number;
   stab: number;
   damage: number;
@@ -112,6 +113,7 @@ export interface Candidate {
   attacker: PokemonBaseStats;
 
   damageDetails: DamageDetails[];
+  fastAttacks: DamageDetails[];
 }
 
 export interface TankCandidate extends Candidate {

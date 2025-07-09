@@ -19,6 +19,7 @@ export class PokemonCardComponent {
   @Input() unhealedDamagePercentage!: number;
   @Input() imageUrl!: string;
   @Input() damageDetails: DamageDetails[] = [];
+  @Input() fastAttacks: DamageDetails[] = [];
   @Input() primaryType!: Type;
   @Input() secondaryType!: Type;
 
