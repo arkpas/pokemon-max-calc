@@ -1,7 +1,8 @@
 @use '@angular/material' as mat;
 
 html {
-  color-scheme: light dark;
+  color-scheme: light;
+  color: black;
   font-family: "Roboto", sans-serif;
   font-optical-sizing: auto;
   @include mat.theme((color: mat.$magenta-palette,
