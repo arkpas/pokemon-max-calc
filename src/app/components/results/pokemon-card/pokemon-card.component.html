@@ -54,11 +54,6 @@
           <span class="col attack-name type-bg {{ entry.moveType.toLowerCase() }}">
             {{ entry.move }}
           </span>
-          <span class="col power"
-            >💪 <strong>{{ entry.power }}</strong></span
-          >
-          <span class="col typeEffectiveness">🎯 {{ (entry.typeEffectiveness * 100).toFixed(1) }}% </span>
-          <span class="col stab">🧬 {{ entry.stab }}</span>
           <span
             class="col damage-stats"
             [ngStyle]="{
@@ -66,6 +61,11 @@
             }"
             >💥 {{ entry.damage.toFixed(0) }} (<strong>{{ entry.damagePercentage.toFixed(1) }}%</strong>)</span
           >
+          <span class="col power"
+            >💪 <strong>{{ entry.power }}</strong></span
+          >
+          <span class="col typeEffectiveness">🎯 {{ (entry.typeEffectiveness * 100).toFixed(1) }}% </span>
+          <span class="col stab">🧬 {{ entry.stab }}</span>
         </summary>
       </details>
     </div>
@@ -77,12 +77,15 @@
           <span class="col attack-name type-bg {{ entry.moveType.toLowerCase() }}">
             {{ entry.move }}
           </span>
+          <span class="col damage-stats"
+            >💥 <strong>{{ entry.damage.toFixed(0) }} </strong></span
+          >
+
           <span class="col power"
             >💪 <strong>{{ entry.power }}</strong></span
           >
           <span class="col typeEffectiveness">🎯 {{ (entry.typeEffectiveness * 100).toFixed(1) }}% </span>
           <span class="col stab">🧬 {{ entry.stab }}</span>
-          <span class="col damage-stats">💥 {{ entry.damage.toFixed(0) }} </span>
         </summary>
       </details>
     </div>

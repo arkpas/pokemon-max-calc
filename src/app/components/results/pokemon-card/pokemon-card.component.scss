@@ -129,7 +129,7 @@
 
                 .damage-summary {
                     display: grid;
-                    grid-template-columns: 150px 50px 75px 45px 120px;
+                    grid-template-columns: 150px 100px 50px 75px 45px;
                     gap: 8px;
                     align-items: center;
                     padding: 4px 8px;
@@ -254,11 +254,18 @@
             .header-inline {
                 flex-wrap: wrap;
             }
+        }
+    }
+}
+
+@media (max-width: 479px) {
+    :host {
+        .pokemon-card {
 
             .damage-section {
                 .damage-list {
                     .damage-summary {
-                        grid-template-columns: 150px 50px 120px;
+                        grid-template-columns: 150px 100px 50px;
 
                         .col {
                             display: none;
@@ -279,47 +286,42 @@
     }
 }
 
-@media (max-width: 479px) {
-    .pokemon-card {
-        width: 300px;
+@media (max-width: 374px) {
+    :host {
+        .pokemon-card {
+            padding: 12px 6px;
 
-        .header-inline {
-            .header-stats {
-                .stat {
+            .header-inline {
+                .header-stats {
+                    .stat {
 
-                    &.atk,
-                    &.def,
-                    &.hp {
-                        display: none;
-                    }
-                }
-            }
-        }
-
-        .damage-section {
-            .damage-list {
-                .damage-summary {
-                    grid-template-columns: 110px 120px;
-
-                    .col {
-                        &.power {
+                        &.atk,
+                        &.def,
+                        &.hp {
                             display: none;
                         }
                     }
+                }
+            }
 
-                    .attack-name {
-                        max-width: 100px;
-                        text-wrap: wrap;
+            .damage-section {
+                .damage-list {
+                    .damage-summary {
+                        grid-template-columns: 110px 120px;
+
+                        .col {
+                            &.power {
+                                display: none;
+                            }
+                        }
+
+                        .attack-name {
+                            max-width: 100px;
+                            text-wrap: wrap;
+                        }
                     }
                 }
             }
         }
-    }
-}
-
-@media (max-width: 379px) {
-    .pokemon-card {
-        width: 250px;
-        padding: 12px 6px;
     }
 }
