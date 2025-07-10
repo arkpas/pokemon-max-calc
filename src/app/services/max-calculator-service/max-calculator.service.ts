@@ -235,6 +235,7 @@ export class MaxCalculatorService {
     const attackerBaseStats = this.getPokemonBaseStats(pokemon);
     const defenderBaseStats = this.getPokemonBaseStats(boss);
 
+    // Standard G-MAX
     if (pokemon.gigantamaxDate.isBefore(date)) {
       const gigantamaxDamageConfiguration = {
         attacker: attackerBaseStats,
@@ -253,7 +254,8 @@ export class MaxCalculatorService {
       damageConfigurations.push(gigantamaxDamageConfiguration);
     }
 
-    if (pokemon.dynamaxDate.isBefore(date)) {
+    // Standard D-MAX
+    if (pokemon.dynamaxDate.isBefore(date) && !pokemon.gigantamaxType) {
       pokemon.fastAttacks.forEach(fastAttack => {
         const dynamaxDamageConfiguration = {
           attacker: attackerBaseStats,
@@ -271,6 +273,25 @@ export class MaxCalculatorService {
 
         damageConfigurations.push(dynamaxDamageConfiguration);
       });
+    }
+
+    // D-MAX with fixed attack type (like Zacian or Zamazenta)
+    if (pokemon.dynamaxDate.isBefore(date) && pokemon.gigantamaxType) {
+      const specialDynamaxDamageConfiguration = {
+        attacker: attackerBaseStats,
+        defender: defenderBaseStats,
+        move: {
+          name: 'G-' + pokemon.gigantamaxType,
+          type: pokemon.gigantamaxType,
+          power: 350,
+          energy: 0,
+          duration: 0,
+        },
+        typeEffectiveness: this.calculateTypeEffectiveness(pokemon.gigantamaxType, boss),
+        stab: this.calculateStab(pokemon.gigantamaxType, pokemon),
+      } as DamageConfiguration;
+
+      damageConfigurations.push(specialDynamaxDamageConfiguration);
     }
 
     damageConfigurations.forEach(damageConfiguration => {
@@ -293,22 +314,12 @@ export class MaxCalculatorService {
 
     const tankDamageConfigurations = this.createBossDamageConfigurations(boss, pokemon);
 
-    // We do not want our tank to get one-shotted, right? Reject them
-    // if (isOneShotted(tankDamageConfigurations)) {
-    // 	return;
-    // }
-
     tankDamageConfigurations.sort((a, b) => a.damage - b.damage);
 
     const avgDamage = tankDamageConfigurations.reduce((a, b) => a + b.damage, 0) / tankDamageConfigurations.length;
-    // const worstCaseAvgDamage =
-    //   (tankDamageConfigurations[tankDamageConfigurations.length - 1].damage +
-    //     tankDamageConfigurations[tankDamageConfigurations.length - 2].damage) /
-    //   2;
-    // const bestCaseAvgDamage =
-    //   (tankDamageConfigurations[0].damage +
-    //     tankDamageConfigurations[1].damage) /
-    //   2;
+
+    // Now calculate best fast attack for tank
+    const fastAttackDamageConfigurations = this.calculateFastAttackDamage(pokemon, boss, true);
 
     const tankCandidate = {
       name: pokemon.name,
@@ -326,6 +337,21 @@ export class MaxCalculatorService {
             power: configuration.move.power,
             move: configuration.move.name,
             moveType: configuration.move.type,
+            duration: configuration.move.duration,
+            typeEffectiveness: configuration.typeEffectiveness,
+            stab: configuration.stab,
+            damage: configuration.damage,
+            damagePercentage: configuration.damagePercentage,
+          } as DamageDetails;
+        }),
+      ],
+      fastAttacks: [
+        ...fastAttackDamageConfigurations.map(configuration => {
+          return {
+            power: configuration.move.power,
+            move: configuration.move.name,
+            moveType: configuration.move.type,
+            duration: configuration.move.duration,
             typeEffectiveness: configuration.typeEffectiveness,
             stab: configuration.stab,
             damage: configuration.damage,
@@ -354,14 +380,12 @@ export class MaxCalculatorService {
       configuration.unhealedDamagePercentage = Math.max(configuration.damagePercentage - 48, 0);
     });
 
-    // We do not want our healer to get one-shotted, right? Reject them
-    // if (isOneShotted(healersDamageConfigurations)) {
-    // 	return;
-    // }
-
     healersDamageConfigurations.sort((a, b) => a.damagePercentage - b.damagePercentage);
 
     const heal = pokemon.hp * 0.48;
+
+    // Now calculate best fast attack for healer
+    const fastAttackDamageConfigurations = this.calculateFastAttackDamage(pokemon, boss, true);
 
     return {
       name: pokemon.name,
@@ -378,11 +402,26 @@ export class MaxCalculatorService {
             power: configuration.move.power,
             move: configuration.move.name,
             moveType: configuration.move.type,
+            duration: configuration.move.duration,
             typeEffectiveness: configuration.typeEffectiveness,
             stab: configuration.stab,
             damage: configuration.damage,
             damagePercentage: configuration.damagePercentage,
             unhealedDamagePercentage: configuration.unhealedDamagePercentage,
+          } as DamageDetails;
+        }),
+      ],
+      fastAttacks: [
+        ...fastAttackDamageConfigurations.map(configuration => {
+          return {
+            power: configuration.move.power,
+            move: configuration.move.name,
+            moveType: configuration.move.type,
+            duration: configuration.move.duration,
+            typeEffectiveness: configuration.typeEffectiveness,
+            stab: configuration.stab,
+            damage: configuration.damage,
+            damagePercentage: configuration.damagePercentage,
           } as DamageDetails;
         }),
       ],
@@ -472,6 +511,40 @@ export class MaxCalculatorService {
     return (damageConfiguration.damage / damageConfiguration.defender.hp) * 100;
   }
 
+  private calculateFastAttackDamage(attacker: Pokemon, defender: Pokemon, onlyHalfSecond: boolean) {
+    const damageConfigurations: DamageConfiguration[] = [];
+    const attackerBaseStats = this.getPokemonBaseStats(attacker);
+    const defenderBaseStats = this.getPokemonBaseStats(defender);
+
+    attacker.fastAttacks.forEach(fastAttack => {
+      // Check if we care only about 0.5s attacks or we calculate all
+      // TODO: revisit if this flag is needed
+      if (!onlyHalfSecond || fastAttack.duration <= 0.5) {
+        const dynamaxDamageConfiguration = {
+          attacker: attackerBaseStats,
+          defender: defenderBaseStats,
+          move: {
+            name: fastAttack.name,
+            type: fastAttack.type,
+            power: fastAttack.power,
+            energy: fastAttack.energy,
+            duration: fastAttack.duration,
+          },
+          typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, defender),
+          stab: this.calculateStab(fastAttack.type, attacker),
+        } as DamageConfiguration;
+
+        damageConfigurations.push(dynamaxDamageConfiguration);
+      }
+    });
+
+    damageConfigurations.forEach(damageConfiguration => {
+      damageConfiguration.damage = this.calculateDamage(damageConfiguration);
+    });
+
+    return damageConfigurations.sort(this.sortFastAttacks);
+  }
+
   private sortAttackers(a: DamageConfiguration, b: DamageConfiguration) {
     return b.damage - a.damage;
   }
@@ -488,5 +561,29 @@ export class MaxCalculatorService {
     }
 
     return a.totalUnhealedDamagePercentage - b.totalUnhealedDamagePercentage;
+  }
+
+  private sortFastAttacks(a: DamageConfiguration, b: DamageConfiguration): number {
+    const durationCompare = a.move.duration - b.move.duration;
+    if (durationCompare !== 0) {
+      return durationCompare;
+    }
+
+    const damageCompare = b.damage - a.damage;
+    if (damageCompare !== 0) {
+      return damageCompare;
+    }
+
+    const typeEffCompare = b.typeEffectiveness - a.typeEffectiveness;
+    if (typeEffCompare !== 0) {
+      return typeEffCompare;
+    }
+
+    const stabCompare = b.stab - a.stab;
+    if (stabCompare !== 0) {
+      return stabCompare;
+    }
+
+    return b.move.power - a.move.power;
   }
 }

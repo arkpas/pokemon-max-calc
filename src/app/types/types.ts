@@ -1,5 +1,17 @@
 import { Moment } from 'moment';
 
+export interface BattleConfiguration {
+  opponentName: string;
+  opponentCpm: number;
+  opponentAtkMod: number;
+  opponentDefMod: number;
+  date: Moment;
+  allyCpm: number;
+  allyAtkIV: number;
+  allyDefIV: number;
+  allyHpIV: number;
+}
+
 export interface Attack {
   name: string;
   type: Type;
@@ -16,7 +28,7 @@ export interface PokemonBaseStats {
   hp: number;
 }
 
-export type Pokemon = PokemonBaseStats & {
+export interface Pokemon extends PokemonBaseStats {
   pokedexNumber: string;
   primaryType: string;
   secondaryType: string;
@@ -26,7 +38,7 @@ export type Pokemon = PokemonBaseStats & {
   hasHalfSecondAttack: boolean;
   fastAttacks: Attack[];
   chargedAttacks: Attack[];
-};
+}
 
 export enum Type {
   Normal = 'Normal',
@@ -84,6 +96,7 @@ export interface DamageDetails {
   power: number;
   move: string;
   moveType: Type;
+  duration: number;
   typeEffectiveness: number;
   stab: number;
   damage: number;
@@ -100,14 +113,15 @@ export interface Candidate {
   attacker: PokemonBaseStats;
 
   damageDetails: DamageDetails[];
+  fastAttacks: DamageDetails[];
 }
 
-export type TankCandidate = Candidate & {
+export interface TankCandidate extends Candidate {
   avgDamage: number;
   avgDamagePercentage: number;
-};
+}
 
-export type HealerCandidate = Candidate & {
+export interface HealerCandidate extends Candidate {
   totalUnhealedDamagePercentage: number;
   heal: number;
-};
+}

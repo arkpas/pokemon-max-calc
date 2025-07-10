@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DamageDetails, Type } from '../../types/types';
+import { DamageDetails, Type } from '../../../types/types';
 
 @Component({
   selector: 'app-pokemon-card',
@@ -19,6 +19,7 @@ export class PokemonCardComponent {
   @Input() unhealedDamagePercentage!: number;
   @Input() imageUrl!: string;
   @Input() damageDetails: DamageDetails[] = [];
+  @Input() fastAttacks: DamageDetails[] = [];
   @Input() primaryType!: Type;
   @Input() secondaryType!: Type;
 

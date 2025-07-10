@@ -1,23 +1,13 @@
-.left-container {
-    padding: 1em;
-    max-width: 300px;
-}
-
-.right-container {
-    padding: 1em;
-    max-width: 600px;
+.results {
     width: 100%;
-}
-
-.container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-}
+    padding: 0.25rem;
 
-:host {
-    margin: 1em;
-    display: block;
+    mat-tab-group {
+        width: 100%;
+    }
 }
 
 .title {
@@ -47,10 +37,10 @@ mat-header-row {
 
 .pokemon-cards {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     flex-wrap: wrap;
-
-    .pokemon-card {
-        margin: 0px 10px;
-    }
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
 }
