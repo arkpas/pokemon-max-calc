@@ -1,3 +1,16 @@
+@use '@angular/material' as mat;
+@use "../../../variables.scss" as *;
+
+:host {
+    @include mat.tabs-overrides((label-text-weight: 600));
+
+    ::ng-deep .mdc-tab.mdc-tab--active {
+        background-color: rgba($dmax-color, 0.25);
+        font-weight: 900;
+    }
+
+}
+
 .results {
     width: 100%;
     display: flex;
@@ -7,6 +20,10 @@
 
     mat-tab-group {
         width: 100%;
+
+        mat-tab {
+            font-weight: 500;
+        }
     }
 }
 

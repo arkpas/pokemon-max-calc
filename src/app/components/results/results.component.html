@@ -1,6 +1,6 @@
 <div class="results">
   <mat-tab-group>
-    <mat-tab label="Attackers">
+    <mat-tab label="⚔️ Attackers">
       <div class="mat-elevation-z8">
         <table mat-table [dataSource]="attackers" matSort>
           <!-- Name Column -->
@@ -32,25 +32,49 @@
         </table>
       </div>
     </mat-tab>
-    <mat-tab class="pokemon-tab" label="Tanks">
-      <div class="mat-elevation-z8"></div>
-      <div class="pokemon-cards">
-        <app-pokemon-card
-          *ngFor="let tank of tanks"
-          [name]="tank.name"
-          [hp]="tank.hp"
-          [def]="tank.def"
-          [avgDamage]="tank.avgDamage"
-          [avgDamagePercentage]="tank.avgDamagePercentage"
-          [damageDetails]="tank.damageDetails"
-          [fastAttacks]="tank.fastAttacks"
-          [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + tank.pokedexNumber + '.png'"
-          [primaryType]="tank.primaryType"
-          [secondaryType]="tank.secondaryType">
-        </app-pokemon-card>
-      </div>
+    <mat-tab label="🛡️ Tanks">
+      <mat-tab-group>
+        <mat-tab label="👊 On fielders">
+          <div class="mat-elevation-z8">
+            <div class="pokemon-cards">
+              <app-pokemon-card
+                *ngFor="let tank of tanks"
+                [name]="tank.name"
+                [hp]="tank.hp"
+                [def]="tank.def"
+                [avgDamage]="tank.avgDamage"
+                [avgDamagePercentage]="tank.avgDamagePercentage"
+                [damageDetails]="tank.damageDetails"
+                [fastAttacks]="tank.fastAttacks"
+                [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + tank.pokedexNumber + '.png'"
+                [primaryType]="tank.primaryType"
+                [secondaryType]="tank.secondaryType">
+              </app-pokemon-card>
+            </div>
+          </div>
+        </mat-tab>
+        <mat-tab label="🔻 Hot-swaps">
+          <div class="mat-elevation-z8">
+            <div class="pokemon-cards">
+              <app-pokemon-card
+                *ngFor="let sponge of sponges"
+                [name]="sponge.name"
+                [hp]="sponge.hp"
+                [def]="sponge.def"
+                [avgDamage]="sponge.avgDamage"
+                [avgDamagePercentage]="sponge.avgDamagePercentage"
+                [damageDetails]="sponge.damageDetails"
+                [fastAttacks]="sponge.fastAttacks"
+                [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + sponge.pokedexNumber + '.png'"
+                [primaryType]="sponge.primaryType"
+                [secondaryType]="sponge.secondaryType">
+              </app-pokemon-card>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
     </mat-tab>
-    <mat-tab label="Healers">
+    <mat-tab label="💚 Healers">
       <div class="pokemon-cards">
         <app-pokemon-card
           *ngFor="let healer of healers"

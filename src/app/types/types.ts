@@ -119,6 +119,7 @@ export interface Candidate {
 export interface TankCandidate extends Candidate {
   avgDamage: number;
   avgDamagePercentage: number;
+  hasHalfSecondAttack: boolean;
 }
 
 export interface HealerCandidate extends Candidate {

@@ -307,11 +307,6 @@ export class MaxCalculatorService {
       return;
     }
 
-    // Do not even do calcs for tanks without 0.5s fast attacks..
-    if (!pokemon.hasHalfSecondAttack) {
-      return;
-    }
-
     const tankDamageConfigurations = this.createBossDamageConfigurations(boss, pokemon);
 
     tankDamageConfigurations.sort((a, b) => a.damage - b.damage);
@@ -326,6 +321,7 @@ export class MaxCalculatorService {
       pokedexNumber: pokemon.pokedexNumber,
       primaryType: pokemon.primaryType,
       secondaryType: pokemon.secondaryType,
+      hasHalfSecondAttack: pokemon.hasHalfSecondAttack,
       def: pokemon.def,
       hp: pokemon.hp,
       attacker: this.getPokemonBaseStats(boss),

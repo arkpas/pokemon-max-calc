@@ -69,7 +69,7 @@
         </summary>
       </details>
     </div>
-    <div class="damage-list">
+    <div *ngIf="fastAttacks.length > 0" class="damage-list">
       <span class="damage-list-name">⚔️ Offense</span>
 
       <details *ngFor="let entry of fastAttacks" class="damage-row">

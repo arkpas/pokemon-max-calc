@@ -25,6 +25,7 @@ export class ResultsComponent implements OnInit, OnDestroy {
   attackers: DamageConfiguration[] = [];
   attackersColumns: string[] = ['name', 'move', 'power', 'damage'];
   tanks: TankCandidate[] = [];
+  sponges: TankCandidate[] = [];
   healers: HealerCandidate[] = [];
 
   ngOnInit(): void {
@@ -59,7 +60,8 @@ export class ResultsComponent implements OnInit, OnDestroy {
     const result = this.maxCalculatorService.calculate(allies, opponent, config.date);
 
     this.attackers = result.attackers;
-    this.tanks = result.tanks;
+    this.tanks = result.tanks.filter(tank => tank.hasHalfSecondAttack);
+    this.sponges = result.tanks;
     this.healers = result.healers;
   }
 }
