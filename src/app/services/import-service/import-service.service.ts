@@ -13,6 +13,7 @@ const HEADERS_MAPPING = {
   secondaryType: 'Secondary type',
   dynamax: 'Dynamax',
   gigantamax: 'Gigantamax',
+  dynamaxType: 'Dynamax type',
   gigantamaxType: 'Gigantamax type',
   fastAttacks: 'Fast attacks',
   chargedAttacks: 'Charged attacks',
@@ -138,6 +139,8 @@ export class ImportServiceService {
       obj['hasHalfSecondAttack'] = this.hasHalfSecondAttack(obj['fastAttacks']);
       obj['primaryType'] = Type[obj['primaryType'] as keyof typeof Type];
       obj['secondaryType'] = Type[obj['secondaryType'] as keyof typeof Type];
+      obj['gigantamaxType'] = Type[obj['gigantamaxType'] as keyof typeof Type];
+      obj['dynamaxType'] = Type[obj['dynamaxType'] as keyof typeof Type];
 
       result.push(obj as Pokemon);
     }

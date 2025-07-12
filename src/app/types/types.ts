@@ -34,6 +34,7 @@ export interface Pokemon extends PokemonBaseStats {
   secondaryType: string;
   dynamaxDate: Moment;
   gigantamaxDate: Moment;
+  dynamaxType: Type;
   gigantamaxType: Type;
   hasHalfSecondAttack: boolean;
   fastAttacks: Attack[];
