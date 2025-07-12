@@ -12,6 +12,13 @@ export interface BattleConfiguration {
   allyHpIV: number;
 }
 
+export interface SimulationResults {
+  attackers: DamageConfiguration[];
+  tanks: TankCandidate[];
+  sponges: TankCandidate[];
+  healers: HealerCandidate[];
+}
+
 export interface Attack {
   name: string;
   type: Type;

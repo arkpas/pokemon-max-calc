@@ -8,6 +8,8 @@ import {
   TankCandidate,
   HealerCandidate,
   ComboDamageConfiguration,
+  BattleConfiguration,
+  SimulationResults,
 } from '../../types/types';
 import { ImportServiceService } from '../import-service/import-service.service';
 import { Moment } from 'moment';
@@ -19,6 +21,37 @@ const TURN_DURATION = 0.5;
 })
 export class MaxCalculatorService {
   private importService = inject(ImportServiceService);
+
+  simulateBattle(config: BattleConfiguration): SimulationResults {
+    // Get all Pokemons from service and our opponent - we do it every time for each simulation,
+    // because we override stats based on battle config
+    const allies = this.importService.getPokemons();
+    const opponent = this.importService.findPokemon(config.opponentName);
+
+    // Calculate final stats for the opponent
+    const opponentAtkIV = 15;
+    const opponentDefIV = 15;
+
+    opponent.atk = (opponent.atk + opponentAtkIV) * config.opponentCpm * config.opponentAtkMod;
+    opponent.def = (opponent.def + opponentDefIV) * config.opponentCpm * config.opponentDefMod;
+
+    // Calculate final stats for allies
+    allies.forEach(ally => {
+      ally.atk = (ally.atk + config.allyAtkIV) * config.allyCpm;
+      ally.def = (ally.def + config.allyDefIV) * config.allyCpm;
+      ally.hp = Math.floor((ally.hp + config.allyHpIV) * config.allyCpm);
+    });
+
+    // Run the simulation
+    const result = this.calculate(allies, opponent, config.date);
+
+    return {
+      attackers: result.attackers,
+      tanks: result.tanks.filter(tank => tank.hasHalfSecondAttack),
+      sponges: result.tanks,
+      healers: result.healers,
+    };
+  }
 
   public calculate(pokemons: Pokemon[], boss: Pokemon, date: Moment) {
     const attackers: DamageConfiguration[] = [];

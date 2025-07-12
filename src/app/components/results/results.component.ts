@@ -1,6 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
 import { MaxCalculatorService } from '../../services/max-calculator-service/max-calculator.service';
-import { ImportServiceService } from '../../services/import-service/import-service.service';
 import { MatTabsModule } from '@angular/material/tabs';
 import { BattleConfiguration, DamageConfiguration, HealerCandidate, TankCandidate } from '../../types/types';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -16,7 +15,6 @@ import { Observable, Subscription } from 'rxjs';
   imports: [MatTabsModule, MatPaginatorModule, MatTableModule, PokemonCardComponent, CommonModule],
 })
 export class ResultsComponent implements OnInit, OnDestroy {
-  private importService = inject(ImportServiceService);
   private maxCalculatorService = inject(MaxCalculatorService);
   private subscriptions = new Subscription();
 
@@ -37,31 +35,11 @@ export class ResultsComponent implements OnInit, OnDestroy {
   }
 
   simulateBattle(config: BattleConfiguration): void {
-    // Get all Pokemons from service and our opponent - we do it every time for each simulation,
-    // because we override stats based on battle config
-    const allies = this.importService.getPokemons();
-    const opponent = this.importService.findPokemon(config.opponentName);
+    const simulationResults = this.maxCalculatorService.simulateBattle(config);
 
-    // Calculate final stats for the opponent
-    const opponentAtkIV = 15;
-    const opponentDefIV = 15;
-
-    opponent.atk = (opponent.atk + opponentAtkIV) * config.opponentCpm * config.opponentAtkMod;
-    opponent.def = (opponent.def + opponentDefIV) * config.opponentCpm * config.opponentDefMod;
-
-    // Calculate final stats for allies
-    allies.forEach(ally => {
-      ally.atk = (ally.atk + config.allyAtkIV) * config.allyCpm;
-      ally.def = (ally.def + config.allyDefIV) * config.allyCpm;
-      ally.hp = Math.floor((ally.hp + config.allyHpIV) * config.allyCpm);
-    });
-
-    // Run the simulation
-    const result = this.maxCalculatorService.calculate(allies, opponent, config.date);
-
-    this.attackers = result.attackers;
-    this.tanks = result.tanks.filter(tank => tank.hasHalfSecondAttack);
-    this.sponges = result.tanks;
-    this.healers = result.healers;
+    this.attackers = simulationResults.attackers;
+    this.tanks = simulationResults.tanks.filter(tank => tank.hasHalfSecondAttack);
+    this.sponges = simulationResults.tanks;
+    this.healers = simulationResults.healers;
   }
 }
