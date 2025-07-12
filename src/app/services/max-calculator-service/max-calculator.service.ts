@@ -46,6 +46,7 @@ export class MaxCalculatorService {
     const result = this.calculate(allies, opponent, config.date);
 
     return {
+      opponent: opponent,
       attackers: result.attackers,
       tanks: result.tanks.filter(tank => tank.hasHalfSecondAttack),
       sponges: result.tanks,

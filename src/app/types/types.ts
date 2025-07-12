@@ -13,6 +13,7 @@ export interface BattleConfiguration {
 }
 
 export interface SimulationResults {
+  opponent: Pokemon;
   attackers: DamageConfiguration[];
   tanks: TankCandidate[];
   sponges: TankCandidate[];
@@ -37,8 +38,8 @@ export interface PokemonBaseStats {
 
 export interface Pokemon extends PokemonBaseStats {
   pokedexNumber: string;
-  primaryType: string;
-  secondaryType: string;
+  primaryType: Type;
+  secondaryType: Type;
   dynamaxDate: Moment;
   gigantamaxDate: Moment;
   dynamaxType: Type;
