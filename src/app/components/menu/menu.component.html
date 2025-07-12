@@ -18,7 +18,7 @@
           matInput
           [formControl]="battleConfigurationForm.controls.opponentName"
           [matAutocomplete]="raidBossAuto" />
-        <mat-autocomplete #raidBossAuto="matAutocomplete">
+        <mat-autocomplete #raidBossAuto="matAutocomplete" (optionSelected)="preconfigureOpponent($event)">
           @for (option of filteredPokemonOptions | async; track option) {
             <mat-option [value]="option">{{ option }}</mat-option>
           }
@@ -39,6 +39,13 @@
           }
         </mat-autocomplete>
         <mat-error *ngIf="battleConfigurationForm.controls.opponentCpm.invalid"> Please provide valid CPM value! </mat-error>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field appearance="outline" (click)="this.battleConfigurationForm.controls.opponentHp.setValue(null)">
+        <mat-label>HP</mat-label>
+        <input matInput type="number" [formControl]="battleConfigurationForm.controls.opponentHp" />
+        <mat-error *ngIf="battleConfigurationForm.controls.opponentHp.invalid"> Please provide valid HP value! </mat-error>
       </mat-form-field>
     </div>
     <div>

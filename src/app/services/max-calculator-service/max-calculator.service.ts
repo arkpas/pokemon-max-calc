@@ -34,6 +34,7 @@ export class MaxCalculatorService {
 
     opponent.atk = (opponent.atk + opponentAtkIV) * config.opponentCpm * config.opponentAtkMod;
     opponent.def = (opponent.def + opponentDefIV) * config.opponentCpm * config.opponentDefMod;
+    opponent.hp = config.opponentHp;
 
     // Calculate final stats for allies
     allies.forEach(ally => {

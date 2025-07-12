@@ -3,25 +3,6 @@ export interface Cpm {
   description: string;
 }
 
-// TODO: update with
-// Dynamax Boss          | Tier     | Category | CPM     | HP        | Atk Mult | Def Mult
-// Venusaur              | 6        | G        | 0.85    | 90000     | 1        | 1
-// Charizard             | 6        | G        | 0.85    | 90000     | 1        | 1
-// Blastoise             | 6        | G        | 0.85    | 90000     | 1        | 1
-// Machamp               | 6        | G        | 0.72    | 115000    | 1        | 1
-// Gengar                | 6        | G        | 0.765   | 90000     | 1        | 1
-// Kingler               | 6        | G        | 0.765   | 115000    | 1        | 1
-// Lapras                | 6        | G        | 0.765   | 90000     | 1        | 1
-// Snorlax               | 6        | G        | 0.765   | 115000    | 1        | 1
-// Articuno              | 5        | D        | 0.7     | 17500     | 2        | 1
-// Zapdos                | 5        | D        | 0.7     | 13000     | 2        | 1
-// Moltres               | 5        | D        | 0.7     | 17500     | 2        | 1
-// Raikou                | 5        | D        | 0.8     | 23000     | 2        | 1
-// Entei                 | 5        | D        | 0.8     | 23000     | 2        | 1
-// Suicune               | 5        | D        | 0.8     | 22000     | 2        | 1
-// Rillaboom             | 6        | G        | 0.9     | 135000    | 1        | 1
-// Toxtricity (Amped Form)| 6       | G        | 0.765   | 180000    | 1.3333   | 1
-// Toxtricity (Low Key Form)| 6     | G        | 0.765   | 180000    | 1.3333   | 1
 export const CPMS: Cpm[] = [
   {
     value: 0.6,

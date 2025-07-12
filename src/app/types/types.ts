@@ -1,10 +1,14 @@
 import { Moment } from 'moment';
 
-export interface BattleConfiguration {
+export interface OpponentConfiguration {
   opponentName: string;
   opponentCpm: number;
+  opponentHp: number;
   opponentAtkMod: number;
   opponentDefMod: number;
+}
+
+export interface BattleConfiguration extends OpponentConfiguration {
   date: Moment;
   allyCpm: number;
   allyAtkIV: number;

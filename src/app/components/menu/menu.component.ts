@@ -1,6 +1,6 @@
 import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,6 +11,7 @@ import { first, map, Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { BattleConfiguration } from '../../types/types';
 import moment from 'moment';
+import { CONFIGURATIONS } from '../../constants/configurations.costants';
 
 @Component({
   selector: 'app-menu',
@@ -31,7 +32,8 @@ export class MenuComponent {
     // TODO: validate if opponent with that name exists
     opponentName: ['', Validators.required],
     // TODO: validate if number
-    opponentCpm: [0.8, Validators.required],
+    opponentCpm: [0, Validators.required],
+    opponentHp: [0, Validators.required],
     opponentAtkMod: [1, Validators.required],
     opponentDefMod: [1, Validators.required],
     date: [new Date(), Validators.required],
@@ -55,7 +57,6 @@ export class MenuComponent {
     this.filteredPokemonOptions = this.battleConfigurationForm.controls.opponentName.valueChanges.pipe(
       map(name => (name ? this.filterPokemonNames(name) : this.pokemonOptions.slice()))
     );
-
     // Opponent CPMs
     this.filteredCpms = this.battleConfigurationForm.controls.opponentCpm.valueChanges.pipe(
       map(cpm => (cpm ? this._filterCpms(cpm) : this.cpms.slice()))
@@ -72,6 +73,22 @@ export class MenuComponent {
   filterPokemonNames(name: string): string[] {
     const filterValue = name.toLowerCase();
     return this.pokemonOptions.filter(o => o.toLowerCase().includes(filterValue));
+  }
+
+  preconfigureOpponent(event: MatAutocompleteSelectedEvent) {
+    const preConfiguration = CONFIGURATIONS.find(config => config.opponentName.toLowerCase() === event.option.value.toLowerCase());
+
+    if (preConfiguration) {
+      this.battleConfigurationForm.controls.opponentCpm.setValue(preConfiguration.opponentCpm);
+      this.battleConfigurationForm.controls.opponentAtkMod.setValue(preConfiguration.opponentAtkMod);
+      this.battleConfigurationForm.controls.opponentDefMod.setValue(preConfiguration.opponentDefMod);
+      this.battleConfigurationForm.controls.opponentHp.setValue(preConfiguration.opponentHp);
+    } else {
+      this.battleConfigurationForm.controls.opponentCpm.setValue(0.7);
+      this.battleConfigurationForm.controls.opponentAtkMod.setValue(1);
+      this.battleConfigurationForm.controls.opponentDefMod.setValue(1);
+      this.battleConfigurationForm.controls.opponentHp.setValue(10000);
+    }
   }
 
   submit(): void {

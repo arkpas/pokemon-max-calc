@@ -48,7 +48,7 @@
 
   <div class="damage-section" *ngIf="showDetails">
     <div class="damage-list">
-      <span class="damage-list-name">🛡️ Defense</span>
+      <span class="damage-list-name">🛡️ Damage taken</span>
       <details *ngFor="let entry of damageDetails" class="damage-row">
         <summary class="damage-summary">
           <span class="col attack-name type-bg {{ entry.moveType.toLowerCase() }}">
@@ -70,7 +70,7 @@
       </details>
     </div>
     <div *ngIf="fastAttacks.length > 0" class="damage-list">
-      <span class="damage-list-name">⚔️ Offense</span>
+      <span class="damage-list-name">⚔️ Recommended fast attacks (0.5s)</span>
 
       <details *ngFor="let entry of fastAttacks" class="damage-row">
         <summary class="damage-summary">
