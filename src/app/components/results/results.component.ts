@@ -42,7 +42,7 @@ export class ResultsComponent implements OnInit, OnDestroy {
     this.opponent = simulationResults.opponent;
     this.attackers = simulationResults.attackers;
     this.tanks = simulationResults.tanks.filter(tank => tank.hasHalfSecondAttack);
-    this.sponges = simulationResults.tanks;
+    this.sponges = simulationResults.sponges;
     this.healers = simulationResults.healers;
   }
 }
