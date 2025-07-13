@@ -84,10 +84,10 @@ export class MenuComponent {
       this.battleConfigurationForm.controls.opponentDefMod.setValue(preConfiguration.opponentDefMod);
       this.battleConfigurationForm.controls.opponentHp.setValue(preConfiguration.opponentHp);
     } else {
-      this.battleConfigurationForm.controls.opponentCpm.setValue(0.7);
+      this.battleConfigurationForm.controls.opponentCpm.setValue(0.8);
       this.battleConfigurationForm.controls.opponentAtkMod.setValue(1);
       this.battleConfigurationForm.controls.opponentDefMod.setValue(1);
-      this.battleConfigurationForm.controls.opponentHp.setValue(10000);
+      this.battleConfigurationForm.controls.opponentHp.setValue(15000);
     }
   }
 
