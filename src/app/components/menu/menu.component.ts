@@ -89,6 +89,9 @@ export class MenuComponent {
       this.battleConfigurationForm.controls.opponentDefMod.setValue(1);
       this.battleConfigurationForm.controls.opponentHp.setValue(15000);
     }
+
+    // Set default battle date
+    this.battleConfigurationForm.controls.date.setValue(this.determineDefaultBattleDate(event.option.value));
   }
 
   submit(): void {
@@ -122,5 +125,43 @@ export class MenuComponent {
     const filterValue = value.toString().toLowerCase();
 
     return this.pokemonCpms.filter(cpm => cpm.value.toString().toLowerCase().includes(filterValue));
+  }
+
+  private determineDefaultBattleDate(pokemonName: string): Date {
+    const pokemon = this.importService.findPokemon(pokemonName);
+    const now = moment();
+
+    // Pokemon did not have premieres yet and they are not known or already had premieres
+    if (
+      (pokemon.dynamaxDate.year() === 9999 || pokemon.dynamaxDate.isBefore(now)) &&
+      (pokemon.gigantamaxDate.year() === 9999 || pokemon.gigantamaxDate.isBefore(now))
+    ) {
+      return new Date();
+    }
+
+    // Next two cases are when one of the dates is in the past
+    // Check if: dmax <= now <= gmax
+    if (now.isBetween(pokemon.dynamaxDate, pokemon.gigantamaxDate, undefined, '[]')) {
+      return pokemon.gigantamaxDate.toDate();
+    }
+
+    // Check if: gmax <= now <= dmax
+    if (now.isBetween(pokemon.gigantamaxDate, pokemon.dynamaxDate, undefined, '[]')) {
+      return pokemon.dynamaxDate.toDate();
+    }
+
+    // Last cases are when both dates are in the future, then we want to take closest premiere date
+    // So first check if: now < dmax <= gmax
+    if (pokemon.dynamaxDate.isBetween(now, pokemon.gigantamaxDate, undefined, '(]')) {
+      return pokemon.dynamaxDate.toDate();
+    }
+
+    // And also: now < gmax <= dmax
+    if (pokemon.gigantamaxDate.isBetween(now, pokemon.dynamaxDate, undefined, '(]')) {
+      return pokemon.gigantamaxDate.toDate();
+    }
+
+    // Otherwise just return today
+    return new Date();
   }
 }

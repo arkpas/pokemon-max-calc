@@ -54,7 +54,7 @@ export class ImportServiceService {
   }
 
   public findPokemon(name: string): Pokemon {
-    const wantedPokemon = this.pokemons.find(pokemon => pokemon.name === name);
+    const wantedPokemon = this.pokemons.find(pokemon => pokemon.name.toLowerCase() === name.toLowerCase());
 
     if (!wantedPokemon) {
       throw new Error(`Pokemon with name ${name} was not found!`);
