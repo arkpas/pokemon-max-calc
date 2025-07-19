@@ -127,4 +127,11 @@ export const CONFIGURATIONS: OpponentConfiguration[] = [
     opponentDefMod: 1,
     opponentHp: 100000,
   },
+  {
+    opponentName: 'Butterfree',
+    opponentCpm: 0.81,
+    opponentAtkMod: 1,
+    opponentDefMod: 1,
+    opponentHp: 100000,
+  },
 ];
