@@ -134,4 +134,18 @@ export const CONFIGURATIONS: OpponentConfiguration[] = [
     opponentDefMod: 1,
     opponentHp: 100000,
   },
+  {
+    opponentName: 'Latios',
+    opponentCpm: 0.75,
+    opponentAtkMod: 2,
+    opponentDefMod: 1,
+    opponentHp: 23000,
+  },
+  {
+    opponentName: 'Latias',
+    opponentCpm: 0.7,
+    opponentAtkMod: 2,
+    opponentDefMod: 1,
+    opponentHp: 25000,
+  },
 ];
