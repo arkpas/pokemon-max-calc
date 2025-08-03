@@ -129,7 +129,7 @@ export const CONFIGURATIONS: OpponentConfiguration[] = [
   },
   {
     opponentName: 'Butterfree',
-    opponentCpm: 0.81,
+    opponentCpm: 0.765,
     opponentAtkMod: 1,
     opponentDefMod: 1,
     opponentHp: 100000,
