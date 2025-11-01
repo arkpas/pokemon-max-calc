@@ -150,9 +150,9 @@ export const CONFIGURATIONS: OpponentConfiguration[] = [
   },
   {
     opponentName: 'Garbodor',
-    opponentCpm: 0.81,
-    opponentAtkMod: 1,
+    opponentCpm: 0.9,
+    opponentAtkMod: 1.4,
     opponentDefMod: 1,
-    opponentHp: 100000,
+    opponentHp: 150000,
   },
 ];
