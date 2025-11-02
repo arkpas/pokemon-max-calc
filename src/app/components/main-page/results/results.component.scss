@@ -1,5 +1,5 @@
 @use '@angular/material' as mat;
-@use "../../../variables.scss" as *;
+@use "../../../../variables.scss" as *;
 
 :host {
     @include mat.tabs-overrides((label-text-weight: 600));

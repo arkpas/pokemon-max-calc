@@ -17,6 +17,7 @@ export interface AllyConfiguration {
 
 export interface BattleConfiguration extends OpponentConfiguration, AllyConfiguration {
   date: Moment;
+  teamOption: TeamOption;
 }
 
 export interface SimulationResults {
@@ -81,6 +82,12 @@ export enum Type {
   Dragon = 'Dragon',
   Dark = 'Dark',
   Fairy = 'Fairy',
+}
+
+export enum TeamOption {
+  allPokemons = 'Use all Pokemon',
+  onlyMyPokemons = 'Use only My Pokemon',
+  onlyDefaultPokemons = 'Use only default Pokemon',
 }
 
 export interface DamageConfiguration {

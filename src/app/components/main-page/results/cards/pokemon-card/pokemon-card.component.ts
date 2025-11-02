@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DamageDetails, Type } from '../../../../types/types';
+import { DamageDetails, Type } from '../../../../../types/types';
 import { getTypeColor, getTypeBadgeClass, getDamagePercentageColor } from '../utils';
-import { CpmToLevelPipe } from '../../../../pipes/cpmToLevel.pipe';
+import { CpmToLevelPipe } from '../../../../../pipes/cpmToLevel.pipe';
 
 @Component({
   selector: 'app-pokemon-card',

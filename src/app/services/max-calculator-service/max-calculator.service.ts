@@ -10,10 +10,11 @@ import {
   ComboDamageConfiguration,
   BattleConfiguration,
   SimulationResults,
+  TeamOption,
 } from '../../types/types';
 import { ImportServiceService } from '../import-service/import-service.service';
 import { Moment } from 'moment';
-import { TeamService } from '../team.service';
+import { MyPokemonService } from '../my-pokemon.service';
 
 const TURN_DURATION = 0.5;
 
@@ -22,17 +23,23 @@ const TURN_DURATION = 0.5;
 })
 export class MaxCalculatorService {
   private importService = inject(ImportServiceService);
-  private teamService = inject(TeamService);
+  private teamService = inject(MyPokemonService);
 
   simulateBattle(config: BattleConfiguration): SimulationResults {
-    // Get all Pokemons from service and our opponent - we do it every time for each simulation,
-    // because we override stats based on battle config
-    const allies = this.importService.getPokemonsWithConfig(config);
+    // Get our opponent with stats adjusted to battle config
     const opponent = this.importService.getOpponent(config);
+    const allies: Pokemon[] = [];
 
-    // Add personal team to the mix
-    const myPokemons = this.teamService.getMyPokemons();
-    allies.push(...myPokemons);
+    if (config.teamOption === TeamOption.allPokemons || config.teamOption === TeamOption.onlyDefaultPokemons) {
+      // Get all Pokemons with stats adjusted to battle config
+      allies.push(...this.importService.getPokemonsWithConfig(config));
+    }
+
+    if (config.teamOption === TeamOption.allPokemons || config.teamOption === TeamOption.onlyMyPokemons) {
+      // Add personal team to the mix
+      const myPokemons = this.teamService.getMyPokemons();
+      allies.push(...myPokemons);
+    }
 
     // Run the simulation
     const result = this.calculate(allies, opponent, config.date);

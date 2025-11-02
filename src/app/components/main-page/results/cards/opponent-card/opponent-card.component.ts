@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Type } from '../../../../types/types';
+import { Type } from '../../../../../types/types';
 import { getTypeColor, getTypeBadgeClass, getDamagePercentageColor } from '../utils';
 import { CommonModule } from '@angular/common';
 

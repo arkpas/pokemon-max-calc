@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
-import { MaxCalculatorService } from '../../services/max-calculator-service/max-calculator.service';
+import { MaxCalculatorService } from '../../../services/max-calculator-service/max-calculator.service';
 import { MatTabsModule } from '@angular/material/tabs';
-import { BattleConfiguration, DamageConfiguration, HealerCandidate, Pokemon, TankCandidate } from '../../types/types';
+import { BattleConfiguration, DamageConfiguration, HealerCandidate, Pokemon, TankCandidate } from '../../../types/types';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { PokemonCardComponent } from './cards/pokemon-card/pokemon-card.component';

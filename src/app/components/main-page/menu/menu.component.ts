@@ -5,23 +5,35 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { ImportServiceService } from '../../services/import-service/import-service.service';
-import { Cpm, CPMS, POKEMON_CPMS } from '../../constants/cpm.constants';
+import { MatSelectModule } from '@angular/material/select';
+import { ImportServiceService } from '../../../services/import-service/import-service.service';
+import { Cpm, CPMS, POKEMON_CPMS } from '../../../constants/cpm.constants';
 import { first, map, Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { BattleConfiguration } from '../../types/types';
+import { BattleConfiguration, TeamOption } from '../../../types/types';
 import moment from 'moment';
-import { CONFIGURATIONS } from '../../constants/configurations.costants';
+import { CONFIGURATIONS } from '../../../constants/configurations.costants';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-menu',
-  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatAutocompleteModule, MatDatepickerModule, CommonModule],
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatAutocompleteModule,
+    MatDatepickerModule,
+    CommonModule,
+    MatSelectModule,
+  ],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',
 })
 export class MenuComponent {
   private importService = inject(ImportServiceService);
   private formBuilder = inject(FormBuilder);
+  private router = inject(Router);
 
   @Output() configurationSubmitEvent = new EventEmitter<BattleConfiguration>();
 
@@ -37,6 +49,7 @@ export class MenuComponent {
     opponentAtkMod: [1, Validators.required],
     opponentDefMod: [1, Validators.required],
     date: [new Date(), Validators.required],
+    teamOption: [TeamOption.allPokemons, Validators.required],
     // TODO: validate if number
     allyCpm: [0.7903, Validators.required],
     allyAtkIV: [15, Validators.required],
@@ -50,6 +63,7 @@ export class MenuComponent {
   filteredPokemonOptions: Observable<string[]>;
   filteredCpms: Observable<Cpm[]>;
   filteredPokemonCpms: Observable<Cpm[]>;
+  teamOptions = [TeamOption.allPokemons, TeamOption.onlyMyPokemons, TeamOption.onlyDefaultPokemons];
 
   constructor() {
     // Pokemon names
@@ -113,6 +127,10 @@ export class MenuComponent {
 
   showForm(): void {
     this.isCollapsed = false;
+  }
+
+  navigateToMyPokemon(): void {
+    this.router.navigateByUrl('/my-pokemon');
   }
 
   private _filterCpms(value: number): Cpm[] {

@@ -29,7 +29,7 @@ const sampleData: MyPokemon[] = [
 @Injectable({
   providedIn: 'root',
 })
-export class TeamService {
+export class MyPokemonService {
   private importService = inject(ImportServiceService);
 
   getMyPokemons(): Pokemon[] {
