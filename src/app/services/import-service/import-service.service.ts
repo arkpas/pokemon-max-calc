@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { Attack, Pokemon, Type } from '../../types/types';
+import { AllyConfiguration, Attack, MyPokemon, OpponentConfiguration, Pokemon, Type } from '../../types/types';
 import moment, { Moment } from 'moment';
 
 type DefendingTypeEffectiveness = Record<string, number>;
@@ -49,8 +49,49 @@ export class ImportServiceService {
   }
 
   public getPokemons(): Pokemon[] {
-    // Copy the pokemons and return them, so we still have "clean" version of them in service
     return this.pokemons.map(pokemon => this.deepCopyPokemon(pokemon));
+  }
+
+  public getPokemonsWithConfig(config: AllyConfiguration): Pokemon[] {
+    // Copy the pokemons and return them, so we still have "clean" version of them in service
+    const pokemons = this.getPokemons();
+
+    // Calculate final stats
+    pokemons.forEach(pokemon => {
+      pokemon.cpm = config.allyCpm;
+      pokemon.atk = (pokemon.atk + config.allyAtkIV) * config.allyCpm;
+      pokemon.def = (pokemon.def + config.allyDefIV) * config.allyCpm;
+      pokemon.hp = Math.floor((pokemon.hp + config.allyHpIV) * config.allyCpm);
+    });
+
+    return pokemons;
+  }
+
+  public getPokemonsForMyPokemons(myPokemons: MyPokemon[]): Pokemon[] {
+    const allPokemons = this.getPokemons();
+    const pokemons: Pokemon[] = [];
+
+    // Calculate final stats
+    myPokemons.forEach(myPokemon => {
+      const pokemon = allPokemons.find(pokemon => pokemon.name === myPokemon.name);
+
+      if (!pokemon) {
+        console.log(`Pokemon with name ${myPokemon.name} was not found!`);
+      } else {
+        pokemon.cpm = myPokemon.allyCpm;
+        pokemon.atk = (pokemon.atk + myPokemon.allyAtkIV) * myPokemon.allyCpm;
+        pokemon.def = (pokemon.def + myPokemon.allyDefIV) * myPokemon.allyCpm;
+        pokemon.hp = Math.floor((pokemon.hp + myPokemon.allyHpIV) * myPokemon.allyCpm);
+
+        pokemons.push(pokemon);
+      }
+    });
+
+    return pokemons;
+  }
+
+  public getPokemonNames(): string[] {
+    return this.pokemons.map(pokemon => pokemon.name);
   }
 
   public findPokemon(name: string): Pokemon {
@@ -61,6 +102,26 @@ export class ImportServiceService {
     }
 
     return this.deepCopyPokemon(wantedPokemon);
+  }
+
+  public getOpponent(config: OpponentConfiguration): Pokemon {
+    const wantedPokemon = this.pokemons.find(pokemon => pokemon.name.toLowerCase() === config.opponentName.toLowerCase());
+
+    if (!wantedPokemon) {
+      throw new Error(`Pokemon with name ${config.opponentName} was not found!`);
+    }
+
+    const opponent = this.deepCopyPokemon(wantedPokemon);
+
+    // Calculate final stats for the opponent
+    const opponentAtkIV = 15;
+    const opponentDefIV = 15;
+
+    opponent.atk = (opponent.atk + opponentAtkIV) * config.opponentCpm * config.opponentAtkMod;
+    opponent.def = (opponent.def + opponentDefIV) * config.opponentCpm * config.opponentDefMod;
+    opponent.hp = config.opponentHp;
+
+    return opponent;
   }
 
   /**

@@ -8,12 +8,15 @@ export interface OpponentConfiguration {
   opponentDefMod: number;
 }
 
-export interface BattleConfiguration extends OpponentConfiguration {
-  date: Moment;
+export interface AllyConfiguration {
   allyCpm: number;
   allyAtkIV: number;
   allyDefIV: number;
   allyHpIV: number;
+}
+
+export interface BattleConfiguration extends OpponentConfiguration, AllyConfiguration {
+  date: Moment;
 }
 
 export interface SimulationResults {
@@ -51,6 +54,11 @@ export interface Pokemon extends PokemonBaseStats {
   hasHalfSecondAttack: boolean;
   fastAttacks: Attack[];
   chargedAttacks: Attack[];
+  cpm: number;
+}
+
+export interface MyPokemon extends AllyConfiguration {
+  name: string;
 }
 
 export enum Type {

@@ -53,7 +53,7 @@ export class MenuComponent {
 
   constructor() {
     // Pokemon names
-    this.pokemonOptions = this.importService.getPokemons().map(pokemon => pokemon.name);
+    this.pokemonOptions = this.importService.getPokemonNames();
     this.filteredPokemonOptions = this.battleConfigurationForm.controls.opponentName.valueChanges.pipe(
       map(name => (name ? this.filterPokemonNames(name) : this.pokemonOptions.slice()))
     );

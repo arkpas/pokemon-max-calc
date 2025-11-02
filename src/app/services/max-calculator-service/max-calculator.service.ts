@@ -13,6 +13,7 @@ import {
 } from '../../types/types';
 import { ImportServiceService } from '../import-service/import-service.service';
 import { Moment } from 'moment';
+import { TeamService } from '../team.service';
 
 const TURN_DURATION = 0.5;
 
@@ -21,27 +22,17 @@ const TURN_DURATION = 0.5;
 })
 export class MaxCalculatorService {
   private importService = inject(ImportServiceService);
+  private teamService = inject(TeamService);
 
   simulateBattle(config: BattleConfiguration): SimulationResults {
     // Get all Pokemons from service and our opponent - we do it every time for each simulation,
     // because we override stats based on battle config
-    const allies = this.importService.getPokemons();
-    const opponent = this.importService.findPokemon(config.opponentName);
+    const allies = this.importService.getPokemonsWithConfig(config);
+    const opponent = this.importService.getOpponent(config);
 
-    // Calculate final stats for the opponent
-    const opponentAtkIV = 15;
-    const opponentDefIV = 15;
-
-    opponent.atk = (opponent.atk + opponentAtkIV) * config.opponentCpm * config.opponentAtkMod;
-    opponent.def = (opponent.def + opponentDefIV) * config.opponentCpm * config.opponentDefMod;
-    opponent.hp = config.opponentHp;
-
-    // Calculate final stats for allies
-    allies.forEach(ally => {
-      ally.atk = (ally.atk + config.allyAtkIV) * config.allyCpm;
-      ally.def = (ally.def + config.allyDefIV) * config.allyCpm;
-      ally.hp = Math.floor((ally.hp + config.allyHpIV) * config.allyCpm);
-    });
+    // Add personal team to the mix
+    const myPokemons = this.teamService.getMyPokemons();
+    allies.push(...myPokemons);
 
     // Run the simulation
     const result = this.calculate(allies, opponent, config.date);
