@@ -59,7 +59,9 @@
                 [fastAttacks]="tank.fastAttacks"
                 [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + tank.pokedexNumber + '.png'"
                 [primaryType]="tank.primaryType"
-                [secondaryType]="tank.secondaryType">
+                [secondaryType]="tank.secondaryType"
+                [cpm]="tank.cpm"
+                [isMyPokemon]="tank.isMyPokemon">
               </app-pokemon-card>
             </div>
           </div>
@@ -78,7 +80,9 @@
                 [fastAttacks]="sponge.fastAttacks"
                 [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + sponge.pokedexNumber + '.png'"
                 [primaryType]="sponge.primaryType"
-                [secondaryType]="sponge.secondaryType">
+                [secondaryType]="sponge.secondaryType"
+                [cpm]="sponge.cpm"
+                [isMyPokemon]="sponge.isMyPokemon">
               </app-pokemon-card>
             </div>
           </div>
@@ -98,7 +102,9 @@
           [fastAttacks]="healer.fastAttacks"
           [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + healer.pokedexNumber + '.png'"
           [primaryType]="healer.primaryType"
-          [secondaryType]="healer.secondaryType">
+          [secondaryType]="healer.secondaryType"
+          [cpm]="healer.cpm"
+          [isMyPokemon]="healer.isMyPokemon">
         </app-pokemon-card>
       </div>
     </mat-tab>

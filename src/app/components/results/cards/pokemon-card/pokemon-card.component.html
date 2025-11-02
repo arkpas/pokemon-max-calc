@@ -7,9 +7,16 @@
   }">
   <div class="header-inline">
     <img class="sprite" [src]="imageUrl" alt="sprite" />
-    <h2 class="name">{{ name }}</h2>
+    <div class="name">
+      <span class="{{ isMyPokemon ? 'my-pokemon' : '' }}">{{ name }}</span>
+    </div>
 
-    <div class="header-stats">
+    <div *ngIf="cpm" class="header-stats">
+      <div class="stat" title="Poziom">
+        ⭐
+        <strong>L{{ cpm | cpmToLevel }}</strong>
+      </div>
+
       <div *ngIf="avgDamage" class="stat" title="Średnie obrażenia (bazowe + procentowe)">
         💥
         <strong>{{ avgDamage.toFixed(1) }} ({{ avgDamagePercentage.toFixed(1) }}%)</strong>

@@ -2,12 +2,13 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DamageDetails, Type } from '../../../../types/types';
 import { getTypeColor, getTypeBadgeClass, getDamagePercentageColor } from '../utils';
+import { CpmToLevelPipe } from '../../../../pipes/cpmToLevel.pipe';
 
 @Component({
   selector: 'app-pokemon-card',
   templateUrl: './pokemon-card.component.html',
   styleUrls: ['./pokemon-card.component.scss'],
-  imports: [CommonModule],
+  imports: [CommonModule, CpmToLevelPipe],
 })
 export class PokemonCardComponent {
   @Input() name!: string;
@@ -23,6 +24,8 @@ export class PokemonCardComponent {
   @Input() fastAttacks: DamageDetails[] = [];
   @Input() primaryType!: Type;
   @Input() secondaryType!: Type;
+  @Input() cpm!: number;
+  @Input() isMyPokemon!: boolean;
 
   showDetails = false;
 

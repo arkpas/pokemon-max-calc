@@ -55,6 +55,7 @@ export interface Pokemon extends PokemonBaseStats {
   fastAttacks: Attack[];
   chargedAttacks: Attack[];
   cpm: number;
+  isMyPokemon: boolean;
 }
 
 export interface MyPokemon extends AllyConfiguration {
@@ -132,7 +133,8 @@ export interface Candidate {
   def: number;
   hp: number;
   attacker: PokemonBaseStats;
-
+  cpm: number;
+  isMyPokemon: boolean;
   damageDetails: DamageDetails[];
   fastAttacks: DamageDetails[];
 }

@@ -82,6 +82,7 @@ export class ImportServiceService {
         pokemon.atk = (pokemon.atk + myPokemon.allyAtkIV) * myPokemon.allyCpm;
         pokemon.def = (pokemon.def + myPokemon.allyDefIV) * myPokemon.allyCpm;
         pokemon.hp = Math.floor((pokemon.hp + myPokemon.allyHpIV) * myPokemon.allyCpm);
+        pokemon.isMyPokemon = true;
 
         pokemons.push(pokemon);
       }

@@ -10,6 +10,20 @@ const sampleData: MyPokemon[] = [
     allyDefIV: 11,
     allyHpIV: 12,
   },
+  {
+    name: 'Zamazenta Crowned Shield',
+    allyCpm: 0.8078,
+    allyAtkIV: 13,
+    allyDefIV: 10,
+    allyHpIV: 12,
+  },
+  {
+    name: 'Some unknown pokemon',
+    allyCpm: 0.8078,
+    allyAtkIV: 13,
+    allyDefIV: 11,
+    allyHpIV: 12,
+  },
 ];
 
 @Injectable({
