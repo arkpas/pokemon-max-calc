@@ -68,16 +68,13 @@ export class ImportServiceService {
   }
 
   public getPokemonsForMyPokemons(myPokemons: MyPokemon[]): Pokemon[] {
-    const allPokemons = this.getPokemons();
     const pokemons: Pokemon[] = [];
 
     // Calculate final stats
     myPokemons.forEach(myPokemon => {
-      const pokemon = allPokemons.find(pokemon => pokemon.name === myPokemon.name);
+      try {
+        const pokemon = this.findPokemon(myPokemon.name);
 
-      if (!pokemon) {
-        console.log(`Pokemon with name ${myPokemon.name} was not found!`);
-      } else {
         pokemon.cpm = myPokemon.allyCpm;
         pokemon.atk = (pokemon.atk + myPokemon.allyAtkIV) * myPokemon.allyCpm;
         pokemon.def = (pokemon.def + myPokemon.allyDefIV) * myPokemon.allyCpm;
@@ -85,6 +82,8 @@ export class ImportServiceService {
         pokemon.isMyPokemon = true;
 
         pokemons.push(pokemon);
+      } catch {
+        console.log(`Error getting My Pokemon with name: "${myPokemon.name}"!`);
       }
     });
 

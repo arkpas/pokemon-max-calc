@@ -35,4 +35,8 @@ export class MyPokemonService {
   getMyPokemons(): Pokemon[] {
     return this.importService.getPokemonsForMyPokemons(sampleData);
   }
+
+  addMyPokemon(pokemon: MyPokemon): void {
+    sampleData.push(pokemon);
+  }
 }
