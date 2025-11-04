@@ -37,14 +37,20 @@ export interface Attack {
   special: string | undefined;
 }
 
-export interface PokemonBaseStats {
+export interface PokemonStats {
   name: string;
   atk: number;
   def: number;
   hp: number;
 }
 
-export interface Pokemon extends PokemonBaseStats {
+export interface PokemonIV {
+  atkIV: number;
+  defIV: number;
+  hpIV: number;
+}
+
+export interface Pokemon extends PokemonStats, PokemonIV {
   pokedexNumber: string;
   primaryType: Type;
   secondaryType: Type;
@@ -91,8 +97,8 @@ export enum TeamOption {
 }
 
 export interface DamageConfiguration {
-  attacker: PokemonBaseStats;
-  defender: PokemonBaseStats;
+  attacker: PokemonStats;
+  defender: PokemonStats;
   move: Attack;
   typeEffectiveness: number;
   stab: number;
@@ -132,14 +138,14 @@ export interface DamageDetails {
   damagePercentage: number;
 }
 
-export interface Candidate {
+export interface Candidate extends PokemonIV {
   name: string;
   pokedexNumber: string;
   primaryType: Type;
   secondaryType: Type;
   def: number;
   hp: number;
-  attacker: PokemonBaseStats;
+  attacker: PokemonStats;
   cpm: number;
   isMyPokemon: boolean;
   damageDetails: DamageDetails[];

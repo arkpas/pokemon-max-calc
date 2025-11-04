@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import {
   Pokemon,
-  PokemonBaseStats,
+  PokemonStats,
   DamageConfiguration,
   Type,
   DamageDetails,
@@ -355,6 +355,9 @@ export class MaxCalculatorService {
       primaryType: pokemon.primaryType,
       secondaryType: pokemon.secondaryType,
       hasHalfSecondAttack: pokemon.hasHalfSecondAttack,
+      atkIV: pokemon.atkIV,
+      defIV: pokemon.defIV,
+      hpIV: pokemon.hpIV,
       def: pokemon.def,
       hp: pokemon.hp,
       cpm: pokemon.cpm,
@@ -423,6 +426,9 @@ export class MaxCalculatorService {
       pokedexNumber: pokemon.pokedexNumber,
       primaryType: pokemon.primaryType,
       secondaryType: pokemon.secondaryType,
+      atkIV: pokemon.atkIV,
+      defIV: pokemon.defIV,
+      hpIV: pokemon.hpIV,
       def: pokemon.def,
       hp: pokemon.hp,
       cpm: pokemon.cpm,
@@ -492,7 +498,7 @@ export class MaxCalculatorService {
     return damageConfigurations;
   }
 
-  private getPokemonBaseStats(pokemon: Pokemon): PokemonBaseStats {
+  private getPokemonBaseStats(pokemon: Pokemon): PokemonStats {
     return {
       name: pokemon.name,
       atk: pokemon.atk,

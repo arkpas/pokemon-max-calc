@@ -11,44 +11,52 @@
       <span class="{{ isMyPokemon ? 'my-pokemon' : '' }}">{{ name }}</span>
     </div>
 
-    <div *ngIf="cpm" class="header-stats">
-      <div class="stat" title="Poziom">
-        ⭐
-        <strong>L{{ cpm | cpmToLevel }}</strong>
-      </div>
+    <div class="data">
+      <div *ngIf="cpm" class="stats">
+        <div class="stat" title="Poziom">
+          ⭐
+          <strong>L{{ cpm | cpmToLevel }}</strong>
+        </div>
 
-      <div *ngIf="avgDamage" class="stat" title="Średnie obrażenia (bazowe + procentowe)">
-        💥
-        <strong>{{ avgDamage.toFixed(1) }} ({{ avgDamagePercentage.toFixed(1) }}%)</strong>
-      </div>
+        <div class="stat" title="IV: {{ atkIV }}/{{ defIV }}/{{ hpIV }}">
+          💎
+          <strong>{{ atkIV + defIV + hpIV | ivPercentage }}%</strong>
+        </div>
 
-      <div *ngIf="heal" class="stat" title="Leczenie (3x Max Heal)">
-        🩹 <strong>{{ heal.toFixed(0) }}</strong>
-      </div>
+        <div *ngIf="avgDamage" class="stat" title="Średnie obrażenia (bazowe + procentowe)">
+          💥
+          <strong>{{ avgDamage.toFixed(1) }} ({{ avgDamagePercentage.toFixed(1) }}%)</strong>
+        </div>
 
-      <div
-        *ngIf="unhealedDamagePercentage !== undefined"
-        class="stat"
-        title="Ile procentowo obrażeń nie będzie w stanie wyleczyć przeciwko wszystkim atakom bossa">
-        🩸 <strong>{{ unhealedDamagePercentage.toFixed(2) }}</strong>
-      </div>
+        <div *ngIf="heal" class="stat" title="Leczenie (3x Max Heal)">
+          🩹 <strong>{{ heal.toFixed(0) }}</strong>
+        </div>
 
-      <div *ngIf="hp" class="stat hp" title="Punkty życia (HP)">
-        ❤️ <strong>{{ hp }}</strong>
-      </div>
+        <div
+          *ngIf="unhealedDamagePercentage !== undefined"
+          class="stat"
+          title="Ile procentowo obrażeń nie będzie w stanie wyleczyć przeciwko wszystkim atakom bossa">
+          🩸 <strong>{{ unhealedDamagePercentage.toFixed(2) }}</strong>
+        </div>
 
-      <div *ngIf="atk" class="stat atk" title="Atak fizyczny (ATK)">
-        ⚔️ <strong>{{ atk }}</strong>
-      </div>
+        <div *ngIf="hp" class="stat hp" title="Punkty życia (HP)">
+          ❤️ <strong>{{ hp }}</strong>
+        </div>
 
-      <div *ngIf="def" class="stat def" title="Obrona fizyczna (DEF)">
-        🛡️ <strong>{{ def.toFixed(0) }}</strong>
-      </div>
+        <div *ngIf="atk" class="stat atk" title="Atak fizyczny (ATK)">
+          ⚔️ <strong>{{ atk }}</strong>
+        </div>
 
-      <div class="damage-toggle" style="margin-left: auto">
-        <button (click)="toggleDetails()" class="icon-button" title="Pokaż/ukryj szczegóły obrażeń">
-          {{ showDetails ? '🚫' : '👁️' }}
-        </button>
+        <div *ngIf="def" class="stat def" title="Obrona fizyczna (DEF)">
+          🛡️ <strong>{{ def.toFixed(0) }}</strong>
+        </div>
+      </div>
+      <div class="details-toggle-wrapper">
+        <div class="damage-toggle" style="margin-left: auto">
+          <button (click)="toggleDetails()" class="icon-button" title="Pokaż/ukryj szczegóły obrażeń">
+            {{ showDetails ? '🚫' : '👁️' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>

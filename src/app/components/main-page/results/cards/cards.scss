@@ -76,20 +76,29 @@
                 }
             }
 
-            .header-stats {
+            .data {
                 display: flex;
                 align-items: center;
                 gap: 10px;
                 width: 100%;
-                padding: 0px 6px;
+                padding: 0px;
 
-                .stat {
+                .stats {
                     display: flex;
+                    flex-wrap: wrap;
                     align-items: center;
+                    gap: 10px;
+                    width: 100%;
+                    padding: 0px;
 
-                    strong {
-                        margin-left: 4px;
-                        font-weight: 600;
+                    .stat {
+                        display: flex;
+                        align-items: center;
+
+                        strong {
+                            margin-left: 4px;
+                            font-weight: 600;
+                        }
                     }
                 }
             }
@@ -305,13 +314,15 @@
             padding: 12px 6px;
 
             .header-inline {
-                .header-stats {
-                    .stat {
+                .data {
+                    .stats {
+                        .stat {
 
-                        &.atk,
-                        &.def,
-                        &.hp {
-                            display: none;
+                            &.atk,
+                            &.def,
+                            &.hp {
+                                display: none;
+                            }
                         }
                     }
                 }

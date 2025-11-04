@@ -3,14 +3,16 @@ import { CommonModule } from '@angular/common';
 import { DamageDetails, Type } from '../../../../../types/types';
 import { getTypeColor, getTypeBadgeClass, getDamagePercentageColor } from '../utils';
 import { CpmToLevelPipe } from '../../../../../pipes/cpmToLevel.pipe';
+import { IvPercentagePipe } from '../../../../../pipes/ivPercentage.pipe';
 
 @Component({
   selector: 'app-pokemon-card',
   templateUrl: './pokemon-card.component.html',
   styleUrls: ['./pokemon-card.component.scss'],
-  imports: [CommonModule, CpmToLevelPipe],
+  imports: [CommonModule, CpmToLevelPipe, IvPercentagePipe],
 })
 export class PokemonCardComponent {
+  // TODO: może trzeba opakować te inputy w jakiś obiekt?
   @Input() name!: string;
   @Input() hp!: number;
   @Input() atk!: number;
@@ -26,6 +28,9 @@ export class PokemonCardComponent {
   @Input() secondaryType!: Type;
   @Input() cpm!: number;
   @Input() isMyPokemon!: boolean;
+  @Input() atkIV!: number;
+  @Input() defIV!: number;
+  @Input() hpIV!: number;
 
   showDetails = false;
 

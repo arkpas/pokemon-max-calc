@@ -59,6 +59,9 @@ export class ImportServiceService {
     // Calculate final stats
     pokemons.forEach(pokemon => {
       pokemon.cpm = config.allyCpm;
+      pokemon.atkIV = config.allyAtkIV;
+      pokemon.defIV = config.allyDefIV;
+      pokemon.hpIV = config.allyHpIV;
       pokemon.atk = (pokemon.atk + config.allyAtkIV) * config.allyCpm;
       pokemon.def = (pokemon.def + config.allyDefIV) * config.allyCpm;
       pokemon.hp = Math.floor((pokemon.hp + config.allyHpIV) * config.allyCpm);
@@ -76,6 +79,9 @@ export class ImportServiceService {
         const pokemon = this.findPokemon(myPokemon.name);
 
         pokemon.cpm = myPokemon.allyCpm;
+        pokemon.atkIV = myPokemon.allyAtkIV;
+        pokemon.defIV = myPokemon.allyDefIV;
+        pokemon.hpIV = myPokemon.allyHpIV;
         pokemon.atk = (pokemon.atk + myPokemon.allyAtkIV) * myPokemon.allyCpm;
         pokemon.def = (pokemon.def + myPokemon.allyDefIV) * myPokemon.allyCpm;
         pokemon.hp = Math.floor((pokemon.hp + myPokemon.allyHpIV) * myPokemon.allyCpm);
