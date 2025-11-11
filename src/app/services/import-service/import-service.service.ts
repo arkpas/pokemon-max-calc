@@ -78,13 +78,13 @@ export class ImportServiceService {
       try {
         const pokemon = this.findPokemon(myPokemon.name);
 
-        pokemon.cpm = myPokemon.allyCpm;
-        pokemon.atkIV = myPokemon.allyAtkIV;
-        pokemon.defIV = myPokemon.allyDefIV;
-        pokemon.hpIV = myPokemon.allyHpIV;
-        pokemon.atk = (pokemon.atk + myPokemon.allyAtkIV) * myPokemon.allyCpm;
-        pokemon.def = (pokemon.def + myPokemon.allyDefIV) * myPokemon.allyCpm;
-        pokemon.hp = Math.floor((pokemon.hp + myPokemon.allyHpIV) * myPokemon.allyCpm);
+        pokemon.cpm = myPokemon.cpm;
+        pokemon.atkIV = myPokemon.atkIV;
+        pokemon.defIV = myPokemon.defIV;
+        pokemon.hpIV = myPokemon.hpIV;
+        pokemon.atk = (pokemon.atk + myPokemon.atkIV) * myPokemon.cpm;
+        pokemon.def = (pokemon.def + myPokemon.defIV) * myPokemon.cpm;
+        pokemon.hp = Math.floor((pokemon.hp + myPokemon.hpIV) * myPokemon.cpm);
         pokemon.isMyPokemon = true;
 
         pokemons.push(pokemon);

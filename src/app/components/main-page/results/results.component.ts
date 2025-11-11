@@ -4,10 +4,10 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { BattleConfiguration, DamageConfiguration, HealerCandidate, Pokemon, TankCandidate } from '../../../types/types';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
-import { PokemonCardComponent } from './cards/pokemon-card/pokemon-card.component';
 import { CommonModule } from '@angular/common';
 import { Observable, Subscription } from 'rxjs';
-import { OpponentCardComponent } from './cards/opponent-card/opponent-card.component';
+import { PokemonCardComponent } from '../../shared/cards/pokemon-card/pokemon-card.component';
+import { OpponentCardComponent } from '../../shared/cards/opponent-card/opponent-card.component';
 
 @Component({
   selector: 'app-results',

@@ -65,8 +65,10 @@ export interface Pokemon extends PokemonStats, PokemonIV {
   isMyPokemon: boolean;
 }
 
-export interface MyPokemon extends AllyConfiguration {
+export interface MyPokemon extends PokemonIV {
+  id: string;
   name: string;
+  cpm: number;
 }
 
 export enum Type {

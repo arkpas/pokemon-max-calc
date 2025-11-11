@@ -1,0 +1,20 @@
+<div class="results">
+  <div class="pokemon-cards">
+    <app-pokemon-card
+      class="pokemon-card"
+      *ngFor="let myPokemon of myPokemons"
+      [name]="myPokemon.name"
+      [primaryType]="myPokemon.primaryType"
+      [secondaryType]="myPokemon.secondaryType"
+      [cpm]="myPokemon.cpm"
+      [atkIV]="myPokemon.atkIV"
+      [defIV]="myPokemon.defIV"
+      [hpIV]="myPokemon.hpIV"
+      [atk]="myPokemon.atk"
+      [def]="myPokemon.def"
+      [hp]="myPokemon.hp"
+      [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + myPokemon.pokedexNumber + '.png'"
+      [isMyPokemon]="myPokemon.isMyPokemon">
+    </app-pokemon-card>
+  </div>
+</div>

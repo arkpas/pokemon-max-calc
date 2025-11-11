@@ -1,74 +1,27 @@
-import { Component, inject } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { Router } from '@angular/router';
-import { ImportServiceService } from '../../services/import-service/import-service.service';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, AfterContentChecked } from '@angular/core';
+import { MenuComponent } from './menu/menu.component';
+import { ResultsComponent } from './results/results.component';
 import { MyPokemonService } from '../../services/my-pokemon.service';
-import { POKEMON_CPMS } from '../../constants/cpm.constants';
-import { map, Observable } from 'rxjs';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { CommonModule } from '@angular/common';
-import { pokemonLevelValidator } from '../../validators/pokemonLevel.directive';
+import { Subject } from 'rxjs';
+import { Pokemon } from '../../types/types';
 
 @Component({
   selector: 'app-my-pokemon',
-  imports: [MatButtonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatAutocompleteModule, CommonModule],
+  imports: [MenuComponent, ResultsComponent],
   templateUrl: './my-pokemon.component.html',
   styleUrl: './my-pokemon.component.scss',
 })
-export class MyPokemonComponent {
-  private router = inject(Router);
-  private importService = inject(ImportServiceService);
+export class MyPokemonComponent implements AfterContentChecked {
   private myPokemonService = inject(MyPokemonService);
-  private formBuilder = inject(FormBuilder);
 
-  myPokemonForm = this.formBuilder.group({
-    pokemon: ['', Validators.required],
-    level: [1, [Validators.required, pokemonLevelValidator()]],
-    atkIV: [0, Validators.required],
-    defIV: [0, Validators.required],
-    hpIV: [0, Validators.required],
-  });
+  private myPokemonsSubject = new Subject<Pokemon[]>();
+  myPokemons$ = this.myPokemonsSubject.asObservable();
 
-  pokemonOptions: string[] = [];
-  filteredPokemonOptions: Observable<string[]>;
-
-  constructor() {
-    // Pokemon names
-    this.pokemonOptions = this.importService.getPokemonNames();
-    this.filteredPokemonOptions = this.myPokemonForm.controls.pokemon.valueChanges.pipe(
-      map(name => (name ? this.filterPokemonNames(name) : this.pokemonOptions.slice()))
-    );
+  ngAfterContentChecked() {
+    this.refreshMyPokemons();
   }
 
-  filterPokemonNames(name: string): string[] {
-    const filterValue = name.toLowerCase();
-    return this.pokemonOptions.filter(o => o.toLowerCase().includes(filterValue));
-  }
-
-  submit(): void {
-    if (!this.myPokemonForm.valid) {
-      return;
-    }
-
-    const cpm = POKEMON_CPMS.find(cpmObject => cpmObject.level === this.myPokemonForm.controls.level.value!);
-
-    if (!cpm) {
-      throw new Error(`Unable to find CPM for level: [${this.myPokemonForm.controls.level.value}]`);
-    }
-
-    this.myPokemonService.addMyPokemon({
-      name: this.myPokemonForm.controls.pokemon.value!,
-      allyCpm: cpm.value,
-      allyAtkIV: this.myPokemonForm.controls.atkIV.value!,
-      allyDefIV: this.myPokemonForm.controls.defIV.value!,
-      allyHpIV: this.myPokemonForm.controls.hpIV.value!,
-    });
-  }
-
-  navigateToMain(): void {
-    this.router.navigateByUrl('/');
+  refreshMyPokemons() {
+    this.myPokemonsSubject.next(this.myPokemonService.getMyPokemons());
   }
 }

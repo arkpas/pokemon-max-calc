@@ -2,41 +2,29 @@ import { inject, Injectable } from '@angular/core';
 import { MyPokemon, Pokemon } from '../types/types';
 import { ImportServiceService } from './import-service/import-service.service';
 
-const sampleData: MyPokemon[] = [
-  {
-    name: 'Zacian Crowned Sword',
-    allyCpm: 0.8078,
-    allyAtkIV: 13,
-    allyDefIV: 11,
-    allyHpIV: 12,
-  },
-  {
-    name: 'Zamazenta Crowned Shield',
-    allyCpm: 0.8078,
-    allyAtkIV: 13,
-    allyDefIV: 10,
-    allyHpIV: 12,
-  },
-  {
-    name: 'Some unknown pokemon',
-    allyCpm: 0.8078,
-    allyAtkIV: 13,
-    allyDefIV: 11,
-    allyHpIV: 12,
-  },
-];
-
 @Injectable({
   providedIn: 'root',
 })
 export class MyPokemonService {
   private importService = inject(ImportServiceService);
+  private myPokemonKey = 'my-pokemon';
+  private myPokemon: MyPokemon[] = [];
+
+  constructor() {
+    const storedPokemons = localStorage.getItem('my-pokemon');
+
+    if (storedPokemons) {
+      this.myPokemon = JSON.parse(storedPokemons);
+    }
+  }
 
   getMyPokemons(): Pokemon[] {
-    return this.importService.getPokemonsForMyPokemons(sampleData);
+    return this.importService.getPokemonsForMyPokemons(this.myPokemon);
   }
 
   addMyPokemon(pokemon: MyPokemon): void {
-    sampleData.push(pokemon);
+    pokemon.id = crypto.randomUUID();
+    this.myPokemon.push(pokemon);
+    localStorage.setItem(this.myPokemonKey, JSON.stringify(this.myPokemon));
   }
 }
