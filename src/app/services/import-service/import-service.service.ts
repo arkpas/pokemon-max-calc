@@ -189,27 +189,29 @@ export class ImportServiceService {
     const result: Pokemon[] = [];
 
     for (let i = 1; i < lines.length; i++) {
-      const obj: Record<string, any> = {};
+      const obj: Record<string, unknown> = {};
       const currentline = lines[i].split('	');
 
       headerMap.forEach((value, key) => {
         obj[key] = currentline[value];
       });
 
-      obj['dynamaxDate'] = this.convertToPremiereDate(obj['dynamax']);
-      obj['gigantamaxDate'] = this.convertToPremiereDate(obj['gigantamax']);
-      obj['fastAttacks'] = this.convertAttacks(obj['fastAttacks']);
-      obj['chargedAttacks'] = this.convertAttacks(obj['chargedAttacks']);
-      obj['atk'] = parseInt(obj['atk']);
-      obj['def'] = parseInt(obj['def']);
-      obj['hp'] = parseInt(obj['hp']);
-      obj['hasHalfSecondAttack'] = this.hasHalfSecondAttack(obj['fastAttacks']);
+      const fastAttacks = this.convertAttacks(obj['fastAttacks'] as string);
+
+      obj['dynamaxDate'] = this.convertToPremiereDate(obj['dynamax'] as string);
+      obj['gigantamaxDate'] = this.convertToPremiereDate(obj['gigantamax'] as string);
+      obj['fastAttacks'] = fastAttacks;
+      obj['chargedAttacks'] = this.convertAttacks(obj['chargedAttacks'] as string);
+      obj['atk'] = parseInt(obj['atk'] as string);
+      obj['def'] = parseInt(obj['def'] as string);
+      obj['hp'] = parseInt(obj['hp'] as string);
+      obj['hasHalfSecondAttack'] = this.hasHalfSecondAttack(fastAttacks);
       obj['primaryType'] = Type[obj['primaryType'] as keyof typeof Type];
       obj['secondaryType'] = Type[obj['secondaryType'] as keyof typeof Type];
       obj['gigantamaxType'] = Type[obj['gigantamaxType'] as keyof typeof Type];
       obj['dynamaxType'] = Type[obj['dynamaxType'] as keyof typeof Type];
 
-      result.push(obj as Pokemon);
+      result.push(obj as unknown as Pokemon);
     }
 
     return result;
