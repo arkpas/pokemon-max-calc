@@ -5,11 +5,8 @@ html {
   color: black;
   font-family: 'Roboto', sans-serif;
   font-optical-sizing: auto;
-  @include mat.theme(
-    (
-      color: mat.$magenta-palette,
-    )
-  );
+  @include mat.theme((color: mat.$magenta-palette,
+    ));
 }
 
 *,
@@ -22,4 +19,11 @@ html {
 
 body {
   box-sizing: border-box;
+}
+
+.sup {
+  position: relative;
+  bottom: 0.9ex;
+  font-size: 80%;
+  font-weight: normal;
 }

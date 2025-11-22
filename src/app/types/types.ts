@@ -138,6 +138,7 @@ export interface DamageDetails {
   stab: number;
   damage: number;
   damagePercentage: number;
+  isElite: boolean;
 }
 
 export interface Candidate extends PokemonIV {
