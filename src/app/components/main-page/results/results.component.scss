@@ -1,48 +1,51 @@
 @use '@angular/material' as mat;
-@use "../../../../variables.scss" as *;
+@use '../../../../variables.scss' as *;
 
 :host {
-    @include mat.tabs-overrides((label-text-weight: 600));
+  @include mat.tabs-overrides(
+    (
+      label-text-weight: 600,
+    )
+  );
 
-    ::ng-deep .mdc-tab.mdc-tab--active {
-        background-color: rgba($dmax-color, 0.25);
-        font-weight: 900;
-    }
-
+  ::ng-deep .mdc-tab.mdc-tab--active {
+    background-color: rgba($dmax-color, 0.25);
+    font-weight: 900;
+  }
 }
 
 .opponent {
-    width: 100%;
-    margin-bottom: 0.5rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
 }
 
 .results {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 0.25rem;
+
+  mat-tab-group {
     width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    padding: 0.25rem;
 
-    mat-tab-group {
-        width: 100%;
-
-        mat-tab {
-            font-weight: 500;
-        }
+    mat-tab {
+      font-weight: 500;
     }
+  }
 }
 
 mat-header-row {
-    font-weight: bold;
-    background-color: #de0d8750;
+  font-weight: bold;
+  background-color: #de0d8750;
 }
 
 .pokemon-cards {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
 }

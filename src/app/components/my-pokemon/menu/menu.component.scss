@@ -1,114 +1,114 @@
-@use "../../../../variables.scss" as *;
+@use '../../../../variables.scss' as *;
 
 .menu {
-    position: fixed;
-    width: 100%;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    overflow-y: scroll;
-    background: $background-color;
-    z-index: 10;
-    padding: 1rem;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  overflow-y: scroll;
+  background: $background-color;
+  z-index: 10;
+  padding: 1rem;
 
-    &.menu-collapsed {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-        width: auto;
-        background: transparent;
-        overflow-y: hidden;
-        left: auto;
-        right: 0;
-        top: auto;
-        padding: 0.75rem;
-
-        form {
-            display: none;
-        }
-    }
-
-    .menu-button {
-        width: 3rem;
-        height: 3rem;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border: 1px solid $dmax-color-dark;
-        border-radius: 50%;
-        background-color: $dmax-color;
-
-        button {
-            background-color: transparent;
-            border: 0;
-            line-height: 2rem;
-            font-size: 2rem;
-            font-weight: 900;
-            color: #FFF;
-        }
-    }
+  &.menu-collapsed {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: auto;
+    background: transparent;
+    overflow-y: hidden;
+    left: auto;
+    right: 0;
+    top: auto;
+    padding: 0.75rem;
 
     form {
-        width: 100%;
-
-        .top-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 2rem;
-
-            .title {
-                font-size: 1.3rem;
-                font-weight: bold;
-            }
-        }
-
-        .bottom-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        mat-form-field {
-            width: 100%;
-        }
-
-        .form-buttons {
-            display: flex;
-            gap: 0.5em;
-        }
+      display: none;
     }
+  }
+
+  .menu-button {
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid $dmax-color-dark;
+    border-radius: 50%;
+    background-color: $dmax-color;
+
+    button {
+      background-color: transparent;
+      border: 0;
+      line-height: 2rem;
+      font-size: 2rem;
+      font-weight: 900;
+      color: #fff;
+    }
+  }
+
+  form {
+    width: 100%;
+
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 2rem;
+
+      .title {
+        font-size: 1.3rem;
+        font-weight: bold;
+      }
+    }
+
+    .bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    mat-form-field {
+      width: 100%;
+    }
+
+    .form-buttons {
+      display: flex;
+      gap: 0.5em;
+    }
+  }
 }
 
 @media (min-width: 769px) {
-    .menu {
-        width: 100%;
-        display: flex;
-        position: relative;
-        overflow-y: hidden;
+  .menu {
+    width: 100%;
+    display: flex;
+    position: relative;
+    overflow-y: hidden;
 
-        .menu-button {
-            display: none;
-        }
-
-        &.menu-collapsed {
-            width: 100%;
-            background: $background-color;
-            padding: 1rem;
-
-            form {
-                display: block;
-            }
-        }
+    .menu-button {
+      display: none;
     }
 
-    .mobile {
-        display: none;
+    &.menu-collapsed {
+      width: 100%;
+      background: $background-color;
+      padding: 1rem;
+
+      form {
+        display: block;
+      }
     }
+  }
+
+  .mobile {
+    display: none;
+  }
 }
 
 @media (max-width: 768px) {
-    .desktop {
-        display: none;
-    }
+  .desktop {
+    display: none;
+  }
 }
