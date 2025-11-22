@@ -18,6 +18,8 @@
     position: relative;
     border-radius: 8px;
     color: black;
+    cursor: default;
+
 
     &.single-type::before {
       content: '';
@@ -336,6 +338,7 @@
         .data {
           .stats {
             .stat {
+
               &.atk,
               &.def,
               &.hp {

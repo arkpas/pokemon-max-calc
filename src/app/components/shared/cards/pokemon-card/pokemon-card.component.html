@@ -17,11 +17,19 @@
           ⭐
           <strong>L{{ cpm | cpmToLevel }}</strong>
         </div>
-
-        <div class="stat" title="IV: {{ atkIV }}/{{ defIV }}/{{ hpIV }}">
+        <!-- eslint-disable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
+        <div
+          class="stat"
+          matTooltip="IV: {{ atkIV }}/{{ defIV }}/{{ hpIV }}"
+          matTooltipPosition="above"
+          #tooltip="matTooltip"
+          (click)="tooltip.toggle()">
           💎
-          <strong>{{ atkIV + defIV + hpIV | ivPercentage }}%</strong>
+          <strong
+            ><u>{{ atkIV + defIV + hpIV | ivPercentage }}%</u></strong
+          >
         </div>
+        <!-- eslint-enable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
       </div>
       <div class="stat-row">
         <div *ngIf="avgDamage" class="stat" title="Średnie obrażenia (bazowe + procentowe)">

@@ -15,7 +15,8 @@
       [hp]="myPokemon.hp"
       [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + myPokemon.pokedexNumber + '.png'"
       [myPokemonId]="myPokemon.myPokemonId"
-      [isMyPokemonActionsEnabled]="true">
+      [isMyPokemonActionsEnabled]="true"
+      (myPokemonRemovedEvent)="refreshMyPokemons()">
     </app-pokemon-card>
   </div>
 </div>

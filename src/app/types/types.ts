@@ -110,6 +110,8 @@ export interface DamageConfiguration {
   maxEnergy: number;
   dphs: number;
   mephs: number;
+  // TODO: below should go away from this type once we switch to cards in Attackers tab
+  myPokemonId: string;
 }
 
 export interface ComboDamageConfiguration {

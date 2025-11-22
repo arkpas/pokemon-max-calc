@@ -282,6 +282,7 @@ export class MaxCalculatorService {
         },
         typeEffectiveness: this.calculateTypeEffectiveness(pokemon.gigantamaxType, boss),
         stab: this.calculateStab(pokemon.gigantamaxType, pokemon),
+        myPokemonId: pokemon.myPokemonId,
       } as DamageConfiguration;
 
       damageConfigurations.push(gigantamaxDamageConfiguration);
@@ -303,6 +304,7 @@ export class MaxCalculatorService {
           },
           typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, boss),
           stab: this.calculateStab(fastAttack.type, pokemon),
+          myPokemonId: pokemon.myPokemonId,
         } as DamageConfiguration;
 
         damageConfigurations.push(dynamaxDamageConfiguration);
@@ -323,6 +325,7 @@ export class MaxCalculatorService {
         },
         typeEffectiveness: this.calculateTypeEffectiveness(pokemon.dynamaxType, boss),
         stab: this.calculateStab(pokemon.dynamaxType, pokemon),
+        myPokemonId: pokemon.myPokemonId,
       } as DamageConfiguration;
 
       damageConfigurations.push(specialDynamaxDamageConfiguration);
