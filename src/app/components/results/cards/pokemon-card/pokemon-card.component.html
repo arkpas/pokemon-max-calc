@@ -75,7 +75,7 @@
       <details *ngFor="let entry of fastAttacks" class="damage-row">
         <summary class="damage-summary">
           <span class="col attack-name type-bg {{ entry.moveType.toLowerCase() }}">
-            {{ entry.move }}
+            {{ entry.move }} <span class="sup" *ngIf="entry.isElite">E</span>
           </span>
           <span class="col damage-stats"
             >💥 <strong>{{ entry.damage.toFixed(0) }} </strong></span

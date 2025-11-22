@@ -172,7 +172,7 @@ export class ImportServiceService {
         power: parseInt(attackStats[1]),
         energy: parseInt(attackStats[2]),
         duration: parseFloat(attackStats[3]),
-        special: attackStats.length >= 4 ? attackStats[3] : undefined,
+        special: attackStats.length > 4 ? attackStats[4] : undefined,
       });
     });
 

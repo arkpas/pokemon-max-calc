@@ -20,3 +20,10 @@ html {
 body {
   box-sizing: border-box;
 }
+
+.sup {
+  position: relative;
+  bottom: 0.9ex;
+  font-size: 80%;
+  font-weight: normal;
+}

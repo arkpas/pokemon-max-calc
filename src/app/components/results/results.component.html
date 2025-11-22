@@ -23,7 +23,7 @@
           <!-- Move Column -->
           <ng-container matColumnDef="move">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Move</th>
-            <td mat-cell *matCellDef="let row">{{ row.move.name }}</td>
+            <td mat-cell *matCellDef="let row">{{ row.move.name }} <span class="sup" *ngIf="row.move.special?.toLowerCase() === 'elite'">E</span></td>
           </ng-container>
 
           <!-- Power Column -->

@@ -301,6 +301,7 @@ export class MaxCalculatorService {
             power: 350,
             energy: 0,
             duration: 0,
+            special: fastAttack.special,
           },
           typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, boss),
           stab: this.calculateStab(fastAttack.type, pokemon),
@@ -316,7 +317,7 @@ export class MaxCalculatorService {
         attacker: attackerBaseStats,
         defender: defenderBaseStats,
         move: {
-          name: 'G-' + pokemon.dynamaxType,
+          name: 'D-' + pokemon.dynamaxType,
           type: pokemon.dynamaxType,
           power: 350,
           energy: 0,
@@ -373,6 +374,7 @@ export class MaxCalculatorService {
             stab: configuration.stab,
             damage: configuration.damage,
             damagePercentage: configuration.damagePercentage,
+            isElite: 'elite' === configuration.move.special,
           } as DamageDetails;
         }),
       ],
@@ -387,6 +389,7 @@ export class MaxCalculatorService {
             stab: configuration.stab,
             damage: configuration.damage,
             damagePercentage: configuration.damagePercentage,
+            isElite: 'elite' === configuration.move.special,
           } as DamageDetails;
         }),
       ],
@@ -439,6 +442,7 @@ export class MaxCalculatorService {
             damage: configuration.damage,
             damagePercentage: configuration.damagePercentage,
             unhealedDamagePercentage: configuration.unhealedDamagePercentage,
+            isElite: 'elite' === configuration.move.special,
           } as DamageDetails;
         }),
       ],
@@ -453,6 +457,7 @@ export class MaxCalculatorService {
             stab: configuration.stab,
             damage: configuration.damage,
             damagePercentage: configuration.damagePercentage,
+            isElite: 'elite' === configuration.move.special,
           } as DamageDetails;
         }),
       ],
@@ -560,6 +565,7 @@ export class MaxCalculatorService {
             power: fastAttack.power,
             energy: fastAttack.energy,
             duration: fastAttack.duration,
+            special: fastAttack.special,
           },
           typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, defender),
           stab: this.calculateStab(fastAttack.type, attacker),
