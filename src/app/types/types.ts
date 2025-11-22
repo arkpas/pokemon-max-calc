@@ -62,7 +62,7 @@ export interface Pokemon extends PokemonStats, PokemonIV {
   fastAttacks: Attack[];
   chargedAttacks: Attack[];
   cpm: number;
-  isMyPokemon: boolean;
+  myPokemonId: string;
 }
 
 export interface MyPokemon extends PokemonIV {
@@ -149,7 +149,7 @@ export interface Candidate extends PokemonIV {
   hp: number;
   attacker: PokemonStats;
   cpm: number;
-  isMyPokemon: boolean;
+  myPokemonId: string;
   damageDetails: DamageDetails[];
   fastAttacks: DamageDetails[];
 }

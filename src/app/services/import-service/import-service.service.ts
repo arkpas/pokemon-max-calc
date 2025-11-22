@@ -85,7 +85,7 @@ export class ImportServiceService {
         pokemon.atk = (pokemon.atk + myPokemon.atkIV) * myPokemon.cpm;
         pokemon.def = (pokemon.def + myPokemon.defIV) * myPokemon.cpm;
         pokemon.hp = Math.floor((pokemon.hp + myPokemon.hpIV) * myPokemon.cpm);
-        pokemon.isMyPokemon = true;
+        pokemon.myPokemonId = myPokemon.id;
 
         pokemons.push(pokemon);
       } catch {

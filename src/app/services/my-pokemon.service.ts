@@ -11,7 +11,7 @@ export class MyPokemonService {
   private myPokemon: MyPokemon[] = [];
 
   constructor() {
-    const storedPokemons = localStorage.getItem('my-pokemon');
+    const storedPokemons = localStorage.getItem(this.myPokemonKey);
 
     if (storedPokemons) {
       this.myPokemon = JSON.parse(storedPokemons);
@@ -25,6 +25,11 @@ export class MyPokemonService {
   addMyPokemon(pokemon: MyPokemon): void {
     pokemon.id = crypto.randomUUID();
     this.myPokemon.push(pokemon);
+    localStorage.setItem(this.myPokemonKey, JSON.stringify(this.myPokemon));
+  }
+
+  removeMyPokemon(id: string): void {
+    this.myPokemon = this.myPokemon.filter(pokemon => pokemon.id != id);
     localStorage.setItem(this.myPokemonKey, JSON.stringify(this.myPokemon));
   }
 }

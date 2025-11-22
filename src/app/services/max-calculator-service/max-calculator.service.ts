@@ -361,7 +361,7 @@ export class MaxCalculatorService {
       def: pokemon.def,
       hp: pokemon.hp,
       cpm: pokemon.cpm,
-      isMyPokemon: pokemon.isMyPokemon,
+      myPokemonId: pokemon.myPokemonId,
       attacker: this.getPokemonBaseStats(boss),
       avgDamage: avgDamage,
       avgDamagePercentage: (avgDamage / pokemon.hp) * 100,
@@ -432,7 +432,7 @@ export class MaxCalculatorService {
       def: pokemon.def,
       hp: pokemon.hp,
       cpm: pokemon.cpm,
-      isMyPokemon: pokemon.isMyPokemon,
+      myPokemonId: pokemon.myPokemonId,
       heal: heal,
       totalUnhealedDamagePercentage: healersDamageConfigurations.reduce((a, b) => a + b.unhealedDamagePercentage, 0),
       damageDetails: [

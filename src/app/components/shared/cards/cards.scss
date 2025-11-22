@@ -81,14 +81,15 @@
         }
       }
 
-      .data {
+      .stats {
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         gap: 10px;
         width: 100%;
         padding: 0px;
 
-        .stats {
+        .stat-row {
           display: flex;
           flex-wrap: wrap;
           align-items: center;
@@ -96,198 +97,204 @@
           width: 100%;
           padding: 0px;
 
-          .stat-row {
+          .stat {
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
-            gap: 10px;
-            width: 100%;
-            padding: 0px;
 
-            .stat {
-              display: flex;
-              align-items: center;
-
-              strong {
-                margin-left: 4px;
-                font-weight: 600;
-              }
+            strong {
+              margin-left: 4px;
+              font-weight: 600;
             }
           }
         }
       }
 
-      .icon-button {
-        background-color: rgba(0, 0, 0, 0.08);
-        border: none;
-        font-size: 16px;
-        cursor: pointer;
-        padding: 4px 6px;
-        border-radius: 6px;
-        transition: background-color 0.2s ease;
-
-        &:hover {
-          background-color: rgba(0, 0, 0, 0.12);
-        }
-
-        &:focus {
-          outline: none;
-          box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.3);
-        }
-      }
-    }
-
-    .damage-section {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-
-      h3 {
-        font-size: 14px;
-        margin-bottom: 6px;
-        font-weight: 600;
-      }
-
-      .damage-list {
+      .actions {
         display: flex;
         flex-direction: column;
-        gap: 4px;
-        border: 1px solid white;
-        border-radius: 4px;
-        padding: 4px;
-        background-color: #ffffff50;
+        gap: 5px;
 
-        .damage-list-name {
-          font-size: 0.9rem;
-          font-weight: 700;
-        }
-
-        .damage-summary {
-          display: grid;
-          grid-template-columns: 150px 100px 50px 75px 45px;
-          gap: 8px;
-          align-items: center;
-          padding: 4px 8px;
-          font-size: 0.9rem;
-          background-color: rgb(239, 239, 239, 0.75);
-          border-radius: 4px;
-
-          .col {
-            font-size: 14px;
-            font-weight: bold;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-align: left;
-
-            &.damage-stats {
-              font-weight: 500;
-            }
-          }
-
-          .attack-name {
-            text-align: center;
-            font-weight: bolder;
-            padding: 2px 8px;
-            border-radius: 4px;
-            color: #fff;
-            max-width: 150px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
+        .action {
+          margin-left: auto;
         }
       }
     }
 
-    .type-badge {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 10px;
-      font-size: 10px;
+    .icon-button {
+      background-color: rgba(0, 0, 0, 0.08);
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: 6px;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.12);
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.3);
+      }
+    }
+  }
+
+  .damage-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    h3 {
+      font-size: 14px;
+      margin-bottom: 6px;
       font-weight: 600;
-      color: white;
-      text-transform: uppercase;
     }
 
-    .type-bg.bug {
-      background-color: #92c92b;
-    }
+    .damage-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border: 1px solid white;
+      border-radius: 4px;
+      padding: 4px;
+      background-color: #ffffff50;
 
-    .type-bg.dark {
-      background-color: #575467;
-    }
+      .damage-list-name {
+        font-size: 0.9rem;
+        font-weight: 700;
+      }
 
-    .type-bg.dragon {
-      background-color: #0566bc;
-    }
+      .damage-summary {
+        display: grid;
+        grid-template-columns: 150px 100px 50px 75px 45px;
+        gap: 8px;
+        align-items: center;
+        padding: 4px 8px;
+        font-size: 0.9rem;
+        background-color: rgb(239, 239, 239, 0.75);
+        border-radius: 4px;
 
-    .type-bg.electric {
-      background-color: #ffce3e;
-    }
+        .col {
+          font-size: 14px;
+          font-weight: bold;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          text-align: left;
 
-    .type-bg.fairy {
-      background-color: #eb8ee2;
-    }
+          &.damage-stats {
+            font-weight: 500;
+          }
+        }
 
-    .type-bg.fighting {
-      background-color: #d23c50;
+        .attack-name {
+          text-align: center;
+          font-weight: bolder;
+          padding: 2px 8px;
+          border-radius: 4px;
+          color: #fff;
+          max-width: 150px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
     }
+  }
 
-    .type-bg.fire {
-      background-color: #f09516;
-    }
+  .type-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    color: white;
+    text-transform: uppercase;
+  }
 
-    .type-bg.flying {
-      background-color: #90aadc;
-    }
+  .type-bg.bug {
+    background-color: #92c92b;
+  }
 
-    .type-bg.ghost {
-      background-color: #776bb6;
-    }
+  .type-bg.dark {
+    background-color: #575467;
+  }
 
-    .type-bg.grass {
-      background-color: #35ab5d;
-    }
+  .type-bg.dragon {
+    background-color: #0566bc;
+  }
 
-    .type-bg.ground {
-      background-color: #d97845;
-    }
+  .type-bg.electric {
+    background-color: #ffce3e;
+  }
 
-    .type-bg.ice {
-      background-color: #96d9d6;
-    }
+  .type-bg.fairy {
+    background-color: #eb8ee2;
+  }
 
-    .type-bg.normal {
-      background-color: #9d9fa0;
-    }
+  .type-bg.fighting {
+    background-color: #d23c50;
+  }
 
-    .type-bg.poison {
-      background-color: #d24fbb;
-    }
+  .type-bg.fire {
+    background-color: #f09516;
+  }
 
-    .type-bg.psychic {
-      background-color: #f76e73;
-    }
+  .type-bg.flying {
+    background-color: #90aadc;
+  }
 
-    .type-bg.rock {
-      background-color: #cdba6c;
-    }
+  .type-bg.ghost {
+    background-color: #776bb6;
+  }
 
-    .type-bg.steel {
-      background-color: #538b9f;
-    }
+  .type-bg.grass {
+    background-color: #35ab5d;
+  }
 
-    .type-bg.water {
-      background-color: #5092d5;
-    }
+  .type-bg.ground {
+    background-color: #d97845;
+  }
+
+  .type-bg.ice {
+    background-color: #96d9d6;
+  }
+
+  .type-bg.normal {
+    background-color: #9d9fa0;
+  }
+
+  .type-bg.poison {
+    background-color: #d24fbb;
+  }
+
+  .type-bg.psychic {
+    background-color: #f76e73;
+  }
+
+  .type-bg.rock {
+    background-color: #cdba6c;
+  }
+
+  .type-bg.steel {
+    background-color: #538b9f;
+  }
+
+  .type-bg.water {
+    background-color: #5092d5;
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 374px) {
   :host {
     .pokemon-card {
       .header-inline {
         flex-wrap: wrap;
+        gap: 10px;
+
+        .actions {
+          flex-direction: row;
+        }
       }
     }
   }
