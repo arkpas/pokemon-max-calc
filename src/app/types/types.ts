@@ -8,12 +8,16 @@ export interface OpponentConfiguration {
   opponentDefMod: number;
 }
 
-export interface BattleConfiguration extends OpponentConfiguration {
-  date: Moment;
+export interface AllyConfiguration {
   allyCpm: number;
   allyAtkIV: number;
   allyDefIV: number;
   allyHpIV: number;
+}
+
+export interface BattleConfiguration extends OpponentConfiguration, AllyConfiguration {
+  date: Moment;
+  teamOption: TeamOption;
 }
 
 export interface SimulationResults {
@@ -33,14 +37,20 @@ export interface Attack {
   special: string | undefined;
 }
 
-export interface PokemonBaseStats {
+export interface PokemonStats {
   name: string;
   atk: number;
   def: number;
   hp: number;
 }
 
-export interface Pokemon extends PokemonBaseStats {
+export interface PokemonIV {
+  atkIV: number;
+  defIV: number;
+  hpIV: number;
+}
+
+export interface Pokemon extends PokemonStats, PokemonIV {
   pokedexNumber: string;
   primaryType: Type;
   secondaryType: Type;
@@ -51,6 +61,14 @@ export interface Pokemon extends PokemonBaseStats {
   hasHalfSecondAttack: boolean;
   fastAttacks: Attack[];
   chargedAttacks: Attack[];
+  cpm: number;
+  myPokemonId: string;
+}
+
+export interface MyPokemon extends PokemonIV {
+  id: string;
+  name: string;
+  cpm: number;
 }
 
 export enum Type {
@@ -74,9 +92,15 @@ export enum Type {
   Fairy = 'Fairy',
 }
 
+export enum TeamOption {
+  allPokemons = 'Use all Pokemon',
+  onlyMyPokemons = 'Use only My Pokemon',
+  onlyDefaultPokemons = 'Use only default Pokemon',
+}
+
 export interface DamageConfiguration {
-  attacker: PokemonBaseStats;
-  defender: PokemonBaseStats;
+  attacker: PokemonStats;
+  defender: PokemonStats;
   move: Attack;
   typeEffectiveness: number;
   stab: number;
@@ -86,6 +110,8 @@ export interface DamageConfiguration {
   maxEnergy: number;
   dphs: number;
   mephs: number;
+  // TODO: below should go away from this type once we switch to cards in Attackers tab
+  myPokemonId: string;
 }
 
 export interface ComboDamageConfiguration {
@@ -117,15 +143,16 @@ export interface DamageDetails {
   isElite: boolean;
 }
 
-export interface Candidate {
+export interface Candidate extends PokemonIV {
   name: string;
   pokedexNumber: string;
   primaryType: Type;
   secondaryType: Type;
   def: number;
   hp: number;
-  attacker: PokemonBaseStats;
-
+  attacker: PokemonStats;
+  cpm: number;
+  myPokemonId: string;
   damageDetails: DamageDetails[];
   fastAttacks: DamageDetails[];
 }

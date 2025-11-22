@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import {
   Pokemon,
-  PokemonBaseStats,
+  PokemonStats,
   DamageConfiguration,
   Type,
   DamageDetails,
@@ -10,9 +10,11 @@ import {
   ComboDamageConfiguration,
   BattleConfiguration,
   SimulationResults,
+  TeamOption,
 } from '../../types/types';
 import { ImportServiceService } from '../import-service/import-service.service';
 import { Moment } from 'moment';
+import { MyPokemonService } from '../my-pokemon.service';
 
 const TURN_DURATION = 0.5;
 
@@ -21,27 +23,23 @@ const TURN_DURATION = 0.5;
 })
 export class MaxCalculatorService {
   private importService = inject(ImportServiceService);
+  private teamService = inject(MyPokemonService);
 
   simulateBattle(config: BattleConfiguration): SimulationResults {
-    // Get all Pokemons from service and our opponent - we do it every time for each simulation,
-    // because we override stats based on battle config
-    const allies = this.importService.getPokemons();
-    const opponent = this.importService.findPokemon(config.opponentName);
+    // Get our opponent with stats adjusted to battle config
+    const opponent = this.importService.getOpponent(config);
+    const allies: Pokemon[] = [];
 
-    // Calculate final stats for the opponent
-    const opponentAtkIV = 15;
-    const opponentDefIV = 15;
+    if (config.teamOption === TeamOption.allPokemons || config.teamOption === TeamOption.onlyDefaultPokemons) {
+      // Get all Pokemons with stats adjusted to battle config
+      allies.push(...this.importService.getPokemonsWithConfig(config));
+    }
 
-    opponent.atk = (opponent.atk + opponentAtkIV) * config.opponentCpm * config.opponentAtkMod;
-    opponent.def = (opponent.def + opponentDefIV) * config.opponentCpm * config.opponentDefMod;
-    opponent.hp = config.opponentHp;
-
-    // Calculate final stats for allies
-    allies.forEach(ally => {
-      ally.atk = (ally.atk + config.allyAtkIV) * config.allyCpm;
-      ally.def = (ally.def + config.allyDefIV) * config.allyCpm;
-      ally.hp = Math.floor((ally.hp + config.allyHpIV) * config.allyCpm);
-    });
+    if (config.teamOption === TeamOption.allPokemons || config.teamOption === TeamOption.onlyMyPokemons) {
+      // Add personal team to the mix
+      const myPokemons = this.teamService.getMyPokemons();
+      allies.push(...myPokemons);
+    }
 
     // Run the simulation
     const result = this.calculate(allies, opponent, config.date);
@@ -284,6 +282,7 @@ export class MaxCalculatorService {
         },
         typeEffectiveness: this.calculateTypeEffectiveness(pokemon.gigantamaxType, boss),
         stab: this.calculateStab(pokemon.gigantamaxType, pokemon),
+        myPokemonId: pokemon.myPokemonId,
       } as DamageConfiguration;
 
       damageConfigurations.push(gigantamaxDamageConfiguration);
@@ -305,6 +304,7 @@ export class MaxCalculatorService {
           },
           typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, boss),
           stab: this.calculateStab(fastAttack.type, pokemon),
+          myPokemonId: pokemon.myPokemonId,
         } as DamageConfiguration;
 
         damageConfigurations.push(dynamaxDamageConfiguration);
@@ -325,6 +325,7 @@ export class MaxCalculatorService {
         },
         typeEffectiveness: this.calculateTypeEffectiveness(pokemon.dynamaxType, boss),
         stab: this.calculateStab(pokemon.dynamaxType, pokemon),
+        myPokemonId: pokemon.myPokemonId,
       } as DamageConfiguration;
 
       damageConfigurations.push(specialDynamaxDamageConfiguration);
@@ -358,8 +359,13 @@ export class MaxCalculatorService {
       primaryType: pokemon.primaryType,
       secondaryType: pokemon.secondaryType,
       hasHalfSecondAttack: pokemon.hasHalfSecondAttack,
+      atkIV: pokemon.atkIV,
+      defIV: pokemon.defIV,
+      hpIV: pokemon.hpIV,
       def: pokemon.def,
       hp: pokemon.hp,
+      cpm: pokemon.cpm,
+      myPokemonId: pokemon.myPokemonId,
       attacker: this.getPokemonBaseStats(boss),
       avgDamage: avgDamage,
       avgDamagePercentage: (avgDamage / pokemon.hp) * 100,
@@ -426,8 +432,13 @@ export class MaxCalculatorService {
       pokedexNumber: pokemon.pokedexNumber,
       primaryType: pokemon.primaryType,
       secondaryType: pokemon.secondaryType,
+      atkIV: pokemon.atkIV,
+      defIV: pokemon.defIV,
+      hpIV: pokemon.hpIV,
       def: pokemon.def,
       hp: pokemon.hp,
+      cpm: pokemon.cpm,
+      myPokemonId: pokemon.myPokemonId,
       heal: heal,
       totalUnhealedDamagePercentage: healersDamageConfigurations.reduce((a, b) => a + b.unhealedDamagePercentage, 0),
       damageDetails: [
@@ -495,7 +506,7 @@ export class MaxCalculatorService {
     return damageConfigurations;
   }
 
-  private getPokemonBaseStats(pokemon: Pokemon): PokemonBaseStats {
+  private getPokemonBaseStats(pokemon: Pokemon): PokemonStats {
     return {
       name: pokemon.name,
       atk: pokemon.atk,

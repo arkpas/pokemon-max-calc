@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { Attack, Pokemon, Type } from '../../types/types';
+import { AllyConfiguration, Attack, MyPokemon, OpponentConfiguration, Pokemon, Type } from '../../types/types';
 import moment, { Moment } from 'moment';
 
 type DefendingTypeEffectiveness = Record<string, number>;
@@ -49,8 +49,55 @@ export class ImportServiceService {
   }
 
   public getPokemons(): Pokemon[] {
-    // Copy the pokemons and return them, so we still have "clean" version of them in service
     return this.pokemons.map(pokemon => this.deepCopyPokemon(pokemon));
+  }
+
+  public getPokemonsWithConfig(config: AllyConfiguration): Pokemon[] {
+    // Copy the pokemons and return them, so we still have "clean" version of them in service
+    const pokemons = this.getPokemons();
+
+    // Calculate final stats
+    pokemons.forEach(pokemon => {
+      pokemon.cpm = config.allyCpm;
+      pokemon.atkIV = config.allyAtkIV;
+      pokemon.defIV = config.allyDefIV;
+      pokemon.hpIV = config.allyHpIV;
+      pokemon.atk = (pokemon.atk + config.allyAtkIV) * config.allyCpm;
+      pokemon.def = (pokemon.def + config.allyDefIV) * config.allyCpm;
+      pokemon.hp = Math.floor((pokemon.hp + config.allyHpIV) * config.allyCpm);
+    });
+
+    return pokemons;
+  }
+
+  public getPokemonsForMyPokemons(myPokemons: MyPokemon[]): Pokemon[] {
+    const pokemons: Pokemon[] = [];
+
+    // Calculate final stats
+    myPokemons.forEach(myPokemon => {
+      try {
+        const pokemon = this.findPokemon(myPokemon.name);
+
+        pokemon.cpm = myPokemon.cpm;
+        pokemon.atkIV = myPokemon.atkIV;
+        pokemon.defIV = myPokemon.defIV;
+        pokemon.hpIV = myPokemon.hpIV;
+        pokemon.atk = (pokemon.atk + myPokemon.atkIV) * myPokemon.cpm;
+        pokemon.def = (pokemon.def + myPokemon.defIV) * myPokemon.cpm;
+        pokemon.hp = Math.floor((pokemon.hp + myPokemon.hpIV) * myPokemon.cpm);
+        pokemon.myPokemonId = myPokemon.id;
+
+        pokemons.push(pokemon);
+      } catch {
+        console.log(`Error getting My Pokemon with name: "${myPokemon.name}"!`);
+      }
+    });
+
+    return pokemons;
+  }
+
+  public getPokemonNames(): string[] {
+    return this.pokemons.map(pokemon => pokemon.name);
   }
 
   public findPokemon(name: string): Pokemon {
@@ -61,6 +108,26 @@ export class ImportServiceService {
     }
 
     return this.deepCopyPokemon(wantedPokemon);
+  }
+
+  public getOpponent(config: OpponentConfiguration): Pokemon {
+    const wantedPokemon = this.pokemons.find(pokemon => pokemon.name.toLowerCase() === config.opponentName.toLowerCase());
+
+    if (!wantedPokemon) {
+      throw new Error(`Pokemon with name ${config.opponentName} was not found!`);
+    }
+
+    const opponent = this.deepCopyPokemon(wantedPokemon);
+
+    // Calculate final stats for the opponent
+    const opponentAtkIV = 15;
+    const opponentDefIV = 15;
+
+    opponent.atk = (opponent.atk + opponentAtkIV) * config.opponentCpm * config.opponentAtkMod;
+    opponent.def = (opponent.def + opponentDefIV) * config.opponentCpm * config.opponentDefMod;
+    opponent.hp = config.opponentHp;
+
+    return opponent;
   }
 
   /**
@@ -122,27 +189,29 @@ export class ImportServiceService {
     const result: Pokemon[] = [];
 
     for (let i = 1; i < lines.length; i++) {
-      const obj: Record<string, any> = {};
+      const obj: Record<string, unknown> = {};
       const currentline = lines[i].split('	');
 
       headerMap.forEach((value, key) => {
         obj[key] = currentline[value];
       });
 
-      obj['dynamaxDate'] = this.convertToPremiereDate(obj['dynamax']);
-      obj['gigantamaxDate'] = this.convertToPremiereDate(obj['gigantamax']);
-      obj['fastAttacks'] = this.convertAttacks(obj['fastAttacks']);
-      obj['chargedAttacks'] = this.convertAttacks(obj['chargedAttacks']);
-      obj['atk'] = parseInt(obj['atk']);
-      obj['def'] = parseInt(obj['def']);
-      obj['hp'] = parseInt(obj['hp']);
-      obj['hasHalfSecondAttack'] = this.hasHalfSecondAttack(obj['fastAttacks']);
+      const fastAttacks = this.convertAttacks(obj['fastAttacks'] as string);
+
+      obj['dynamaxDate'] = this.convertToPremiereDate(obj['dynamax'] as string);
+      obj['gigantamaxDate'] = this.convertToPremiereDate(obj['gigantamax'] as string);
+      obj['fastAttacks'] = fastAttacks;
+      obj['chargedAttacks'] = this.convertAttacks(obj['chargedAttacks'] as string);
+      obj['atk'] = parseInt(obj['atk'] as string);
+      obj['def'] = parseInt(obj['def'] as string);
+      obj['hp'] = parseInt(obj['hp'] as string);
+      obj['hasHalfSecondAttack'] = this.hasHalfSecondAttack(fastAttacks);
       obj['primaryType'] = Type[obj['primaryType'] as keyof typeof Type];
       obj['secondaryType'] = Type[obj['secondaryType'] as keyof typeof Type];
       obj['gigantamaxType'] = Type[obj['gigantamaxType'] as keyof typeof Type];
       obj['dynamaxType'] = Type[obj['dynamaxType'] as keyof typeof Type];
 
-      result.push(obj as Pokemon);
+      result.push(obj as unknown as Pokemon);
     }
 
     return result;
