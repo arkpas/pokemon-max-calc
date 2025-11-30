@@ -20,21 +20,20 @@ export interface BattleConfiguration extends OpponentConfiguration, AllyConfigur
   teamOption: TeamOption;
 }
 
-export interface SimulationResults {
-  opponent: Pokemon;
-  attackers: DamageConfiguration[];
-  tanks: TankCandidate[];
-  sponges: TankCandidate[];
-  healers: HealerCandidate[];
-}
-
 export interface Attack {
   name: string;
   type: Type;
   power: number;
   energy: number;
   duration: number;
-  special: string | undefined;
+  special: string;
+}
+
+export interface PokemonBase {
+  pokedexNumber: string;
+  primaryType: Type;
+  secondaryType: Type;
+  cpm: number;
 }
 
 export interface PokemonStats {
@@ -50,10 +49,7 @@ export interface PokemonIV {
   hpIV: number;
 }
 
-export interface Pokemon extends PokemonStats, PokemonIV {
-  pokedexNumber: string;
-  primaryType: Type;
-  secondaryType: Type;
+export interface Pokemon extends PokemonBase, PokemonStats, PokemonIV {
   dynamaxDate: Moment;
   gigantamaxDate: Moment;
   dynamaxType: Type;
@@ -61,7 +57,6 @@ export interface Pokemon extends PokemonStats, PokemonIV {
   hasHalfSecondAttack: boolean;
   fastAttacks: Attack[];
   chargedAttacks: Attack[];
-  cpm: number;
   myPokemonId: string;
 }
 
@@ -98,22 +93,6 @@ export enum TeamOption {
   onlyDefaultPokemons = 'Use only default Pokemon',
 }
 
-export interface DamageConfiguration {
-  attacker: PokemonStats;
-  defender: PokemonStats;
-  move: Attack;
-  typeEffectiveness: number;
-  stab: number;
-  damage: number;
-  damagePercentage: number;
-  unhealedDamagePercentage: number;
-  maxEnergy: number;
-  dphs: number;
-  mephs: number;
-  // TODO: below should go away from this type once we switch to cards in Attackers tab
-  myPokemonId: string;
-}
-
 export interface ComboDamageConfiguration {
   pokemon: string;
   faName: string;
@@ -131,39 +110,42 @@ export interface ComboDamageConfiguration {
   mephs: number;
 }
 
-export interface DamageDetails {
-  power: number;
-  move: string;
-  moveType: Type;
-  duration: number;
+export interface StaticDamageModifiers {
+  friendship: number;
+  dodged: number;
+  mega: number;
+  trainer: number;
+  charged: number;
+  party: number;
+  support: number;
+  spread: number;
+}
+
+export interface DynamicDamageModifiers {
   typeEffectiveness: number;
   stab: number;
+  weather: number;
+}
+
+export interface DamageModifiers extends StaticDamageModifiers, DynamicDamageModifiers {}
+
+export interface DamageDetails {
+  move: Attack;
+  damageModifiers: DamageModifiers;
   damage: number;
   damagePercentage: number;
-  isElite: boolean;
+  unhealedDamagePercentage: number;
+  maxEnergy: number;
+  damagePerTurn: number;
+  maxEnergyPerTurn: number;
 }
 
-export interface Candidate extends PokemonIV {
-  name: string;
-  pokedexNumber: string;
-  primaryType: Type;
-  secondaryType: Type;
-  def: number;
-  hp: number;
-  attacker: PokemonStats;
-  cpm: number;
-  myPokemonId: string;
-  damageDetails: DamageDetails[];
-  fastAttacks: DamageDetails[];
-}
-
-export interface TankCandidate extends Candidate {
-  avgDamage: number;
-  avgDamagePercentage: number;
-  hasHalfSecondAttack: boolean;
-}
-
-export interface HealerCandidate extends Candidate {
-  totalUnhealedDamagePercentage: number;
+export interface Candidate extends Pokemon {
+  fastAttackDamageDetails: DamageDetails[];
+  maxPhaseDamageDetails: DamageDetails[];
+  damageTakenDetails: DamageDetails[];
+  avgDamageTaken: number;
+  avgDamageTakenPercentage: number;
   heal: number;
+  totalUnhealedDamagePercentage: number;
 }

@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { Pokemon } from '../../../types/types';
 import { PokemonCardComponent } from '../../shared/cards/pokemon-card/pokemon-card.component';
 import { CommonModule } from '@angular/common';
-import { MyPokemonService } from '../../../services/my-pokemon.service';
+import { MyPokemonService } from '../../../services/my-pokemon-service/my-pokemon.service';
 
 @Component({
   selector: 'app-results',

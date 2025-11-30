@@ -12,84 +12,30 @@
   </div>
   <mat-tab-group>
     <mat-tab label="⚔️ Attackers">
-      <div class="mat-elevation-z8">
-        <table mat-table [dataSource]="attackers" matSort>
-          <!-- Name Column -->
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
-            <td mat-cell *matCellDef="let row">{{ row.myPokemonId ? '(my)' : '' }} {{ row.attacker.name }}</td>
-          </ng-container>
-
-          <!-- Move Column -->
-          <ng-container matColumnDef="move">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Move</th>
-            <td mat-cell *matCellDef="let row">{{ row.move.name }} <span class="sup" *ngIf="row.move.special?.toLowerCase() === 'elite'">E</span></td>
-          </ng-container>
-
-          <!-- Power Column -->
-          <ng-container matColumnDef="power">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Power</th>
-            <td mat-cell *matCellDef="let row">{{ row.move.power }}</td>
-          </ng-container>
-
-          <!-- Damage Column -->
-          <ng-container matColumnDef="damage">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Damage</th>
-            <td mat-cell *matCellDef="let row">{{ row.damage }}</td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="attackersColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: attackersColumns"></tr>
-        </table>
-      </div>
+      <mat-tab-group>
+        <mat-tab label="New">
+          <div class="mat-elevation-z8">
+            <div class="pokemon-cards">
+              <app-pokemon-card *ngFor="let attacker of attackers" [candidate]="attacker" [pokemonCardType]="PokemonCardTypeEnum.Attacker">
+              </app-pokemon-card>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
     </mat-tab>
     <mat-tab label="🛡️ Tanks">
       <mat-tab-group>
         <mat-tab label="👊 On fielders">
           <div class="mat-elevation-z8">
             <div class="pokemon-cards">
-              <app-pokemon-card
-                *ngFor="let tank of tanks"
-                [name]="tank.name"
-                [hp]="tank.hp"
-                [def]="tank.def"
-                [avgDamage]="tank.avgDamage"
-                [avgDamagePercentage]="tank.avgDamagePercentage"
-                [damageDetails]="tank.damageDetails"
-                [fastAttacks]="tank.fastAttacks"
-                [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + tank.pokedexNumber + '.png'"
-                [primaryType]="tank.primaryType"
-                [secondaryType]="tank.secondaryType"
-                [cpm]="tank.cpm"
-                [myPokemonId]="tank.myPokemonId"
-                [atkIV]="tank.atkIV"
-                [defIV]="tank.defIV"
-                [hpIV]="tank.hpIV">
-              </app-pokemon-card>
+              <app-pokemon-card *ngFor="let tank of tanks" [candidate]="tank" [pokemonCardType]="PokemonCardTypeEnum.Tank"> </app-pokemon-card>
             </div>
           </div>
         </mat-tab>
         <mat-tab label="🔻 Hot-swaps">
           <div class="mat-elevation-z8">
             <div class="pokemon-cards">
-              <app-pokemon-card
-                *ngFor="let sponge of sponges"
-                [name]="sponge.name"
-                [hp]="sponge.hp"
-                [def]="sponge.def"
-                [avgDamage]="sponge.avgDamage"
-                [avgDamagePercentage]="sponge.avgDamagePercentage"
-                [damageDetails]="sponge.damageDetails"
-                [fastAttacks]="sponge.fastAttacks"
-                [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + sponge.pokedexNumber + '.png'"
-                [primaryType]="sponge.primaryType"
-                [secondaryType]="sponge.secondaryType"
-                [cpm]="sponge.cpm"
-                [myPokemonId]="sponge.myPokemonId"
-                [atkIV]="sponge.atkIV"
-                [defIV]="sponge.defIV"
-                [hpIV]="sponge.hpIV">
-              </app-pokemon-card>
+              <app-pokemon-card *ngFor="let sponge of sponges" [candidate]="sponge" [pokemonCardType]="PokemonCardTypeEnum.Tank"> </app-pokemon-card>
             </div>
           </div>
         </mat-tab>
@@ -97,24 +43,7 @@
     </mat-tab>
     <mat-tab label="💚 Healers">
       <div class="pokemon-cards">
-        <app-pokemon-card
-          *ngFor="let healer of healers"
-          [name]="healer.name"
-          [hp]="healer.hp"
-          [def]="healer.def"
-          [heal]="healer.heal"
-          [unhealedDamagePercentage]="healer.totalUnhealedDamagePercentage"
-          [damageDetails]="healer.damageDetails"
-          [fastAttacks]="healer.fastAttacks"
-          [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + healer.pokedexNumber + '.png'"
-          [primaryType]="healer.primaryType"
-          [secondaryType]="healer.secondaryType"
-          [cpm]="healer.cpm"
-          [myPokemonId]="healer.myPokemonId"
-          [atkIV]="healer.atkIV"
-          [defIV]="healer.defIV"
-          [hpIV]="healer.hpIV">
-        </app-pokemon-card>
+        <app-pokemon-card *ngFor="let healer of healers" [candidate]="healer" [pokemonCardType]="PokemonCardTypeEnum.Healer"> </app-pokemon-card>
       </div>
     </mat-tab>
   </mat-tab-group>

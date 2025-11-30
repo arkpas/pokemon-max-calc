@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { MyPokemon, Pokemon } from '../types/types';
-import { ImportServiceService } from './import-service/import-service.service';
+import { MyPokemon, Pokemon } from '../../types/types';
+import { ImportServiceService } from '../import-service/import-service.service';
 
 @Injectable({
   providedIn: 'root',

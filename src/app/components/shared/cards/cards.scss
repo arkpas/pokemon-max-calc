@@ -169,13 +169,17 @@
 
       .damage-summary {
         display: grid;
-        grid-template-columns: 150px 100px 50px 75px 45px;
+        grid-template-columns: 150px 110px 50px 75px 45px;
         gap: 8px;
         align-items: center;
         padding: 4px 8px;
         font-size: 0.9rem;
         background-color: rgb(239, 239, 239, 0.75);
         border-radius: 4px;
+
+        &.offensive {
+          grid-template-columns: 150px 50px 50px 50px 75px 45px;
+        }
 
         .col {
           font-size: 14px;
@@ -193,12 +197,7 @@
         .attack-name {
           text-align: center;
           font-weight: bolder;
-          padding: 2px 8px;
-          border-radius: 4px;
-          color: #fff;
           max-width: 150px;
-          overflow: hidden;
-          text-overflow: ellipsis;
         }
       }
     }
@@ -212,6 +211,16 @@
     font-weight: 600;
     color: white;
     text-transform: uppercase;
+  }
+
+  .type-bg {
+    text-align: center;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #fff;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .type-bg.bug {
@@ -284,6 +293,14 @@
 
   .type-bg.water {
     background-color: #5092d5;
+  }
+
+  .type-bg.g-max {
+    background-color: #d200ce;
+  }
+
+  .type-bg.d-max {
+    background-color: #666666;
   }
 }
 
