@@ -75,9 +75,6 @@
       </div>
     </div>
     <div class="actions">
-      <div class="action" *ngIf="isMyPokemonActionsEnabled && candidate.myPokemonId">
-        <button (click)="removeMyPokemon()" class="icon-button" title="Usuń swojego Pokemona">🗑️</button>
-      </div>
       <div class="action" *ngIf="candidate.damageTakenDetails && candidate.damageTakenDetails.length !== 0">
         <button (click)="toggleDetails()" class="icon-button" title="Pokaż/ukryj szczegóły obrażeń">
           {{ showDetails ? '🚫' : '👁️' }}

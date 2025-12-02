@@ -1,10 +1,10 @@
 <div class="results">
   <div class="pokemon-cards">
-    <app-pokemon-card
+    <app-my-pokemon-card
       class="pokemon-card"
       *ngFor="let myPokemon of myPokemons"
-      [isMyPokemonActionsEnabled]="true"
+      [myPokemon]="myPokemon"
       (myPokemonRemovedEvent)="refreshMyPokemons()">
-    </app-pokemon-card>
+    </app-my-pokemon-card>
   </div>
 </div>
