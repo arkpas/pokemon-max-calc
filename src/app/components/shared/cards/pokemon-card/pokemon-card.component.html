@@ -94,13 +94,19 @@
           <span class="col damage-stats"
             >💥 <strong>{{ entry.damage.toFixed(0) }} </strong></span
           >
-
           <span class="col power"
             >💪 <strong>{{ entry.move.power }}</strong></span
           >
-          <span class="col duration">⏱️ {{ entry.move.duration }}s </span>
-          <span class="col typeEffectiveness">🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% </span>
-          <span class="col stab">🧬 {{ entry.damageModifiers.stab }}</span>
+          <!-- eslint-disable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
+          <span
+            class="col"
+            matTooltip="🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% 🧬 {{ entry.damageModifiers.stab }}"
+            matTooltipPosition="above"
+            #tooltip="matTooltip"
+            (click)="tooltip.toggle()">
+            🔍
+          </span>
+          <!-- eslint-enable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
         </summary>
       </details>
     </div>
@@ -121,8 +127,16 @@
           <span class="col power"
             >💪 <strong>{{ entry.move.power }}</strong></span
           >
-          <span class="col typeEffectiveness">🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% </span>
-          <span class="col stab">🧬 {{ entry.damageModifiers.stab }}</span>
+          <!-- eslint-disable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
+          <span
+            class="col"
+            matTooltip="🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% 🧬 {{ entry.damageModifiers.stab }}"
+            matTooltipPosition="above"
+            #tooltip="matTooltip"
+            (click)="tooltip.toggle()">
+            🔍
+          </span>
+          <!-- eslint-enable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
         </summary>
       </details>
     </div>
@@ -142,8 +156,17 @@
             >💪 <strong>{{ entry.move.power }}</strong></span
           >
           <span class="col duration">⏱️ {{ entry.move.duration }}s </span>
-          <span class="col typeEffectiveness">🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% </span>
-          <span class="col stab">🧬 {{ entry.damageModifiers.stab }}</span>
+          <span class="col maxEnergy">🌀 {{ entry.maxEnergy }} </span>
+          <!-- eslint-disable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
+          <span
+            class="col"
+            matTooltip="🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% 🧬 {{ entry.damageModifiers.stab }}"
+            matTooltipPosition="above"
+            #tooltip="matTooltip"
+            (click)="tooltip.toggle()">
+            🔍
+          </span>
+          <!-- eslint-enable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
         </summary>
       </details>
     </div>
