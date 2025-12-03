@@ -12,16 +12,12 @@
   </div>
   <mat-tab-group>
     <mat-tab label="⚔️ Attackers">
-      <mat-tab-group>
-        <mat-tab label="New">
-          <div class="mat-elevation-z8">
-            <div class="pokemon-cards">
-              <app-pokemon-card *ngFor="let attacker of attackers" [candidate]="attacker" [pokemonCardType]="PokemonCardTypeEnum.Attacker">
-              </app-pokemon-card>
-            </div>
-          </div>
-        </mat-tab>
-      </mat-tab-group>
+      <div class="mat-elevation-z8">
+        <div class="pokemon-cards">
+          <app-pokemon-card *ngFor="let attacker of attackers" [candidate]="attacker" [pokemonCardType]="PokemonCardTypeEnum.Attacker">
+          </app-pokemon-card>
+        </div>
+      </div>
     </mat-tab>
     <mat-tab label="🛡️ Tanks">
       <mat-tab-group>

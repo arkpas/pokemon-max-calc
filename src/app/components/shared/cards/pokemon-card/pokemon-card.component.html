@@ -25,7 +25,6 @@
           ⭐
           <strong>L{{ candidate.cpm | cpmToLevel }}</strong>
         </div>
-        <!-- eslint-disable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
         <div
           class="stat"
           matTooltip="IV: {{ candidate.atkIV }}/{{ candidate.defIV }}/{{ candidate.hpIV }}"
@@ -37,7 +36,6 @@
             ><u>{{ candidate.atkIV + candidate.defIV + candidate.hpIV | ivPercentage }}%</u></strong
           >
         </div>
-        <!-- eslint-enable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
       </div>
       <div class="stat-row">
         <div *ngIf="pokemonCardType === PokemonCardTypeEnum.Attacker && candidate.maxPhaseDamageDetails.length" class="stat" title="Obrażenia)">
@@ -83,92 +81,84 @@
     </div>
   </div>
 
-  <div class="damage-section" *ngIf="showDetails">
-    <div class="damage-list" *ngIf="pokemonCardType === PokemonCardTypeEnum.Attacker">
-      <span class="damage-list-name">👾 Max Phase Damage</span>
-      <details *ngFor="let entry of candidate.maxPhaseDamageDetails" class="damage-row">
-        <summary class="damage-summary offensive">
-          <span class="col attack-name type-bg {{ entry.move.type.toLowerCase() }}">
-            {{ entry.move.name }} <span class="sup" *ngIf="entry.move.special === 'elite'">E</span>
-          </span>
-          <span class="col damage-stats"
-            >💥 <strong>{{ entry.damage.toFixed(0) }} </strong></span
-          >
-          <span class="col power"
-            >💪 <strong>{{ entry.move.power }}</strong></span
-          >
-          <!-- eslint-disable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
-          <span
-            class="col"
-            matTooltip="🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% 🧬 {{ entry.damageModifiers.stab }}"
-            matTooltipPosition="above"
-            #tooltip="matTooltip"
-            (click)="tooltip.toggle()">
-            🔍
-          </span>
-          <!-- eslint-enable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
-        </summary>
-      </details>
+  <div class="damage-details" *ngIf="showDetails">
+    <div class="damage-details-section" *ngIf="pokemonCardType === PokemonCardTypeEnum.Attacker">
+      <span class="damage-details-section-name">👾 Max Phase Damage</span>
+      <div class="damage-details-table-wrapper">
+        <table class="damage-details-table">
+          <tr *ngFor="let entry of candidate.maxPhaseDamageDetails">
+            <td>
+              <div class="type-bg {{ entry.move.type.toLowerCase() }}">
+                {{ entry.move.name }} <span class="sup" *ngIf="entry.move.special === 'elite'">E</span>
+              </div>
+            </td>
+            <td title="Damage">💥 {{ entry.damage.toFixed(0) }}</td>
+            <td title="Power">💪 {{ entry.move.power }}</td>
+            <td
+              matTooltip="🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% 🧬 {{ entry.damageModifiers.stab }}"
+              matTooltipPosition="above"
+              #tooltip="matTooltip"
+              (click)="tooltip.toggle()">
+              🔍
+            </td>
+            <td></td>
+          </tr>
+        </table>
+      </div>
     </div>
-    <div class="damage-list" *ngIf="pokemonCardType !== PokemonCardTypeEnum.Attacker">
-      <span class="damage-list-name">🛡️ Damage taken</span>
-      <details *ngFor="let entry of candidate.damageTakenDetails" class="damage-row">
-        <summary class="damage-summary">
-          <span class="col attack-name type-bg {{ entry.move.type.toLowerCase() }}">
-            {{ entry.move.name }}
-          </span>
-          <span
-            class="col damage-stats"
-            [ngStyle]="{
-              color: getDamagePercentageColor(entry.damagePercentage),
-            }"
-            >💥 {{ entry.damage.toFixed(0) }} (<strong>{{ entry.damagePercentage.toFixed(1) }}%</strong>)</span
-          >
-          <span class="col power"
-            >💪 <strong>{{ entry.move.power }}</strong></span
-          >
-          <!-- eslint-disable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
-          <span
-            class="col"
-            matTooltip="🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% 🧬 {{ entry.damageModifiers.stab }}"
-            matTooltipPosition="above"
-            #tooltip="matTooltip"
-            (click)="tooltip.toggle()">
-            🔍
-          </span>
-          <!-- eslint-enable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
-        </summary>
-      </details>
+    <div class="damage-details-section" *ngIf="pokemonCardType !== PokemonCardTypeEnum.Attacker">
+      <span class="damage-details-section-name">🛡️ Damage taken</span>
+      <div class="damage-details-table-wrapper">
+        <table class="damage-details-table">
+          <tr *ngFor="let entry of candidate.damageTakenDetails">
+            <td>
+              <div class="type-bg {{ entry.move.type.toLowerCase() }}">
+                {{ entry.move.name }}
+              </div>
+            </td>
+            <td title="Damage">
+              <span [ngStyle]="{ color: getDamagePercentageColor(entry.damagePercentage) }">
+                💥 {{ entry.damage.toFixed(0) }} ({{ entry.damagePercentage.toFixed(1) }}%)
+              </span>
+            </td>
+            <td title="Power">💪 {{ entry.move.power }}</td>
+            <td
+              matTooltip="🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% 🧬 {{ entry.damageModifiers.stab }}"
+              matTooltipPosition="above"
+              #tooltip="matTooltip"
+              (click)="tooltip.toggle()">
+              🔍
+            </td>
+            <td></td>
+          </tr>
+        </table>
+      </div>
     </div>
-    <div class="damage-list">
-      <span class="damage-list-name">⚔️ Fast Attacks</span>
-
-      <details *ngFor="let entry of candidate.fastAttackDamageDetails" class="damage-row">
-        <summary class="damage-summary offensive">
-          <span class="col attack-name type-bg {{ entry.move.type.toLowerCase() }}">
-            {{ entry.move.name }} <span class="sup" *ngIf="entry.move.special === 'elite'">E</span>
-          </span>
-          <span class="col damage-stats"
-            >💥 <strong>{{ entry.damage.toFixed(0) }} </strong></span
-          >
-
-          <span class="col power"
-            >💪 <strong>{{ entry.move.power }}</strong></span
-          >
-          <span class="col duration">⏱️ {{ entry.move.duration }}s </span>
-          <span class="col maxEnergy">🌀 {{ entry.maxEnergy }} </span>
-          <!-- eslint-disable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
-          <span
-            class="col"
-            matTooltip="🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% 🧬 {{ entry.damageModifiers.stab }}"
-            matTooltipPosition="above"
-            #tooltip="matTooltip"
-            (click)="tooltip.toggle()">
-            🔍
-          </span>
-          <!-- eslint-enable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
-        </summary>
-      </details>
+    <div class="damage-details-section">
+      <span class="damage-details-section-name">⚔️ Fast Attacks</span>
+      <div class="damage-details-table-wrapper">
+        <table class="damage-details-table">
+          <tr *ngFor="let entry of candidate.fastAttackDamageDetails">
+            <td>
+              <div class="type-bg {{ entry.move.type.toLowerCase() }}">
+                {{ entry.move.name }} <span class="sup" *ngIf="entry.move.special === 'elite'">E</span>
+              </div>
+            </td>
+            <td title="Damage">💥 {{ entry.damage.toFixed(0) }}</td>
+            <td title="Move duration">⏱️ {{ entry.move.duration }}s</td>
+            <td title="Max Energy">🌀 {{ entry.maxEnergy }}</td>
+            <td title="Power">💪 {{ entry.move.power }}</td>
+            <td
+              matTooltip="🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% 🧬 {{ entry.damageModifiers.stab }}"
+              matTooltipPosition="above"
+              #tooltip="matTooltip"
+              (click)="tooltip.toggle()">
+              🔍
+            </td>
+            <td></td>
+          </tr>
+        </table>
+      </div>
     </div>
   </div>
 </div>
