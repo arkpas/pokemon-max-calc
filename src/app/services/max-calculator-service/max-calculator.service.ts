@@ -55,6 +55,7 @@ export class MaxCalculatorService {
       // Offensive
       const maxPhaseDamageDetails = this.calculateMaxPhaseDamageDetails(pokemon, boss, date);
       const fastAttackDamageDetails = this.calculateFastAttackDamageDetails(pokemon, boss, false);
+      const chargedAttackDamageDetails = this.calculateChargedAttackDamageDetails(pokemon, boss);
 
       // TODO: use it!
       // const onFieldDamageCombos = this.calculateOnFieldDamageCombos(pokemon, boss, date);
@@ -72,6 +73,7 @@ export class MaxCalculatorService {
         avgDamageTakenPercentage,
         damageTakenDetails,
         fastAttackDamageDetails,
+        chargedAttackDamageDetails,
         totalUnhealedDamagePercentage,
         heal,
         maxPhaseDamageDetails,
@@ -198,6 +200,36 @@ export class MaxCalculatorService {
     fastAttackDamageDetails.sort(this.sortFastAttacks);
 
     return fastAttackDamageDetails;
+  }
+
+  private calculateChargedAttackDamageDetails(attacker: Pokemon, defender: Pokemon): DamageDetails[] {
+    const chargedAttackDamageDetails: DamageDetails[] = [];
+    const staticDamageModifiers: StaticDamageModifiers = {
+      friendship: 1,
+      dodged: 1,
+      mega: 1,
+      trainer: 1,
+      charged: 1,
+      party: 1,
+      support: 1,
+      spread: 1,
+    };
+
+    attacker.chargedAttacks.forEach(chargedAttack => {
+      const dynamicDamageModifiers: DynamicDamageModifiers = {
+        typeEffectiveness: this.calculateTypeEffectiveness(chargedAttack.type, defender),
+        stab: this.calculateStab(chargedAttack.type, attacker),
+        weather: 1,
+      };
+
+      chargedAttackDamageDetails.push(
+        this.calculateDamage(chargedAttack, attacker, defender, { ...staticDamageModifiers, ...dynamicDamageModifiers })
+      );
+    });
+
+    chargedAttackDamageDetails.sort(this.sortChargedAttacks);
+
+    return chargedAttackDamageDetails;
   }
 
   private calculateDamageTakenDetails(attacker: Pokemon, defender: Pokemon): DamageDetails[] {
@@ -428,9 +460,43 @@ export class MaxCalculatorService {
   }
 
   private sortFastAttacks(a: DamageDetails, b: DamageDetails): number {
+    const maxEnergyPerTurnCompare = b.maxEnergyPerTurn - a.maxEnergyPerTurn;
+    if (maxEnergyPerTurnCompare !== 0) {
+      return maxEnergyPerTurnCompare;
+    }
+
     const durationCompare = a.move.duration - b.move.duration;
     if (durationCompare !== 0) {
       return durationCompare;
+    }
+
+    const damageCompare = b.damage - a.damage;
+    if (damageCompare !== 0) {
+      return damageCompare;
+    }
+
+    const specialCompare = a.move.special.length - b.move.special.length;
+    if (specialCompare !== 0) {
+      return specialCompare;
+    }
+
+    const typeEffCompare = b.damageModifiers.typeEffectiveness - a.damageModifiers.typeEffectiveness;
+    if (typeEffCompare !== 0) {
+      return typeEffCompare;
+    }
+
+    const stabCompare = b.damageModifiers.stab - a.damageModifiers.stab;
+    if (stabCompare !== 0) {
+      return stabCompare;
+    }
+
+    return b.move.power - a.move.power;
+  }
+
+  private sortChargedAttacks(a: DamageDetails, b: DamageDetails): number {
+    const maxEnergyPerTurnCompare = b.maxEnergyPerTurn - a.maxEnergyPerTurn;
+    if (maxEnergyPerTurnCompare !== 0) {
+      return maxEnergyPerTurnCompare;
     }
 
     const damageCompare = b.damage - a.damage;

@@ -160,5 +160,31 @@
         </table>
       </div>
     </div>
+    <div class="damage-details-section">
+      <span class="damage-details-section-name">💣 Charged Attacks</span>
+      <div class="damage-details-table-wrapper">
+        <table class="damage-details-table">
+          <tr *ngFor="let entry of candidate.chargedAttackDamageDetails">
+            <td>
+              <div class="type-bg {{ entry.move.type.toLowerCase() }}">
+                {{ entry.move.name }} <span class="sup" *ngIf="entry.move.special === 'elite'">E</span>
+              </div>
+            </td>
+            <td title="Damage">💥 {{ entry.damage.toFixed(0) }}</td>
+            <td title="Move duration">⏱️ {{ entry.move.duration }}s</td>
+            <td title="Max Energy">🌀 {{ entry.maxEnergy }}</td>
+            <td title="Power">💪 {{ entry.move.power }}</td>
+            <td
+              matTooltip="🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% 🧬 {{ entry.damageModifiers.stab }}"
+              matTooltipPosition="above"
+              #tooltip="matTooltip"
+              (click)="tooltip.toggle()">
+              🔍
+            </td>
+            <td></td>
+          </tr>
+        </table>
+      </div>
+    </div>
   </div>
 </div>

@@ -142,6 +142,7 @@ export interface DamageDetails {
 
 export interface Candidate extends Pokemon {
   fastAttackDamageDetails: DamageDetails[];
+  chargedAttackDamageDetails: DamageDetails[];
   maxPhaseDamageDetails: DamageDetails[];
   damageTakenDetails: DamageDetails[];
   avgDamageTaken: number;
