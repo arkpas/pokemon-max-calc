@@ -81,6 +81,151 @@ export class MaxCalculatorService {
     return candidates;
   }
 
+  private calculateMaxPhaseDamageDetails(ally: Pokemon, opponent: Pokemon, date: Moment): DamageDetails[] {
+    const damageDetails: DamageDetails[] = [];
+    const staticDamageModifiers: StaticDamageModifiers = {
+      friendship: 1,
+      dodged: 1,
+      mega: 1,
+      trainer: 1,
+      charged: 1,
+      party: 1,
+      support: 1,
+      spread: 1,
+    };
+
+    // Standard G-MAX
+    if (ally.gigantamaxDate.isBefore(date)) {
+      const move: Attack = {
+        name: GMAX + ' ' + ally.gigantamaxType,
+        type: ally.gigantamaxType,
+        power: 450,
+        energy: 0,
+        duration: 0,
+        special: GMAX,
+      };
+
+      const dynamicDamageModifiers: DynamicDamageModifiers = {
+        typeEffectiveness: this.calculateTypeEffectiveness(ally.gigantamaxType, opponent),
+        stab: this.calculateStab(ally.gigantamaxType, ally),
+        weather: 1,
+      };
+
+      damageDetails.push(this.calculateDamage(move, ally, opponent, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
+    }
+
+    // Standard D-MAX
+    if (ally.dynamaxDate.isBefore(date) && !ally.dynamaxType) {
+      const dmaxDamageByTypeMap = new Map<Type, DamageDetails>();
+
+      ally.fastAttacks.forEach(fastAttack => {
+        // D-Max attack of the same type deal same damage, so if we already have it, we can safely skip
+        if (dmaxDamageByTypeMap.has(fastAttack.type)) {
+          return;
+        }
+
+        const move: Attack = {
+          name: DMAX + ' ' + fastAttack.type,
+          type: fastAttack.type,
+          power: 350,
+          energy: 0,
+          duration: 0,
+          special: DMAX,
+        };
+
+        const dynamicDamageModifiers: DynamicDamageModifiers = {
+          typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, opponent),
+          stab: this.calculateStab(fastAttack.type, ally),
+          weather: 1,
+        };
+
+        dmaxDamageByTypeMap.set(fastAttack.type, this.calculateDamage(move, ally, opponent, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
+      });
+
+      damageDetails.push(...Array.from(dmaxDamageByTypeMap.values()));
+    }
+
+    // D-MAX with fixed attack type (like Zacian or Zamazenta)
+    if (ally.dynamaxDate.isBefore(date) && ally.dynamaxType) {
+      const move: Attack = {
+        name: DMAX + ' ' + ally.dynamaxType,
+        type: ally.dynamaxType,
+        power: 350,
+        energy: 0,
+        duration: 0,
+        special: DMAX,
+      };
+
+      const dynamicDamageModifiers: DynamicDamageModifiers = {
+        typeEffectiveness: this.calculateTypeEffectiveness(ally.dynamaxType, opponent),
+        stab: this.calculateStab(ally.dynamaxType, ally),
+        weather: 1,
+      };
+
+      damageDetails.push(this.calculateDamage(move, ally, opponent, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
+    }
+
+    return damageDetails;
+  }
+
+  private calculateFastAttackDamageDetails(attacker: Pokemon, defender: Pokemon, onlyHalfSecond: boolean): DamageDetails[] {
+    const fastAttackDamageDetails: DamageDetails[] = [];
+    const staticDamageModifiers: StaticDamageModifiers = {
+      friendship: 1,
+      dodged: 1,
+      mega: 1,
+      trainer: 1,
+      charged: 1,
+      party: 1,
+      support: 1,
+      spread: 1,
+    };
+
+    attacker.fastAttacks.forEach(fastAttack => {
+      // Check if we care only about 0.5s attacks or we calculate all
+      // TODO: revisit if this flag is needed
+      if (!onlyHalfSecond || fastAttack.duration <= 0.5) {
+        const dynamicDamageModifiers: DynamicDamageModifiers = {
+          typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, defender),
+          stab: this.calculateStab(fastAttack.type, attacker),
+          weather: 1,
+        };
+
+        fastAttackDamageDetails.push(this.calculateDamage(fastAttack, attacker, defender, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
+      }
+    });
+
+    fastAttackDamageDetails.sort(this.sortFastAttacks);
+
+    return fastAttackDamageDetails;
+  }
+
+  private calculateDamageTakenDetails(attacker: Pokemon, defender: Pokemon): DamageDetails[] {
+    const damageTakenDetails: DamageDetails[] = [];
+    const staticDamageModifiers: StaticDamageModifiers = {
+      friendship: 1,
+      dodged: 1,
+      mega: 1,
+      trainer: 1,
+      charged: 1,
+      party: 1,
+      support: 1,
+      spread: 1,
+    };
+
+    attacker.chargedAttacks.forEach(attack => {
+      const dynamicDamageModifiers: DynamicDamageModifiers = {
+        typeEffectiveness: this.calculateTypeEffectiveness(attack.type, defender),
+        stab: this.calculateStab(attack.type, attacker),
+        weather: 1,
+      };
+
+      damageTakenDetails.push(this.calculateDamage(attack, attacker, defender, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
+    });
+
+    return damageTakenDetails;
+  }
+
   private calculateOnFieldDamageCombos(attacker: Pokemon, defender: Pokemon, date: Moment): ComboDamageConfiguration[] {
     // No DMax or GMax = we can't use this pokemon yet
     if (!attacker.dynamaxDate.isBefore(date) && !attacker.gigantamaxDate.isBefore(date)) {
@@ -221,151 +366,6 @@ export class MaxCalculatorService {
     }
 
     return mephsCompare;
-  }
-
-  private calculateFastAttackDamageDetails(attacker: Pokemon, defender: Pokemon, onlyHalfSecond: boolean): DamageDetails[] {
-    const fastAttackDamageDetails: DamageDetails[] = [];
-    const staticDamageModifiers: StaticDamageModifiers = {
-      friendship: 1,
-      dodged: 1,
-      mega: 1,
-      trainer: 1,
-      charged: 1,
-      party: 1,
-      support: 1,
-      spread: 1,
-    };
-
-    attacker.fastAttacks.forEach(fastAttack => {
-      // Check if we care only about 0.5s attacks or we calculate all
-      // TODO: revisit if this flag is needed
-      if (!onlyHalfSecond || fastAttack.duration <= 0.5) {
-        const dynamicDamageModifiers: DynamicDamageModifiers = {
-          typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, defender),
-          stab: this.calculateStab(fastAttack.type, attacker),
-          weather: 1,
-        };
-
-        fastAttackDamageDetails.push(this.calculateDamage(fastAttack, attacker, defender, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
-      }
-    });
-
-    fastAttackDamageDetails.sort(this.sortFastAttacks);
-
-    return fastAttackDamageDetails;
-  }
-
-  private calculateMaxPhaseDamageDetails(ally: Pokemon, opponent: Pokemon, date: Moment): DamageDetails[] {
-    const damageDetails: DamageDetails[] = [];
-    const staticDamageModifiers: StaticDamageModifiers = {
-      friendship: 1,
-      dodged: 1,
-      mega: 1,
-      trainer: 1,
-      charged: 1,
-      party: 1,
-      support: 1,
-      spread: 1,
-    };
-
-    // Standard G-MAX
-    if (ally.gigantamaxDate.isBefore(date)) {
-      const move: Attack = {
-        name: GMAX + ' ' + ally.gigantamaxType,
-        type: ally.gigantamaxType,
-        power: 450,
-        energy: 0,
-        duration: 0,
-        special: GMAX,
-      };
-
-      const dynamicDamageModifiers: DynamicDamageModifiers = {
-        typeEffectiveness: this.calculateTypeEffectiveness(ally.gigantamaxType, opponent),
-        stab: this.calculateStab(ally.gigantamaxType, ally),
-        weather: 1,
-      };
-
-      damageDetails.push(this.calculateDamage(move, ally, opponent, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
-    }
-
-    // Standard D-MAX
-    if (ally.dynamaxDate.isBefore(date) && !ally.dynamaxType) {
-      const dmaxDamageByTypeMap = new Map<Type, DamageDetails>();
-
-      ally.fastAttacks.forEach(fastAttack => {
-        // D-Max attack of the same type deal same damage, so if we already have it, we can safely skip
-        if (dmaxDamageByTypeMap.has(fastAttack.type)) {
-          return;
-        }
-
-        const move: Attack = {
-          name: DMAX + ' ' + fastAttack.type,
-          type: fastAttack.type,
-          power: 350,
-          energy: 0,
-          duration: 0,
-          special: DMAX,
-        };
-
-        const dynamicDamageModifiers: DynamicDamageModifiers = {
-          typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, opponent),
-          stab: this.calculateStab(fastAttack.type, ally),
-          weather: 1,
-        };
-
-        dmaxDamageByTypeMap.set(fastAttack.type, this.calculateDamage(move, ally, opponent, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
-      });
-
-      damageDetails.push(...Array.from(dmaxDamageByTypeMap.values()));
-    }
-
-    // D-MAX with fixed attack type (like Zacian or Zamazenta)
-    if (ally.dynamaxDate.isBefore(date) && ally.dynamaxType) {
-      const move: Attack = {
-        name: DMAX + ' ' + ally.dynamaxType,
-        type: ally.dynamaxType,
-        power: 350,
-        energy: 0,
-        duration: 0,
-        special: DMAX,
-      };
-
-      const dynamicDamageModifiers: DynamicDamageModifiers = {
-        typeEffectiveness: this.calculateTypeEffectiveness(ally.dynamaxType, opponent),
-        stab: this.calculateStab(ally.dynamaxType, ally),
-        weather: 1,
-      };
-
-      damageDetails.push(this.calculateDamage(move, ally, opponent, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
-    }
-
-    return damageDetails;
-  }
-
-  private calculateDamageTakenDetails(attacker: Pokemon, defender: Pokemon): DamageDetails[] {
-    const damageTakenDetails: DamageDetails[] = [];
-    const staticDamageModifiers: StaticDamageModifiers = {
-      friendship: 1,
-      dodged: 1,
-      mega: 1,
-      trainer: 1,
-      charged: 1,
-      party: 1,
-      support: 1,
-      spread: 1,
-    };
-
-    attacker.chargedAttacks.forEach(attack => {
-      const dynamicDamageModifiers: DynamicDamageModifiers = {
-        typeEffectiveness: this.calculateTypeEffectiveness(attack.type, defender),
-        stab: this.calculateStab(attack.type, attacker),
-        weather: 1,
-      };
-
-      damageTakenDetails.push(this.calculateDamage(attack, attacker, defender, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
-    });
-
-    return damageTakenDetails;
   }
 
   private calculateTypeEffectiveness(type: Type, defendingPokemon: Pokemon) {
