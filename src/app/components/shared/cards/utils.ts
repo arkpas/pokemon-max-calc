@@ -43,3 +43,12 @@ export function getDamagePercentageColor(damagePercentage: number): string {
       return 'black';
   }
 }
+
+export function getFastAttackDurationColor(duration: number): string {
+  switch (true) {
+    case duration <= 0.5:
+      return 'green';
+    default:
+      return 'red';
+  }
+}

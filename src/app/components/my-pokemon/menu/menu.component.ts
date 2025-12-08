@@ -3,7 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { ImportServiceService } from '../../../services/import-service/import-service.service';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MyPokemonService } from '../../../services/my-pokemon.service';
+import { MyPokemonService } from '../../../services/my-pokemon-service/my-pokemon.service';
 import { POKEMON_CPMS } from '../../../constants/cpm.constants';
 import { map, Observable } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';

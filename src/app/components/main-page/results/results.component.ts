@@ -1,13 +1,14 @@
 import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
-import { MaxCalculatorService } from '../../../services/max-calculator-service/max-calculator.service';
+import { DMAX, MaxCalculatorService } from '../../../services/max-calculator-service/max-calculator.service';
 import { MatTabsModule } from '@angular/material/tabs';
-import { BattleConfiguration, DamageConfiguration, HealerCandidate, Pokemon, TankCandidate } from '../../../types/types';
+import { BattleConfiguration, Candidate, Pokemon } from '../../../types/types';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { CommonModule } from '@angular/common';
 import { Observable, Subscription } from 'rxjs';
-import { PokemonCardComponent } from '../../shared/cards/pokemon-card/pokemon-card.component';
+import { PokemonCardComponent, PokemonCardTypeEnum } from '../../shared/cards/pokemon-card/pokemon-card.component';
 import { OpponentCardComponent } from '../../shared/cards/opponent-card/opponent-card.component';
+import { sortAttackers, sortHealers, sortTanks } from '../../../util/sorting.util';
 
 @Component({
   selector: 'app-results',
@@ -22,11 +23,13 @@ export class ResultsComponent implements OnInit, OnDestroy {
   @Input() battleConfiguration!: Observable<BattleConfiguration>;
 
   opponent: Pokemon | undefined = undefined;
-  attackers: DamageConfiguration[] = [];
-  attackersColumns: string[] = ['name', 'move', 'power', 'damage'];
-  tanks: TankCandidate[] = [];
-  sponges: TankCandidate[] = [];
-  healers: HealerCandidate[] = [];
+  candidates: Candidate[] = [];
+  attackers: Candidate[] = [];
+  tanks: Candidate[] = [];
+  sponges: Candidate[] = [];
+  healers: Candidate[] = [];
+
+  readonly PokemonCardTypeEnum = PokemonCardTypeEnum;
 
   ngOnInit(): void {
     this.subscriptions.add(this.battleConfiguration.subscribe(battleConfiguration => this.simulateBattle(battleConfiguration)));
@@ -37,12 +40,36 @@ export class ResultsComponent implements OnInit, OnDestroy {
   }
 
   simulateBattle(config: BattleConfiguration): void {
-    const simulationResults = this.maxCalculatorService.simulateBattle(config);
+    this.candidates = this.maxCalculatorService.simulateBattle(config);
+    this.attackers = this.groupAttackers(this.candidates).sort(sortAttackers);
+    this.tanks = [...this.candidates.filter(candidate => candidate.hasHalfSecondAttack)].sort(sortTanks);
+    this.sponges = [...this.candidates].sort(sortTanks);
+    this.healers = [...this.candidates.filter(candidate => candidate.hasHalfSecondAttack)].sort(sortHealers);
 
-    this.opponent = simulationResults.opponent;
-    this.attackers = simulationResults.attackers;
-    this.tanks = simulationResults.tanks;
-    this.sponges = simulationResults.sponges;
-    this.healers = simulationResults.healers;
+    console.log(this.attackers);
+  }
+
+  groupAttackers(candidates: Candidate[]): Candidate[] {
+    const attackers: Candidate[] = [];
+    candidates.forEach(candidate => {
+      const attackerByMaxAttackMap = new Map<string, Candidate>();
+
+      candidate.maxPhaseDamageDetails.forEach(maxPhaseDamageDetails => {
+        const attackerPerMaxAttack = { ...candidate, maxPhaseDamageDetails: [maxPhaseDamageDetails] };
+
+        // For normal Dynamax Pokemon we list only fast attacks matching the type of max phase attack
+        if (maxPhaseDamageDetails.move.special === DMAX && !candidate.dynamaxType) {
+          attackerPerMaxAttack.fastAttackDamageDetails = attackerPerMaxAttack.fastAttackDamageDetails.filter(
+            damageDetails => damageDetails.move.type === maxPhaseDamageDetails.move.type
+          );
+        }
+
+        attackerByMaxAttackMap.set(maxPhaseDamageDetails.move.name, attackerPerMaxAttack);
+      });
+
+      attackers.push(...Array.from(attackerByMaxAttackMap.values()));
+    });
+
+    return attackers;
   }
 }

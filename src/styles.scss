@@ -27,3 +27,7 @@ body {
   font-size: 80%;
   font-weight: normal;
 }
+
+:root {
+  @include mat.expansion-overrides((container-background-color: transparent));
+}

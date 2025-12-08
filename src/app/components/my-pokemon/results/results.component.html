@@ -1,22 +1,10 @@
 <div class="results">
   <div class="pokemon-cards">
-    <app-pokemon-card
+    <app-my-pokemon-card
       class="pokemon-card"
       *ngFor="let myPokemon of myPokemons"
-      [name]="myPokemon.name"
-      [primaryType]="myPokemon.primaryType"
-      [secondaryType]="myPokemon.secondaryType"
-      [cpm]="myPokemon.cpm"
-      [atkIV]="myPokemon.atkIV"
-      [defIV]="myPokemon.defIV"
-      [hpIV]="myPokemon.hpIV"
-      [atk]="myPokemon.atk"
-      [def]="myPokemon.def"
-      [hp]="myPokemon.hp"
-      [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + myPokemon.pokedexNumber + '.png'"
-      [myPokemonId]="myPokemon.myPokemonId"
-      [isMyPokemonActionsEnabled]="true"
+      [myPokemon]="myPokemon"
       (myPokemonRemovedEvent)="refreshMyPokemons()">
-    </app-pokemon-card>
+    </app-my-pokemon-card>
   </div>
 </div>

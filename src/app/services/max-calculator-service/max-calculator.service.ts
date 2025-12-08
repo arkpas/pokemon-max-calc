@@ -2,21 +2,24 @@ import { Injectable, inject } from '@angular/core';
 import {
   Pokemon,
   PokemonStats,
-  DamageConfiguration,
   Type,
-  DamageDetails,
-  TankCandidate,
-  HealerCandidate,
   ComboDamageConfiguration,
   BattleConfiguration,
-  SimulationResults,
   TeamOption,
+  DamageDetails,
+  DamageModifiers,
+  Attack,
+  DynamicDamageModifiers,
+  StaticDamageModifiers,
+  Candidate,
 } from '../../types/types';
 import { ImportServiceService } from '../import-service/import-service.service';
 import { Moment } from 'moment';
-import { MyPokemonService } from '../my-pokemon.service';
+import { MyPokemonService } from '../my-pokemon-service/my-pokemon.service';
 
 const TURN_DURATION = 0.5;
+export const GMAX = 'G-Max';
+export const DMAX = 'D-Max';
 
 @Injectable({
   providedIn: 'root',
@@ -25,7 +28,7 @@ export class MaxCalculatorService {
   private importService = inject(ImportServiceService);
   private teamService = inject(MyPokemonService);
 
-  simulateBattle(config: BattleConfiguration): SimulationResults {
+  simulateBattle(config: BattleConfiguration): Candidate[] {
     // Get our opponent with stats adjusted to battle config
     const opponent = this.importService.getOpponent(config);
     const allies: Pokemon[] = [];
@@ -42,117 +45,269 @@ export class MaxCalculatorService {
     }
 
     // Run the simulation
-    const result = this.calculate(allies, opponent, config.date);
-
-    return {
-      opponent: opponent,
-      attackers: result.attackers,
-      tanks: result.tanks.filter(tank => tank.hasHalfSecondAttack),
-      sponges: result.tanks,
-      healers: result.healers,
-    };
+    return this.calculate(allies, opponent, config.date);
   }
 
   public calculate(pokemons: Pokemon[], boss: Pokemon, date: Moment) {
-    const attackers: DamageConfiguration[] = [];
-    const tanks: TankCandidate[] = [];
-    const healers: HealerCandidate[] = [];
-    const onFielders: ComboDamageConfiguration[] = [];
+    const candidates: Candidate[] = [];
 
     pokemons.forEach(pokemon => {
-      // On fielders
-      const onFieldDamageConfigurations = this.createOnFieldDamageConfigurations(pokemon, boss, date);
+      // Offensive
+      const maxPhaseDamageDetails = this.calculateMaxPhaseDamageDetails(pokemon, boss, date);
+      const fastAttackDamageDetails = this.calculateFastAttackDamageDetails(pokemon, boss, false);
+      const chargedAttackDamageDetails = this.calculateChargedAttackDamageDetails(pokemon, boss);
 
-      onFielders.push(...onFieldDamageConfigurations);
+      // TODO: use it!
+      // const onFieldDamageCombos = this.calculateOnFieldDamageCombos(pokemon, boss, date);
 
-      // Attackers
-      const pokemonDamageConfigurations = this.createDamageConfigurations(pokemon, boss, date);
-      attackers.push(...pokemonDamageConfigurations);
+      // Defensive
+      const damageTakenDetails = this.calculateDamageTakenDetails(boss, pokemon);
+      const avgDamageTaken = damageTakenDetails.reduce((a, b) => a + b.damage, 0) / damageTakenDetails.length;
+      const avgDamageTakenPercentage = (avgDamageTaken / pokemon.hp) * 100;
+      const heal = pokemon.hp * 0.48;
+      const totalUnhealedDamagePercentage = damageTakenDetails.reduce((a, b) => a + b.unhealedDamagePercentage, 0);
 
-      // Tanks
-      const tankCandidate = this.candidateForTank(pokemon, boss, date);
-      if (tankCandidate) {
-        tanks.push(tankCandidate);
-      }
+      candidates.push({
+        ...pokemon,
+        avgDamageTaken,
+        avgDamageTakenPercentage,
+        damageTakenDetails,
+        fastAttackDamageDetails,
+        chargedAttackDamageDetails,
+        totalUnhealedDamagePercentage,
+        heal,
+        maxPhaseDamageDetails,
+      });
+    });
 
-      // Healers
-      const healerCandidate = this.candidateForHealer(pokemon, boss, date);
-      if (healerCandidate) {
-        healers.push(healerCandidate);
+    return candidates;
+  }
+
+  private calculateMaxPhaseDamageDetails(ally: Pokemon, opponent: Pokemon, date: Moment): DamageDetails[] {
+    const damageDetails: DamageDetails[] = [];
+    const staticDamageModifiers: StaticDamageModifiers = {
+      friendship: 1,
+      dodged: 1,
+      mega: 1,
+      trainer: 1,
+      charged: 1,
+      party: 1,
+      support: 1,
+      spread: 1,
+    };
+
+    // Standard G-MAX
+    if (ally.gigantamaxDate.isBefore(date)) {
+      const move: Attack = {
+        name: GMAX + ' ' + ally.gigantamaxType,
+        type: ally.gigantamaxType,
+        power: 450,
+        energy: 0,
+        duration: 0,
+        special: GMAX,
+      };
+
+      const dynamicDamageModifiers: DynamicDamageModifiers = {
+        typeEffectiveness: this.calculateTypeEffectiveness(ally.gigantamaxType, opponent),
+        stab: this.calculateStab(ally.gigantamaxType, ally),
+        weather: 1,
+      };
+
+      damageDetails.push(this.calculateDamage(move, ally, opponent, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
+    }
+
+    // Standard D-MAX
+    if (ally.dynamaxDate.isBefore(date) && !ally.dynamaxType) {
+      const dmaxDamageByTypeMap = new Map<Type, DamageDetails>();
+
+      ally.fastAttacks.forEach(fastAttack => {
+        // D-Max attack of the same type deal same damage, so if we already have it, we can safely skip
+        if (dmaxDamageByTypeMap.has(fastAttack.type)) {
+          return;
+        }
+
+        const move: Attack = {
+          name: DMAX + ' ' + fastAttack.type,
+          type: fastAttack.type,
+          power: 350,
+          energy: 0,
+          duration: 0,
+          special: DMAX,
+        };
+
+        const dynamicDamageModifiers: DynamicDamageModifiers = {
+          typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, opponent),
+          stab: this.calculateStab(fastAttack.type, ally),
+          weather: 1,
+        };
+
+        dmaxDamageByTypeMap.set(fastAttack.type, this.calculateDamage(move, ally, opponent, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
+      });
+
+      damageDetails.push(...Array.from(dmaxDamageByTypeMap.values()));
+    }
+
+    // D-MAX with fixed attack type (like Zacian or Zamazenta)
+    if (ally.dynamaxDate.isBefore(date) && ally.dynamaxType) {
+      const move: Attack = {
+        name: DMAX + ' ' + ally.dynamaxType,
+        type: ally.dynamaxType,
+        power: 350,
+        energy: 0,
+        duration: 0,
+        special: DMAX,
+      };
+
+      const dynamicDamageModifiers: DynamicDamageModifiers = {
+        typeEffectiveness: this.calculateTypeEffectiveness(ally.dynamaxType, opponent),
+        stab: this.calculateStab(ally.dynamaxType, ally),
+        weather: 1,
+      };
+
+      damageDetails.push(this.calculateDamage(move, ally, opponent, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
+    }
+
+    return damageDetails;
+  }
+
+  private calculateFastAttackDamageDetails(attacker: Pokemon, defender: Pokemon, onlyHalfSecond: boolean): DamageDetails[] {
+    const fastAttackDamageDetails: DamageDetails[] = [];
+    const staticDamageModifiers: StaticDamageModifiers = {
+      friendship: 1,
+      dodged: 1,
+      mega: 1,
+      trainer: 1,
+      charged: 1,
+      party: 1,
+      support: 1,
+      spread: 1,
+    };
+
+    attacker.fastAttacks.forEach(fastAttack => {
+      // Check if we care only about 0.5s attacks or we calculate all
+      // TODO: revisit if this flag is needed
+      if (!onlyHalfSecond || fastAttack.duration <= 0.5) {
+        const dynamicDamageModifiers: DynamicDamageModifiers = {
+          typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, defender),
+          stab: this.calculateStab(fastAttack.type, attacker),
+          weather: 1,
+        };
+
+        fastAttackDamageDetails.push(this.calculateDamage(fastAttack, attacker, defender, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
       }
     });
 
-    attackers.sort(this.sortAttackers);
-    tanks.sort(this.sortTanks);
-    healers.sort(this.sortHealers);
-    onFielders.sort(this.sortComboDamageConfigurations);
+    fastAttackDamageDetails.sort(this.sortFastAttacks);
 
-    const result = {
-      attackers: attackers,
-      tanks: tanks,
-      healers: healers,
-    };
-
-    console.log(result);
-    console.log('On fielders:');
-    console.log(onFielders);
-
-    return result;
+    return fastAttackDamageDetails;
   }
 
-  private createOnFieldDamageConfigurations(pokemon: Pokemon, boss: Pokemon, date: Moment): ComboDamageConfiguration[] {
+  private calculateChargedAttackDamageDetails(attacker: Pokemon, defender: Pokemon): DamageDetails[] {
+    const chargedAttackDamageDetails: DamageDetails[] = [];
+    const staticDamageModifiers: StaticDamageModifiers = {
+      friendship: 1,
+      dodged: 1,
+      mega: 1,
+      trainer: 1,
+      charged: 1,
+      party: 1,
+      support: 1,
+      spread: 1,
+    };
+
+    attacker.chargedAttacks.forEach(chargedAttack => {
+      const dynamicDamageModifiers: DynamicDamageModifiers = {
+        typeEffectiveness: this.calculateTypeEffectiveness(chargedAttack.type, defender),
+        stab: this.calculateStab(chargedAttack.type, attacker),
+        weather: 1,
+      };
+
+      chargedAttackDamageDetails.push(
+        this.calculateDamage(chargedAttack, attacker, defender, { ...staticDamageModifiers, ...dynamicDamageModifiers })
+      );
+    });
+
+    chargedAttackDamageDetails.sort(this.sortChargedAttacks);
+
+    return chargedAttackDamageDetails;
+  }
+
+  private calculateDamageTakenDetails(attacker: Pokemon, defender: Pokemon): DamageDetails[] {
+    const damageTakenDetails: DamageDetails[] = [];
+    const staticDamageModifiers: StaticDamageModifiers = {
+      friendship: 1,
+      dodged: 1,
+      mega: 1,
+      trainer: 1,
+      charged: 1,
+      party: 1,
+      support: 1,
+      spread: 1,
+    };
+
+    attacker.chargedAttacks.forEach(attack => {
+      const dynamicDamageModifiers: DynamicDamageModifiers = {
+        typeEffectiveness: this.calculateTypeEffectiveness(attack.type, defender),
+        stab: this.calculateStab(attack.type, attacker),
+        weather: 1,
+      };
+
+      damageTakenDetails.push(this.calculateDamage(attack, attacker, defender, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
+    });
+
+    return damageTakenDetails;
+  }
+
+  private calculateOnFieldDamageCombos(attacker: Pokemon, defender: Pokemon, date: Moment): ComboDamageConfiguration[] {
     // No DMax or GMax = we can't use this pokemon yet
-    if (!pokemon.dynamaxDate.isBefore(date) && !pokemon.gigantamaxDate.isBefore(date)) {
+    if (!attacker.dynamaxDate.isBefore(date) && !attacker.gigantamaxDate.isBefore(date)) {
       return [];
     }
 
-    const faDamageConfigurations: DamageConfiguration[] = [];
-    const caDamageConfigurations: DamageConfiguration[] = [];
-    const attackerBaseStats = this.getPokemonBaseStats(pokemon);
-    const defenderBaseStats = this.getPokemonBaseStats(boss);
+    const staticDamageModifiers: StaticDamageModifiers = {
+      friendship: 1,
+      dodged: 1,
+      mega: 1,
+      trainer: 1,
+      charged: 1,
+      party: 1,
+      support: 1,
+      spread: 1,
+    };
 
-    pokemon.fastAttacks.forEach(fastAttack => {
-      const damageConfiguration = {
-        attacker: attackerBaseStats,
-        defender: defenderBaseStats,
-        move: fastAttack,
-        typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, boss),
-        stab: this.calculateStab(fastAttack.type, pokemon),
-      } as DamageConfiguration;
+    const faDamageDetailsList: DamageDetails[] = [];
+    const caDamageDetailsList: DamageDetails[] = [];
 
-      faDamageConfigurations.push(damageConfiguration);
+    attacker.fastAttacks.forEach(fastAttack => {
+      const dynamicDamageModifiers: DynamicDamageModifiers = {
+        typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, defender),
+        stab: this.calculateStab(fastAttack.type, attacker),
+        weather: 1,
+      };
+
+      faDamageDetailsList.push(this.calculateDamage(fastAttack, attacker, defender, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
     });
 
-    pokemon.chargedAttacks.forEach(chargedAttack => {
-      const damageConfiguration = {
-        attacker: attackerBaseStats,
-        defender: defenderBaseStats,
-        move: chargedAttack,
-        typeEffectiveness: this.calculateTypeEffectiveness(chargedAttack.type, boss),
-        stab: this.calculateStab(chargedAttack.type, pokemon),
-      } as DamageConfiguration;
+    attacker.chargedAttacks.forEach(chargedAttack => {
+      const dynamicDamageModifiers: DynamicDamageModifiers = {
+        typeEffectiveness: this.calculateTypeEffectiveness(chargedAttack.type, defender),
+        stab: this.calculateStab(chargedAttack.type, attacker),
+        weather: 1,
+      };
 
-      caDamageConfigurations.push(damageConfiguration);
-    });
-
-    faDamageConfigurations.forEach(damageConfiguration => {
-      this.calculateDamageConfiguration(damageConfiguration);
-    });
-
-    caDamageConfigurations.forEach(damageConfiguration => {
-      this.calculateDamageConfiguration(damageConfiguration);
+      caDamageDetailsList.push(this.calculateDamage(chargedAttack, attacker, defender, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
     });
 
     const comboDamageConfigurations: ComboDamageConfiguration[] = [];
 
-    faDamageConfigurations.forEach(faDamageConfiguration => {
-      caDamageConfigurations.forEach(caDamageConfiguration => {
-        const comboDamageConfiguration = this.calculateComboDamageConfiguration(faDamageConfiguration, caDamageConfiguration);
+    faDamageDetailsList.forEach(faDamageDetails => {
+      caDamageDetailsList.forEach(caDamageDetails => {
+        const comboDamageConfiguration = this.calculateComboDamageConfiguration(attacker.name, faDamageDetails, caDamageDetails);
 
         comboDamageConfigurations.push(comboDamageConfiguration);
       });
 
-      const faOnlyComboDamageConfiguration = this.calculateComboDamageConfiguration(faDamageConfiguration);
+      const faOnlyComboDamageConfiguration = this.calculateComboDamageConfiguration(attacker.name, faDamageDetails);
       comboDamageConfigurations.push(faOnlyComboDamageConfiguration);
     });
 
@@ -161,70 +316,52 @@ export class MaxCalculatorService {
     return comboDamageConfigurations;
   }
 
-  private calculateDamageConfiguration(damageConfiguration: DamageConfiguration) {
-    damageConfiguration.damage = this.calculateDamage(damageConfiguration);
-    // Damage per half a second (dphs)
-    damageConfiguration.dphs = damageConfiguration.damage / (damageConfiguration.move.duration / TURN_DURATION);
-
-    // Energy per half a second (ephs)
-    // Each 0.5% HP of boss damage you deal is 1 Max Energy
-    // First we calculate how much percent of damage we do
-    const damagePercentage = (damageConfiguration.damage / damageConfiguration.defender.hp) * 100;
-    // Then we multiply it by 2 to get amount of energy: 0.5%HP * 2 = 1 energy, 1%HP * 2 = 2 energy etc.
-    // and we cut off the decimal place digits by using `Math.floor()`
-    const maxEnergyCalculated = Math.floor(damagePercentage * 2);
-    // And finally with `Math.max()` we pick whichever is higher between our energy calc or 1 energy,
-    // because you can never generate less than 1 energy per attack
-    damageConfiguration.maxEnergy = Math.max(maxEnergyCalculated, 1);
-    // And now divide it by duration of the move
-    damageConfiguration.mephs = damageConfiguration.maxEnergy / (damageConfiguration.move.duration / TURN_DURATION);
-  }
-
   private calculateComboDamageConfiguration(
-    faDamageConfiguration: DamageConfiguration,
-    caDamageConfiguration?: DamageConfiguration
+    pokemonName: string,
+    faDamageDetails: DamageDetails,
+    caDamageDetails?: DamageDetails
   ): ComboDamageConfiguration {
     // Case where we have FA only configuration
-    if (!caDamageConfiguration) {
+    if (!caDamageDetails) {
       return {
-        pokemon: faDamageConfiguration.attacker.name,
-        faName: faDamageConfiguration.move.name,
-        faDmg: faDamageConfiguration.damage,
-        faMaxEnergy: faDamageConfiguration.maxEnergy,
+        pokemon: pokemonName,
+        faName: faDamageDetails.move.name,
+        faDmg: faDamageDetails.damage,
+        faMaxEnergy: faDamageDetails.maxEnergy,
         faCount: 1,
         caName: '-',
         caDmg: 0,
         caMaxEnergy: 0,
         caCount: 0,
-        totalMaxEnergy: faDamageConfiguration.maxEnergy,
-        totalDmg: faDamageConfiguration.damage,
-        totalDuration: faDamageConfiguration.move.duration,
-        dphs: faDamageConfiguration.dphs,
-        mephs: faDamageConfiguration.mephs,
+        totalMaxEnergy: faDamageDetails.maxEnergy,
+        totalDmg: faDamageDetails.damage,
+        totalDuration: faDamageDetails.move.duration,
+        dphs: faDamageDetails.damagePerTurn,
+        mephs: faDamageDetails.maxEnergyPerTurn,
       };
     }
 
     // First we need to find out how many FAs and CAs we should do to finish with 0 energy (full energy cycle)
-    const comboCycleEnergy = this.lcm(faDamageConfiguration.move.energy, caDamageConfiguration.move.energy);
-    const faCount = comboCycleEnergy / faDamageConfiguration.move.energy;
-    const caCount = comboCycleEnergy / caDamageConfiguration.move.energy;
+    const comboCycleEnergy = this.lcm(faDamageDetails.move.energy, caDamageDetails.move.energy);
+    const faCount = comboCycleEnergy / faDamageDetails.move.energy;
+    const caCount = comboCycleEnergy / caDamageDetails.move.energy;
 
-    const totalMaxEnergy = faCount * faDamageConfiguration.maxEnergy + caCount * caDamageConfiguration.maxEnergy;
-    const totalDamage = faCount * faDamageConfiguration.damage + caCount * caDamageConfiguration.damage;
-    const totalDuration = faCount * faDamageConfiguration.move.duration + caCount * caDamageConfiguration.move.duration;
+    const totalMaxEnergy = faCount * faDamageDetails.maxEnergy + caCount * caDamageDetails.maxEnergy;
+    const totalDamage = faCount * faDamageDetails.damage + caCount * caDamageDetails.damage;
+    const totalDuration = faCount * faDamageDetails.move.duration + caCount * caDamageDetails.move.duration;
     const totalTurns = totalDuration / TURN_DURATION;
     const mephs = totalMaxEnergy / totalTurns;
     const dphs = totalDamage / totalTurns;
 
     return {
-      pokemon: faDamageConfiguration.attacker.name,
-      faName: faDamageConfiguration.move.name,
-      faDmg: faDamageConfiguration.damage,
-      faMaxEnergy: faDamageConfiguration.maxEnergy,
+      pokemon: pokemonName,
+      faName: faDamageDetails.move.name,
+      faDmg: faDamageDetails.damage,
+      faMaxEnergy: faDamageDetails.maxEnergy,
       faCount: faCount,
-      caName: caDamageConfiguration.move.name,
-      caDmg: caDamageConfiguration.damage,
-      caMaxEnergy: caDamageConfiguration.maxEnergy,
+      caName: caDamageDetails.move.name,
+      caDmg: caDamageDetails.damage,
+      caMaxEnergy: caDamageDetails.maxEnergy,
       caCount: caCount,
       totalMaxEnergy: totalMaxEnergy,
       totalDmg: totalDamage,
@@ -263,258 +400,6 @@ export class MaxCalculatorService {
     return mephsCompare;
   }
 
-  private createDamageConfigurations(pokemon: Pokemon, boss: Pokemon, date: Moment) {
-    const damageConfigurations: DamageConfiguration[] = [];
-    const attackerBaseStats = this.getPokemonBaseStats(pokemon);
-    const defenderBaseStats = this.getPokemonBaseStats(boss);
-
-    // Standard G-MAX
-    if (pokemon.gigantamaxDate.isBefore(date)) {
-      const gigantamaxDamageConfiguration = {
-        attacker: attackerBaseStats,
-        defender: defenderBaseStats,
-        move: {
-          name: 'G-' + pokemon.gigantamaxType,
-          type: pokemon.gigantamaxType,
-          power: 450,
-          energy: 0,
-          duration: 0,
-        },
-        typeEffectiveness: this.calculateTypeEffectiveness(pokemon.gigantamaxType, boss),
-        stab: this.calculateStab(pokemon.gigantamaxType, pokemon),
-        myPokemonId: pokemon.myPokemonId,
-      } as DamageConfiguration;
-
-      damageConfigurations.push(gigantamaxDamageConfiguration);
-    }
-
-    // Standard D-MAX
-    if (pokemon.dynamaxDate.isBefore(date) && !pokemon.dynamaxType) {
-      pokemon.fastAttacks.forEach(fastAttack => {
-        const dynamaxDamageConfiguration = {
-          attacker: attackerBaseStats,
-          defender: defenderBaseStats,
-          move: {
-            name: fastAttack.name,
-            type: fastAttack.type,
-            power: 350,
-            energy: 0,
-            duration: 0,
-            special: fastAttack.special,
-          },
-          typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, boss),
-          stab: this.calculateStab(fastAttack.type, pokemon),
-          myPokemonId: pokemon.myPokemonId,
-        } as DamageConfiguration;
-
-        damageConfigurations.push(dynamaxDamageConfiguration);
-      });
-    }
-
-    // D-MAX with fixed attack type (like Zacian or Zamazenta)
-    if (pokemon.dynamaxDate.isBefore(date) && pokemon.dynamaxType) {
-      const specialDynamaxDamageConfiguration = {
-        attacker: attackerBaseStats,
-        defender: defenderBaseStats,
-        move: {
-          name: 'D-' + pokemon.dynamaxType,
-          type: pokemon.dynamaxType,
-          power: 350,
-          energy: 0,
-          duration: 0,
-        },
-        typeEffectiveness: this.calculateTypeEffectiveness(pokemon.dynamaxType, boss),
-        stab: this.calculateStab(pokemon.dynamaxType, pokemon),
-        myPokemonId: pokemon.myPokemonId,
-      } as DamageConfiguration;
-
-      damageConfigurations.push(specialDynamaxDamageConfiguration);
-    }
-
-    damageConfigurations.forEach(damageConfiguration => {
-      damageConfiguration.damage = this.calculateDamage(damageConfiguration);
-    });
-
-    return damageConfigurations;
-  }
-
-  private candidateForTank(pokemon: Pokemon, boss: Pokemon, date: Moment) {
-    // No DMax or GMax = we can't use this pokemon yet
-    if (!pokemon.dynamaxDate.isBefore(date) && !pokemon.gigantamaxDate.isBefore(date)) {
-      return;
-    }
-
-    const tankDamageConfigurations = this.createBossDamageConfigurations(boss, pokemon);
-
-    tankDamageConfigurations.sort((a, b) => a.damage - b.damage);
-
-    const avgDamage = tankDamageConfigurations.reduce((a, b) => a + b.damage, 0) / tankDamageConfigurations.length;
-
-    // Now calculate best fast attack for tank
-    const fastAttackDamageConfigurations = this.calculateFastAttackDamage(pokemon, boss, true);
-
-    const tankCandidate = {
-      name: pokemon.name,
-      pokedexNumber: pokemon.pokedexNumber,
-      primaryType: pokemon.primaryType,
-      secondaryType: pokemon.secondaryType,
-      hasHalfSecondAttack: pokemon.hasHalfSecondAttack,
-      atkIV: pokemon.atkIV,
-      defIV: pokemon.defIV,
-      hpIV: pokemon.hpIV,
-      def: pokemon.def,
-      hp: pokemon.hp,
-      cpm: pokemon.cpm,
-      myPokemonId: pokemon.myPokemonId,
-      attacker: this.getPokemonBaseStats(boss),
-      avgDamage: avgDamage,
-      avgDamagePercentage: (avgDamage / pokemon.hp) * 100,
-      damageDetails: [
-        ...tankDamageConfigurations.map(configuration => {
-          return {
-            power: configuration.move.power,
-            move: configuration.move.name,
-            moveType: configuration.move.type,
-            duration: configuration.move.duration,
-            typeEffectiveness: configuration.typeEffectiveness,
-            stab: configuration.stab,
-            damage: configuration.damage,
-            damagePercentage: configuration.damagePercentage,
-            isElite: 'elite' === configuration.move.special,
-          } as DamageDetails;
-        }),
-      ],
-      fastAttacks: [
-        ...fastAttackDamageConfigurations.map(configuration => {
-          return {
-            power: configuration.move.power,
-            move: configuration.move.name,
-            moveType: configuration.move.type,
-            duration: configuration.move.duration,
-            typeEffectiveness: configuration.typeEffectiveness,
-            stab: configuration.stab,
-            damage: configuration.damage,
-            damagePercentage: configuration.damagePercentage,
-            isElite: 'elite' === configuration.move.special,
-          } as DamageDetails;
-        }),
-      ],
-    } as TankCandidate;
-
-    return tankCandidate;
-  }
-
-  private candidateForHealer(pokemon: Pokemon, boss: Pokemon, date: Moment) {
-    // No DMax or GMax = we can't use this pokemon yet
-    if (!pokemon.dynamaxDate.isBefore(date) && !pokemon.gigantamaxDate.isBefore(date)) {
-      return;
-    }
-
-    // Do not even do calcs for healers without 0.5s fast attacks..
-    if (!pokemon.hasHalfSecondAttack) {
-      return;
-    }
-
-    const healersDamageConfigurations = this.createBossDamageConfigurations(boss, pokemon);
-    healersDamageConfigurations.forEach(configuration => {
-      configuration.unhealedDamagePercentage = Math.max(configuration.damagePercentage - 48, 0);
-    });
-
-    healersDamageConfigurations.sort((a, b) => a.damagePercentage - b.damagePercentage);
-
-    const heal = pokemon.hp * 0.48;
-
-    // Now calculate best fast attack for healer
-    const fastAttackDamageConfigurations = this.calculateFastAttackDamage(pokemon, boss, true);
-
-    return {
-      name: pokemon.name,
-      pokedexNumber: pokemon.pokedexNumber,
-      primaryType: pokemon.primaryType,
-      secondaryType: pokemon.secondaryType,
-      atkIV: pokemon.atkIV,
-      defIV: pokemon.defIV,
-      hpIV: pokemon.hpIV,
-      def: pokemon.def,
-      hp: pokemon.hp,
-      cpm: pokemon.cpm,
-      myPokemonId: pokemon.myPokemonId,
-      heal: heal,
-      totalUnhealedDamagePercentage: healersDamageConfigurations.reduce((a, b) => a + b.unhealedDamagePercentage, 0),
-      damageDetails: [
-        ...healersDamageConfigurations.map(configuration => {
-          return {
-            power: configuration.move.power,
-            move: configuration.move.name,
-            moveType: configuration.move.type,
-            duration: configuration.move.duration,
-            typeEffectiveness: configuration.typeEffectiveness,
-            stab: configuration.stab,
-            damage: configuration.damage,
-            damagePercentage: configuration.damagePercentage,
-            unhealedDamagePercentage: configuration.unhealedDamagePercentage,
-            isElite: 'elite' === configuration.move.special,
-          } as DamageDetails;
-        }),
-      ],
-      fastAttacks: [
-        ...fastAttackDamageConfigurations.map(configuration => {
-          return {
-            power: configuration.move.power,
-            move: configuration.move.name,
-            moveType: configuration.move.type,
-            duration: configuration.move.duration,
-            typeEffectiveness: configuration.typeEffectiveness,
-            stab: configuration.stab,
-            damage: configuration.damage,
-            damagePercentage: configuration.damagePercentage,
-            isElite: 'elite' === configuration.move.special,
-          } as DamageDetails;
-        }),
-      ],
-    } as HealerCandidate;
-  }
-
-  private createBossDamageConfigurations(boss: Pokemon, pokemon: Pokemon) {
-    const damageConfigurations: DamageConfiguration[] = [];
-    const attackerBaseStats = this.getPokemonBaseStats(boss);
-    const defenderBaseStats = this.getPokemonBaseStats(pokemon);
-
-    boss.chargedAttacks.forEach(attack => {
-      const damageConfiguration = {
-        attacker: attackerBaseStats,
-        defender: defenderBaseStats,
-        move: {
-          name: attack.name,
-          type: attack.type,
-          power: attack.power,
-          energy: 0,
-          duration: 0,
-        },
-        typeEffectiveness: this.calculateTypeEffectiveness(attack.type, pokemon),
-        stab: this.calculateStab(attack.type, boss),
-      } as DamageConfiguration;
-
-      damageConfigurations.push(damageConfiguration);
-    });
-
-    damageConfigurations.forEach(configuration => {
-      configuration.damage = this.calculateDamage(configuration);
-      configuration.damagePercentage = this.calculateDamagePercentage(configuration);
-    });
-
-    return damageConfigurations;
-  }
-
-  private getPokemonBaseStats(pokemon: Pokemon): PokemonStats {
-    return {
-      name: pokemon.name,
-      atk: pokemon.atk,
-      def: pokemon.def,
-      hp: pokemon.hp,
-    };
-  }
-
   private calculateTypeEffectiveness(type: Type, defendingPokemon: Pokemon) {
     const defendingTypeEffectiveness = this.importService.typesMap.get(type);
 
@@ -529,89 +414,57 @@ export class MaxCalculatorService {
     return type === pokemon.primaryType || type === pokemon.secondaryType ? 1.2 : 1;
   }
 
-  private calculateDamage(damageConfiguration: DamageConfiguration) {
-    const weather = 1;
-    const friendship = 1;
-    const dodged = 1;
-    const mega = 1;
-    const trainer = 1;
-    const charged = 1;
-
-    return (
+  private calculateDamage(move: Attack, attacker: PokemonStats, defender: PokemonStats, damageModifiers: DamageModifiers): DamageDetails {
+    const damage =
       Math.floor(
         0.5 *
-          damageConfiguration.move.power *
-          (damageConfiguration.attacker.atk / damageConfiguration.defender.def) *
-          damageConfiguration.typeEffectiveness *
-          damageConfiguration.stab *
-          weather *
-          friendship *
-          dodged *
-          mega *
-          trainer *
-          charged
-      ) + 1
-    );
+          move.power *
+          (attacker.atk / defender.def) *
+          damageModifiers.typeEffectiveness *
+          damageModifiers.stab *
+          damageModifiers.weather *
+          damageModifiers.friendship *
+          damageModifiers.dodged *
+          damageModifiers.mega *
+          damageModifiers.trainer *
+          damageModifiers.party *
+          damageModifiers.support *
+          damageModifiers.spread
+      ) + 1;
+    const damagePercentage = (damage / defender.hp) * 100;
+    const unhealedDamagePercentage = Math.max(damagePercentage - 48, 0);
+    const maxEnergy = this.calculateMaxEnergy(damagePercentage);
+    const damagePerTurn = damage / (move.duration / TURN_DURATION);
+    const maxEnergyPerTurn = maxEnergy / (move.duration / TURN_DURATION);
+
+    return {
+      move,
+      damageModifiers,
+      damage,
+      damagePercentage,
+      unhealedDamagePercentage,
+      maxEnergy,
+      damagePerTurn,
+      maxEnergyPerTurn,
+    };
   }
 
-  private calculateDamagePercentage(damageConfiguration: DamageConfiguration) {
-    return (damageConfiguration.damage / damageConfiguration.defender.hp) * 100;
+  private calculateMaxEnergy(damagePercentage: number) {
+    // Each 0.5% HP of boss damage you deal is 1 Max Energy
+    // We multiply it by 2 to get amount of energy: 0.5%HP * 2 = 1 energy, 1%HP * 2 = 2 energy etc.
+    // and we cut off the decimal place digits by using `Math.floor()`
+    const maxEnergyCalculated = Math.floor(damagePercentage * 2);
+    // And finally with `Math.max()` we pick whichever is higher between our energy calc or 1 energy,
+    // because you can never generate less than 1 energy per attack
+    return Math.max(maxEnergyCalculated, 1);
   }
 
-  private calculateFastAttackDamage(attacker: Pokemon, defender: Pokemon, onlyHalfSecond: boolean) {
-    const damageConfigurations: DamageConfiguration[] = [];
-    const attackerBaseStats = this.getPokemonBaseStats(attacker);
-    const defenderBaseStats = this.getPokemonBaseStats(defender);
-
-    attacker.fastAttacks.forEach(fastAttack => {
-      // Check if we care only about 0.5s attacks or we calculate all
-      // TODO: revisit if this flag is needed
-      if (!onlyHalfSecond || fastAttack.duration <= 0.5) {
-        const dynamaxDamageConfiguration = {
-          attacker: attackerBaseStats,
-          defender: defenderBaseStats,
-          move: {
-            name: fastAttack.name,
-            type: fastAttack.type,
-            power: fastAttack.power,
-            energy: fastAttack.energy,
-            duration: fastAttack.duration,
-            special: fastAttack.special,
-          },
-          typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, defender),
-          stab: this.calculateStab(fastAttack.type, attacker),
-        } as DamageConfiguration;
-
-        damageConfigurations.push(dynamaxDamageConfiguration);
-      }
-    });
-
-    damageConfigurations.forEach(damageConfiguration => {
-      damageConfiguration.damage = this.calculateDamage(damageConfiguration);
-    });
-
-    return damageConfigurations.sort(this.sortFastAttacks);
-  }
-
-  private sortAttackers(a: DamageConfiguration, b: DamageConfiguration) {
-    return b.damage - a.damage;
-  }
-
-  private sortTanks(a: TankCandidate, b: TankCandidate) {
-    return a.avgDamage - b.avgDamage;
-  }
-
-  private sortHealers(a: HealerCandidate, b: HealerCandidate) {
-    const totalUnhealedDamagePercentageDiff = a.totalUnhealedDamagePercentage - b.totalUnhealedDamagePercentage;
-
-    if (totalUnhealedDamagePercentageDiff == 0) {
-      return b.heal - a.heal;
+  private sortFastAttacks(a: DamageDetails, b: DamageDetails): number {
+    const maxEnergyPerTurnCompare = b.maxEnergyPerTurn - a.maxEnergyPerTurn;
+    if (maxEnergyPerTurnCompare !== 0) {
+      return maxEnergyPerTurnCompare;
     }
 
-    return a.totalUnhealedDamagePercentage - b.totalUnhealedDamagePercentage;
-  }
-
-  private sortFastAttacks(a: DamageConfiguration, b: DamageConfiguration): number {
     const durationCompare = a.move.duration - b.move.duration;
     if (durationCompare !== 0) {
       return durationCompare;
@@ -622,12 +475,46 @@ export class MaxCalculatorService {
       return damageCompare;
     }
 
-    const typeEffCompare = b.typeEffectiveness - a.typeEffectiveness;
+    const specialCompare = a.move.special.length - b.move.special.length;
+    if (specialCompare !== 0) {
+      return specialCompare;
+    }
+
+    const typeEffCompare = b.damageModifiers.typeEffectiveness - a.damageModifiers.typeEffectiveness;
     if (typeEffCompare !== 0) {
       return typeEffCompare;
     }
 
-    const stabCompare = b.stab - a.stab;
+    const stabCompare = b.damageModifiers.stab - a.damageModifiers.stab;
+    if (stabCompare !== 0) {
+      return stabCompare;
+    }
+
+    return b.move.power - a.move.power;
+  }
+
+  private sortChargedAttacks(a: DamageDetails, b: DamageDetails): number {
+    const maxEnergyPerTurnCompare = b.maxEnergyPerTurn - a.maxEnergyPerTurn;
+    if (maxEnergyPerTurnCompare !== 0) {
+      return maxEnergyPerTurnCompare;
+    }
+
+    const damageCompare = b.damage - a.damage;
+    if (damageCompare !== 0) {
+      return damageCompare;
+    }
+
+    const specialCompare = a.move.special.length - b.move.special.length;
+    if (specialCompare !== 0) {
+      return specialCompare;
+    }
+
+    const typeEffCompare = b.damageModifiers.typeEffectiveness - a.damageModifiers.typeEffectiveness;
+    if (typeEffCompare !== 0) {
+      return typeEffCompare;
+    }
+
+    const stabCompare = b.damageModifiers.stab - a.damageModifiers.stab;
     if (stabCompare !== 0) {
       return stabCompare;
     }
