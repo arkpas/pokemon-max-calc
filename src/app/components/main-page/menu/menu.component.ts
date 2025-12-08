@@ -141,10 +141,10 @@ export class MenuComponent {
     return this.generalConfigs.filter(generalConfig => generalConfig.opponentCpm.toString().toLowerCase().includes(filterValue));
   }
 
-  private _filterPokemonCpms(value: number): Cpm[] {
-    const filterValue = value.toString().toLowerCase();
+  private _filterPokemonCpms(level: number): Cpm[] {
+    const filterValue = level.toString().toLowerCase();
 
-    return this.pokemonCpms.filter(cpm => cpm.value.toString().toLowerCase().includes(filterValue));
+    return this.pokemonCpms.filter(cpm => cpm.description.toString().toLowerCase().includes(filterValue));
   }
 
   private determineDefaultBattleDate(pokemonName: string): Date {
