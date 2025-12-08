@@ -31,10 +31,10 @@
         <mat-label>CPM</mat-label>
         <input matInput [matAutocomplete]="cpmAuto" [formControl]="battleConfigurationForm.controls.opponentCpm" />
         <mat-autocomplete #cpmAuto="matAutocomplete">
-          @for (cpm of filteredCpms | async; track cpm.description) {
-            <mat-option [value]="cpm.value">
-              <span>{{ cpm.value }}</span> |
-              <small>{{ cpm.description }}</small>
+          @for (generalConfig of filteredGeneralConfigs | async; track generalConfig.opponentCpm) {
+            <mat-option [value]="generalConfig.opponentCpm">
+              <span>{{ generalConfig.opponentCpm }}</span> |
+              <small>{{ generalConfig.opponentName }}</small>
             </mat-option>
           }
         </mat-autocomplete>

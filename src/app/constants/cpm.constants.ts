@@ -1,44 +1,10 @@
 export interface Cpm {
   value: number;
+  level: number;
   description: string;
 }
 
-export const CPMS: Cpm[] = [
-  {
-    value: 0.6,
-    description: 'T4 Dynamax',
-  },
-  {
-    value: 0.7,
-    description: 'T5 Dynamax (Kanto Birds)',
-  },
-  {
-    value: 0.8,
-    description: 'T5 Dynamax (Johto Beasts)',
-  },
-  {
-    value: 0.72,
-    description: 'T6 Gigantamax (Machamp, Cinderace)',
-  },
-  {
-    value: 0.765,
-    description: 'T6 Gigantamax (Tox, Gengar, Kingler, Lapras, Snorlax)',
-  },
-  {
-    value: 0.81,
-    description: 'T6 Gigantamax (Inteleon)',
-  },
-  {
-    value: 0.85,
-    description: 'T6 Gigantamax (Kanto Starters)',
-  },
-  {
-    value: 0.9,
-    description: 'T6 Gigantamax (Rillaboom)',
-  },
-];
-
-export const POKEMON_CPMS = [
+export const POKEMON_CPMS: Cpm[] = [
   { value: 0.84529999, level: 51, description: '51 lvl' },
   { value: 0.84279999, level: 50.5, description: '50.5 lvl' },
   { value: 0.84029999, level: 50, description: '50 lvl' },

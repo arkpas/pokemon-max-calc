@@ -7,12 +7,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { ImportServiceService } from '../../../services/import-service/import-service.service';
-import { Cpm, CPMS, POKEMON_CPMS } from '../../../constants/cpm.constants';
+import { POKEMON_CPMS, Cpm } from '../../../constants/cpm.constants';
 import { first, map, Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { BattleConfiguration, TeamOption } from '../../../types/types';
+import { BattleConfiguration, OpponentConfiguration, TeamOption } from '../../../types/types';
 import moment from 'moment';
-import { CONFIGURATIONS } from '../../../constants/configurations.costants';
+import { SPECIFIC_CONFIGS, GENERAL_CONFIGS } from '../../../constants/configurations.costants';
 import { Router } from '@angular/router';
 
 @Component({
@@ -58,11 +58,13 @@ export class MenuComponent {
   });
 
   pokemonOptions: string[] = [];
-  cpms: Cpm[] = CPMS;
+  generalConfigs: OpponentConfiguration[] = GENERAL_CONFIGS;
   pokemonCpms: Cpm[] = POKEMON_CPMS;
+
   filteredPokemonOptions: Observable<string[]>;
-  filteredCpms: Observable<Cpm[]>;
+  filteredGeneralConfigs: Observable<OpponentConfiguration[]>;
   filteredPokemonCpms: Observable<Cpm[]>;
+
   teamOptions = [TeamOption.allPokemons, TeamOption.onlyMyPokemons, TeamOption.onlyDefaultPokemons];
 
   constructor() {
@@ -72,8 +74,8 @@ export class MenuComponent {
       map(name => (name ? this.filterPokemonNames(name) : this.pokemonOptions.slice()))
     );
     // Opponent CPMs
-    this.filteredCpms = this.battleConfigurationForm.controls.opponentCpm.valueChanges.pipe(
-      map(cpm => (cpm ? this._filterCpms(cpm) : this.cpms.slice()))
+    this.filteredGeneralConfigs = this.battleConfigurationForm.controls.opponentCpm.valueChanges.pipe(
+      map(cpm => (cpm ? this._filterGeneralConfigs(cpm) : this.generalConfigs.slice()))
     );
 
     // Ally CPMs
@@ -90,7 +92,7 @@ export class MenuComponent {
   }
 
   preconfigureOpponent(event: MatAutocompleteSelectedEvent) {
-    const preConfiguration = CONFIGURATIONS.find(config => config.opponentName.toLowerCase() === event.option.value.toLowerCase());
+    const preConfiguration = SPECIFIC_CONFIGS.find(config => config.opponentName.toLowerCase() === event.option.value.toLowerCase());
 
     if (preConfiguration) {
       this.battleConfigurationForm.controls.opponentCpm.setValue(preConfiguration.opponentCpm);
@@ -133,10 +135,10 @@ export class MenuComponent {
     this.router.navigateByUrl('/my-pokemon');
   }
 
-  private _filterCpms(value: number): Cpm[] {
+  private _filterGeneralConfigs(value: number): OpponentConfiguration[] {
     const filterValue = value.toString().toLowerCase();
 
-    return this.cpms.filter(cpm => cpm.value.toString().toLowerCase().includes(filterValue));
+    return this.generalConfigs.filter(generalConfig => generalConfig.opponentCpm.toString().toLowerCase().includes(filterValue));
   }
 
   private _filterPokemonCpms(value: number): Cpm[] {
