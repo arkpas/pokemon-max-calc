@@ -1,11 +1,11 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Output, ViewChild } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelect, MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { ImportServiceService } from '../../../services/import-service/import-service.service';
 import { POKEMON_CPMS, Cpm } from '../../../constants/cpm.constants';
 import { first, map, Observable } from 'rxjs';
@@ -14,6 +14,7 @@ import { BattleConfiguration, OpponentConfiguration, TeamOption } from '../../..
 import moment from 'moment';
 import { SPECIFIC_CONFIGS, GENERAL_CONFIGS } from '../../../constants/configurations.costants';
 import { Router } from '@angular/router';
+import { MatExpansionModule, MatExpansionPanel } from '@angular/material/expansion';
 
 @Component({
   selector: 'app-menu',
@@ -26,6 +27,7 @@ import { Router } from '@angular/router';
     MatDatepickerModule,
     CommonModule,
     MatSelectModule,
+    MatExpansionModule,
   ],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',
@@ -36,6 +38,8 @@ export class MenuComponent {
   private router = inject(Router);
 
   @Output() configurationSubmitEvent = new EventEmitter<BattleConfiguration>();
+  @ViewChild('advancedPanel') advancedPanel!: MatExpansionPanel;
+  @ViewChild('generalConfigSelect') generalConfigSelect!: MatSelect;
 
   isCollapsed = false;
   isSubmittedAtLeastOnce = false;
@@ -58,11 +62,10 @@ export class MenuComponent {
   });
 
   pokemonOptions: string[] = [];
-  generalConfigs: OpponentConfiguration[] = GENERAL_CONFIGS;
+  generalConfigs: OpponentConfiguration[] = [...GENERAL_CONFIGS];
   pokemonCpms: Cpm[] = POKEMON_CPMS;
 
   filteredPokemonOptions: Observable<string[]>;
-  filteredGeneralConfigs: Observable<OpponentConfiguration[]>;
   filteredPokemonCpms: Observable<Cpm[]>;
 
   teamOptions = [TeamOption.allPokemons, TeamOption.onlyMyPokemons, TeamOption.onlyDefaultPokemons];
@@ -73,15 +76,19 @@ export class MenuComponent {
     this.filteredPokemonOptions = this.battleConfigurationForm.controls.opponentName.valueChanges.pipe(
       map(name => (name ? this.filterPokemonNames(name) : this.pokemonOptions.slice()))
     );
-    // Opponent CPMs
-    this.filteredGeneralConfigs = this.battleConfigurationForm.controls.opponentCpm.valueChanges.pipe(
-      map(cpm => (cpm ? this._filterGeneralConfigs(cpm) : this.generalConfigs.slice()))
-    );
-
     // Ally CPMs
     this.filteredPokemonCpms = this.battleConfigurationForm.controls.allyCpm.valueChanges.pipe(
       map(cpm => (cpm ? this._filterPokemonCpms(cpm) : this.pokemonCpms.slice()))
     );
+
+    // Add custom option to general configs
+    this.generalConfigs.push({
+      opponentAtkMod: 1,
+      opponentName: 'Custom',
+      opponentCpm: 0,
+      opponentHp: 0,
+      opponentDefMod: 1,
+    });
 
     this.configurationSubmitEvent.pipe(first()).subscribe(() => (this.isSubmittedAtLeastOnce = true));
   }
@@ -105,6 +112,8 @@ export class MenuComponent {
       this.battleConfigurationForm.controls.opponentDefMod.setValue(1);
       this.battleConfigurationForm.controls.opponentHp.setValue(15000);
     }
+
+    this.generalConfigSelect.value = 'Custom';
 
     // Set default battle date
     this.battleConfigurationForm.controls.date.setValue(this.determineDefaultBattleDate(event.option.value));
@@ -135,10 +144,25 @@ export class MenuComponent {
     this.router.navigateByUrl('/my-pokemon');
   }
 
-  private _filterGeneralConfigs(value: number): OpponentConfiguration[] {
-    const filterValue = value.toString().toLowerCase();
+  selectAll(event: FocusEvent): void {
+    const input = event.target as HTMLInputElement;
+    input.select();
+  }
 
-    return this.generalConfigs.filter(generalConfig => generalConfig.opponentCpm.toString().toLowerCase().includes(filterValue));
+  changeGeneralConfig(event: MatSelectChange): void {
+    const generalConfig = this.generalConfigs.find(generalConfig => generalConfig.opponentName === event.value);
+
+    if (generalConfig) {
+      this.battleConfigurationForm.controls.opponentCpm.setValue(generalConfig.opponentCpm);
+      this.battleConfigurationForm.controls.opponentAtkMod.setValue(generalConfig.opponentAtkMod);
+      this.battleConfigurationForm.controls.opponentDefMod.setValue(generalConfig.opponentDefMod);
+      this.battleConfigurationForm.controls.opponentHp.setValue(generalConfig.opponentHp);
+
+      if (generalConfig.opponentName === 'Custom') {
+        // expand Advanced section to provide custom values
+        this.advancedPanel.open();
+      }
+    }
   }
 
   private _filterPokemonCpms(level: number): Cpm[] {
