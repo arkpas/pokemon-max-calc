@@ -9,6 +9,7 @@ import { Observable, Subscription } from 'rxjs';
 import { PokemonCardComponent, PokemonCardTypeEnum } from '../../shared/cards/pokemon-card/pokemon-card.component';
 import { OpponentCardComponent } from '../../shared/cards/opponent-card/opponent-card.component';
 import { sortAttackers, sortHealers, sortTanks } from '../../../util/sorting.util';
+import { ImportServiceService } from '../../../services/import-service/import-service.service';
 
 @Component({
   selector: 'app-results',
@@ -18,6 +19,7 @@ import { sortAttackers, sortHealers, sortTanks } from '../../../util/sorting.uti
 })
 export class ResultsComponent implements OnInit, OnDestroy {
   private maxCalculatorService = inject(MaxCalculatorService);
+  private importService = inject(ImportServiceService);
   private subscriptions = new Subscription();
 
   @Input() battleConfiguration!: Observable<BattleConfiguration>;
@@ -45,6 +47,8 @@ export class ResultsComponent implements OnInit, OnDestroy {
     this.tanks = [...this.candidates.filter(candidate => candidate.hasHalfSecondAttack)].sort(sortTanks);
     this.sponges = [...this.candidates].sort(sortTanks);
     this.healers = [...this.candidates.filter(candidate => candidate.hasHalfSecondAttack)].sort(sortHealers);
+
+    this.opponent = this.importService.findPokemon(config.opponentName);
 
     console.log(this.attackers);
   }
