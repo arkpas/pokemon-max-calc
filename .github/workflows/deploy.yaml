@@ -18,7 +18,10 @@ jobs:
       - name: Install
         run: npm install
       - name: Deploy
-        run: npm run deploy
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          npm run deploy
         env:
           CI: true
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
