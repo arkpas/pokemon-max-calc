@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - main
-  workflow_run:
-    workflows: [Update application data]
-    types:
-      - completed
 
 jobs:
   deploy:
@@ -27,3 +23,6 @@ jobs:
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           npm run deploy
+        env:
+          CI: true
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
