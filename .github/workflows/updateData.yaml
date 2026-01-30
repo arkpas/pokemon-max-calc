@@ -3,6 +3,7 @@ name: Update application data
 on:
   schedule:
     - cron: '0 22 * * *'
+  workflow_dispatch:
 
 permissions:
   contents: write
