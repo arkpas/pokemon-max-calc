@@ -10,6 +10,7 @@ import { PokemonCardComponent, PokemonCardTypeEnum } from '../../shared/cards/po
 import { OpponentCardComponent } from '../../shared/cards/opponent-card/opponent-card.component';
 import { sortAttackers, sortHealers, sortTanks } from '../../../util/sorting.util';
 import { ImportServiceService } from '../../../services/import-service/import-service.service';
+import { configDotenv } from 'dotenv';
 
 @Component({
   selector: 'app-results',
@@ -48,7 +49,7 @@ export class ResultsComponent implements OnInit, OnDestroy {
     this.sponges = [...this.candidates].sort(sortTanks);
     this.healers = [...this.candidates.filter(candidate => candidate.hasHalfSecondAttack)].sort(sortHealers);
 
-    this.opponent = this.importService.findPokemon(config.opponentName);
+    this.opponent = this.importService.getOpponent(config);
 
     console.log(this.attackers);
   }
