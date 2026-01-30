@@ -1,4 +1,5 @@
 import { writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import 'dotenv/config';
 
 const ensureDirectoryExists = dirPath => {
   if (!existsSync(dirPath)) {
