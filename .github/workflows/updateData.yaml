@@ -28,7 +28,16 @@ jobs:
         id: check_diff
         run: git diff --exit-code ./public/pokemons.tsv
         continue-on-error: true
-      - name: Push new data if needed
+      - name: Install dependencies
+        if: steps.check_diff.outcome != 'success'
+        run: npm ci
+      - name: Install Playwright Browsers
+        if: steps.check_diff.outcome != 'success'
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        if: steps.check_diff.outcome != 'success'
+        run: npx playwright test
+      - name: Push new data
         if: steps.check_diff.outcome != 'success'
         run: |
           git config user.name "GitHub Actions Bot"
