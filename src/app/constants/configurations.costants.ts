@@ -70,5 +70,6 @@ export const SPECIFIC_CONFIGS: OpponentConfiguration[] = [
   { opponentName: 'Eternatus (Eternamax)', opponentCpm: 0.75, opponentHp: 60000, opponentAtkMod: 0.9, opponentDefMod: 1 },
   { opponentName: 'Garbodor', opponentCpm: 1.4, opponentHp: 100000, opponentAtkMod: 0.9, opponentDefMod: 1 },
   { opponentName: 'Grimmsnarl', opponentCpm: 1.2, opponentHp: 70000, opponentAtkMod: 0.9, opponentDefMod: 1 },
+  { opponentName: 'Ho-Oh', opponentCpm: 0.7, opponentHp: 27000, opponentAtkMod: 2, opponentDefMod: 1 },
   { opponentName: 'Meowth', opponentCpm: 0.9, opponentHp: 160000, opponentAtkMod: 1, opponentDefMod: 1 },
 ];
