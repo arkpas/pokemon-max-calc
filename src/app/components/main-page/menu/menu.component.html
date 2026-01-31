@@ -1,7 +1,9 @@
 <div [ngClass]="isCollapsed ? 'menu menu-collapsed' : 'menu'">
-  <div *ngIf="isCollapsed" class="menu-button">
-    <button (click)="showForm()">☰</button>
-  </div>
+  @if (isCollapsed) {
+    <div class="menu-button">
+      <button (click)="showForm()">☰</button>
+    </div>
+  }
 
   <form [formGroup]="battleConfigurationForm" (ngSubmit)="submit()">
     <div class="top-row">
@@ -11,19 +13,14 @@
     </div>
 
     <div>
-      <mat-form-field appearance="outline" (click)="this.battleConfigurationForm.controls.opponentName.setValue(null)">
-        <mat-label>Boss</mat-label>
-        <input
-          placeholder="Select opponent"
-          matInput
+      <mat-form-field appearance="outline">
+        <mat-label>Select opponent</mat-label>
+        <mtx-select
+          [items]="pokemonOptions"
+          [required]="true"
           [formControl]="battleConfigurationForm.controls.opponentName"
-          [matAutocomplete]="raidBossAuto" />
-        <mat-autocomplete #raidBossAuto="matAutocomplete" (optionSelected)="preconfigureOpponent($event)">
-          @for (option of filteredPokemonOptions | async; track option) {
-            <mat-option [value]="option">{{ option }}</mat-option>
-          }
-        </mat-autocomplete>
-        <mat-error *ngIf="battleConfigurationForm.controls.opponentName.invalid"> Please provide valid Pokemon name! </mat-error>
+          (change)="preconfigureOpponent($event)"></mtx-select>
+        <mat-error>Please provide valid Pokemon name!</mat-error>
       </mat-form-field>
     </div>
     <div>
@@ -44,7 +41,9 @@
         <input matInput [matDatepicker]="picker" [formControl]="battleConfigurationForm.controls.date" />
         <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
-        <mat-error *ngIf="battleConfigurationForm.controls.date.invalid"> Please provide valid date! </mat-error>
+        @if (battleConfigurationForm.controls.date.invalid) {
+          <mat-error> Please provide valid date! </mat-error>
+        }
       </mat-form-field>
     </div>
     <div>
@@ -63,16 +62,20 @@
             </mat-option>
           }
         </mat-autocomplete>
-        <mat-error *ngIf="battleConfigurationForm.controls.allyCpm.invalid"> Please provide valid CPM value! </mat-error>
+        @if (battleConfigurationForm.controls.allyCpm.invalid) {
+          <mat-error> Please provide valid CPM value! </mat-error>
+        }
       </mat-form-field>
     </div>
     <div>
       <mat-form-field appearance="outline">
         <mat-label>Team option</mat-label>
         <mat-select [formControl]="battleConfigurationForm.controls.teamOption">
-          <mat-option *ngFor="let option of teamOptions" [value]="option">
-            {{ option }}
-          </mat-option>
+          @for (option of teamOptions; track option) {
+            <mat-option [value]="option">
+              {{ option }}
+            </mat-option>
+          }
         </mat-select>
       </mat-form-field>
     </div>
@@ -85,14 +88,18 @@
         <mat-form-field appearance="outline">
           <mat-label>CPM</mat-label>
           <input matInput type="number" [formControl]="battleConfigurationForm.controls.opponentCpm" (focus)="this.selectAll($event)" />
-          <mat-error *ngIf="battleConfigurationForm.controls.opponentCpm.invalid"> Please provide valid CPM value! </mat-error>
+          @if (battleConfigurationForm.controls.opponentCpm.invalid) {
+            <mat-error> Please provide valid CPM value! </mat-error>
+          }
         </mat-form-field>
       </div>
       <div>
         <mat-form-field appearance="outline">
           <mat-label>HP</mat-label>
           <input matInput type="number" [formControl]="battleConfigurationForm.controls.opponentHp" (focus)="this.selectAll($event)" />
-          <mat-error *ngIf="battleConfigurationForm.controls.opponentHp.invalid"> Please provide valid HP value! </mat-error>
+          @if (battleConfigurationForm.controls.opponentHp.invalid) {
+            <mat-error> Please provide valid HP value! </mat-error>
+          }
         </mat-form-field>
       </div>
       <div>
@@ -105,7 +112,9 @@
             type="number"
             [formControl]="battleConfigurationForm.controls.opponentAtkMod"
             (focus)="this.selectAll($event)" />
-          <mat-error *ngIf="battleConfigurationForm.controls.opponentAtkMod.invalid"> Please provide valid attack modificator value! </mat-error>
+          @if (battleConfigurationForm.controls.opponentAtkMod.invalid) {
+            <mat-error> Please provide valid attack modificator value! </mat-error>
+          }
         </mat-form-field>
       </div>
       <div>
@@ -118,7 +127,9 @@
             type="number"
             [formControl]="battleConfigurationForm.controls.opponentDefMod"
             (focus)="this.selectAll($event)" />
-          <mat-error *ngIf="battleConfigurationForm.controls.opponentDefMod.invalid"> Please provide valid defense modificator value! </mat-error>
+          @if (battleConfigurationForm.controls.opponentDefMod.invalid) {
+            <mat-error> Please provide valid defense modificator value! </mat-error>
+          }
         </mat-form-field>
       </div>
     </mat-expansion-panel>

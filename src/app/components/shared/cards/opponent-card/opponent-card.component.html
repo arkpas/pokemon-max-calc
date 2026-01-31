@@ -11,17 +11,23 @@
 
     <div class="data">
       <div class="stats">
-        <div *ngIf="atk" class="stat atk" title="Atak fizyczny (ATK)">
-          ⚔️ <strong>{{ atk.toFixed(0) }}</strong>
-        </div>
+        @if (atk) {
+          <div class="stat atk" title="Atak fizyczny (ATK)">
+            ⚔️ <strong>{{ atk.toFixed(0) }}</strong>
+          </div>
+        }
 
-        <div *ngIf="def" class="stat def" title="Obrona fizyczna (DEF)">
-          🛡️ <strong>{{ def.toFixed(0) }}</strong>
-        </div>
+        @if (def) {
+          <div class="stat def" title="Obrona fizyczna (DEF)">
+            🛡️ <strong>{{ def.toFixed(0) }}</strong>
+          </div>
+        }
 
-        <div *ngIf="hp" class="stat hp" title="Punkty życia (HP)">
-          ❤️ <strong>{{ hp }}</strong>
-        </div>
+        @if (hp) {
+          <div class="stat hp" title="Punkty życia (HP)">
+            ❤️ <strong>{{ hp }}</strong>
+          </div>
+        }
       </div>
     </div>
   </div>

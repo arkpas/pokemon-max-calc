@@ -10,48 +10,48 @@
       class="sprite"
       [src]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + myPokemon.pokedexNumber + '.png'"
       alt="sprite" />
-    <div class="name">
-      <span class="{{ myPokemon.myPokemonId ? 'my-pokemon' : '' }}">{{ myPokemon.name }}</span>
-    </div>
-
-    <div *ngIf="myPokemon.cpm" class="stats">
-      <div class="stat-row">
-        <div class="stat" title="Poziom">
-          ⭐
-          <strong>L{{ myPokemon.cpm | cpmToLevel }}</strong>
-        </div>
-        <!-- eslint-disable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
-        <div
-          class="stat"
-          matTooltip="IV: {{ myPokemon.atkIV }}/{{ myPokemon.defIV }}/{{ myPokemon.hpIV }}"
-          matTooltipPosition="above"
-          #tooltip="matTooltip"
-          (click)="tooltip.toggle()">
-          💎
-          <strong
-            ><u>{{ myPokemon.atkIV + myPokemon.defIV + myPokemon.hpIV | ivPercentage }}%</u></strong
-          >
-        </div>
-        <!-- eslint-enable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
+      <div class="name">
+        <span class="{{ myPokemon.myPokemonId ? 'my-pokemon' : '' }}">{{ myPokemon.name }}</span>
       </div>
-      <div class="stat-row">
-        <div class="stat atk" title="Atak fizyczny (ATK)">
-          ⚔️ <strong>{{ myPokemon.atk.toFixed(0) }}</strong>
-        </div>
 
-        <div class="stat def" title="Obrona fizyczna (DEF)">
-          🛡️ <strong>{{ myPokemon.def.toFixed(0) }}</strong>
-        </div>
-
-        <div class="stat hp" title="Punkty życia (HP)">
-          ❤️ <strong>{{ myPokemon.hp }}</strong>
+      @if (myPokemon.cpm) {
+        <div class="stats">
+          <div class="stat-row">
+            <div class="stat" title="Poziom">
+              ⭐
+              <strong>L{{ myPokemon.cpm | cpmToLevel }}</strong>
+            </div>
+            <!-- eslint-disable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
+            <div
+              class="stat"
+              matTooltip="IV: {{ myPokemon.atkIV }}/{{ myPokemon.defIV }}/{{ myPokemon.hpIV }}"
+              matTooltipPosition="above"
+              #tooltip="matTooltip"
+              (click)="tooltip.toggle()">
+              💎
+              <strong
+                ><u>{{ myPokemon.atkIV + myPokemon.defIV + myPokemon.hpIV | ivPercentage }}%</u></strong
+                >
+              </div>
+              <!-- eslint-enable @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -->
+            </div>
+            <div class="stat-row">
+              <div class="stat atk" title="Atak fizyczny (ATK)">
+                ⚔️ <strong>{{ myPokemon.atk.toFixed(0) }}</strong>
+              </div>
+              <div class="stat def" title="Obrona fizyczna (DEF)">
+                🛡️ <strong>{{ myPokemon.def.toFixed(0) }}</strong>
+              </div>
+              <div class="stat hp" title="Punkty życia (HP)">
+                ❤️ <strong>{{ myPokemon.hp }}</strong>
+              </div>
+            </div>
+          </div>
+        }
+        <div class="actions">
+          <div class="action">
+            <button (click)="removeMyPokemon()" class="icon-button" title="Usuń swojego Pokemona">🗑️</button>
+          </div>
         </div>
       </div>
     </div>
-    <div class="actions">
-      <div class="action">
-        <button (click)="removeMyPokemon()" class="icon-button" title="Usuń swojego Pokemona">🗑️</button>
-      </div>
-    </div>
-  </div>
-</div>
