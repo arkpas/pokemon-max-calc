@@ -10,158 +10,180 @@
       class="sprite"
       [src]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + candidate.pokedexNumber + '.png'"
       alt="sprite" />
-    <div class="name">
-      <span class="{{ candidate.myPokemonId ? 'my-pokemon' : '' }}">{{ candidate.name }}</span>
-    </div>
+      <div class="name">
+        <span class="{{ candidate.myPokemonId ? 'my-pokemon' : '' }}">{{ candidate.name }}</span>
+      </div>
 
-    <div *ngIf="candidate.cpm" class="stats">
-      <div class="stat-row">
-        <div *ngIf="pokemonCardType === PokemonCardTypeEnum.Attacker && candidate.maxPhaseDamageDetails.length" class="stat" title="Max Type)">
-          <div class="{{ candidate.maxPhaseDamageDetails[0].move.special.toLowerCase() }} type-bg">
-            {{ candidate.maxPhaseDamageDetails[0].move.special }}
+      @if (candidate.cpm) {
+        <div class="stats">
+          <div class="stat-row">
+            @if (pokemonCardType === PokemonCardTypeEnum.Attacker && candidate.maxPhaseDamageDetails.length) {
+              <div class="stat" title="Max Type)">
+                <div class="{{ candidate.maxPhaseDamageDetails[0].move.special.toLowerCase() }} type-bg">
+                  {{ candidate.maxPhaseDamageDetails[0].move.special }}
+                </div>
+              </div>
+            }
+            <div class="stat" title="Poziom">
+              ⭐
+              <strong>L{{ candidate.cpm | cpmToLevel }}</strong>
+            </div>
+            <div
+              class="stat"
+              matTooltip="IV: {{ candidate.atkIV }}/{{ candidate.defIV }}/{{ candidate.hpIV }}"
+              matTooltipPosition="above"
+              #tooltip="matTooltip"
+              (click)="tooltip.toggle()">
+              💎
+              <strong
+                ><u>{{ candidate.atkIV + candidate.defIV + candidate.hpIV | ivPercentage }}%</u></strong
+                >
+              </div>
+            </div>
+            <div class="stat-row">
+              @if (pokemonCardType === PokemonCardTypeEnum.Attacker && candidate.maxPhaseDamageDetails.length) {
+                <div class="stat" title="Obrażenia)">
+                  💥
+                  <strong>{{ candidate.maxPhaseDamageDetails[0].damage }}</strong>
+                </div>
+              }
+              @if (pokemonCardType === PokemonCardTypeEnum.Tank) {
+                <div class="stat" title="Średnie obrażenia (bazowe + procentowe)">
+                  💥
+                  <strong>{{ candidate.avgDamageTaken.toFixed(1) }} ({{ candidate.avgDamageTakenPercentage.toFixed(1) }}%)</strong>
+                </div>
+              }
+              @if (pokemonCardType === PokemonCardTypeEnum.Healer) {
+                <div class="stat" title="Leczenie (3x Max Heal)">
+                  🩹 <strong>{{ candidate.heal.toFixed(0) }}</strong>
+                </div>
+              }
+              @if (pokemonCardType === PokemonCardTypeEnum.Healer) {
+                <div
+                  class="stat"
+                  title="Ile procentowo obrażeń nie będzie w stanie wyleczyć przeciwko wszystkim atakom bossa">
+                  🩸 <strong>{{ candidate.totalUnhealedDamagePercentage.toFixed(2) }}</strong>
+                </div>
+              }
+              <div class="stat atk" title="Atak fizyczny (ATK)">
+                ⚔️ <strong>{{ candidate.atk.toFixed(0) }}</strong>
+              </div>
+              <div class="stat def" title="Obrona fizyczna (DEF)">
+                🛡️ <strong>{{ candidate.def.toFixed(0) }}</strong>
+              </div>
+              <div class="stat hp" title="Punkty życia (HP)">
+                ❤️ <strong>{{ candidate.hp }}</strong>
+              </div>
+            </div>
+          </div>
+        }
+        <div class="actions">
+          @if (candidate.damageTakenDetails && candidate.damageTakenDetails.length !== 0) {
+            <div class="action">
+              <button (click)="toggleDetails()" class="icon-button" title="Pokaż/ukryj szczegóły obrażeń">
+                {{ showDetails ? '🚫' : '👁️' }}
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+
+      @if (showDetails) {
+        <div class="damage-details">
+          @if (pokemonCardType === PokemonCardTypeEnum.Attacker) {
+            <div class="damage-details-section">
+              <span class="damage-details-section-name">👾 Max Phase Damage</span>
+              <div class="damage-details-table-wrapper">
+                <table class="damage-details-table">
+                  @for (entry of candidate.maxPhaseDamageDetails; track entry) {
+                    <tr>
+                      <td>
+                        <div class="type-bg {{ entry.move.type.toLowerCase() }}">
+                          {{ entry.move.name }} @if (entry.move.special === 'elite') {
+                          <span class="sup">E</span>
+                        }
+                      </div>
+                    </td>
+                    <td title="Damage">💥 {{ entry.damage.toFixed(0) }}</td>
+                    <td title="Power">💪 {{ entry.move.power }}</td>
+                    <td
+                      matTooltip="🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% 🧬 {{ entry.damageModifiers.stab }}"
+                      matTooltipPosition="above"
+                      #tooltip="matTooltip"
+                      (click)="tooltip.toggle()">
+                      🔍
+                    </td>
+                    <td></td>
+                  </tr>
+                }
+              </table>
+            </div>
+          </div>
+        }
+        <div class="damage-details-section">
+          <span class="damage-details-section-name">⚔️ Fast Attacks</span>
+          <div class="damage-details-table-wrapper">
+            <table class="damage-details-table">
+              @for (entry of candidate.fastAttackDamageDetails; track entry) {
+                <tr>
+                  <td>
+                    <div class="type-bg {{ entry.move.type.toLowerCase() }}">
+                      {{ entry.move.name }} @if (entry.move.special === 'elite') {
+                      <span class="sup">E</span>
+                    }
+                  </div>
+                </td>
+                <td title="Damage">💥 {{ entry.damage.toFixed(0) }}</td>
+                <td title="Move duration" [ngStyle]="{ color: getFastAttackDurationColor(entry.move.duration) }">⏱️ {{ entry.move.duration }}s</td>
+                <td title="Max Energy">🌀 {{ entry.maxEnergy }}</td>
+                <td title="Power">💪 {{ entry.move.power }}</td>
+                <td
+                  matTooltip="🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% 🧬 {{ entry.damageModifiers.stab }}"
+                  matTooltipPosition="above"
+                  #tooltip="matTooltip"
+                  (click)="tooltip.toggle()">
+                  🔍
+                </td>
+                <td></td>
+              </tr>
+            }
+          </table>
+        </div>
+      </div>
+      @if (pokemonCardType !== PokemonCardTypeEnum.Attacker) {
+        <div class="damage-details-section">
+          <span class="damage-details-section-name">🛡️ Damage taken</span>
+          <div class="damage-details-table-wrapper">
+            <table class="damage-details-table">
+              @for (entry of candidate.damageTakenDetails; track entry) {
+                <tr>
+                  <td>
+                    <div class="type-bg {{ entry.move.type.toLowerCase() }}">
+                      {{ entry.move.name }}
+                    </div>
+                  </td>
+                  <td title="Damage">
+                    <span [ngStyle]="{ color: getDamagePercentageColor(entry.damagePercentage) }">
+                      💥 {{ entry.damage.toFixed(0) }} ({{ entry.damagePercentage.toFixed(1) }}%)
+                    </span>
+                  </td>
+                  <td title="Power">💪 {{ entry.move.power }}</td>
+                  <td
+                    matTooltip="🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% 🧬 {{ entry.damageModifiers.stab }}"
+                    matTooltipPosition="above"
+                    #tooltip="matTooltip"
+                    (click)="tooltip.toggle()">
+                    🔍
+                  </td>
+                  <td></td>
+                </tr>
+              }
+            </table>
           </div>
         </div>
-        <div class="stat" title="Poziom">
-          ⭐
-          <strong>L{{ candidate.cpm | cpmToLevel }}</strong>
-        </div>
-        <div
-          class="stat"
-          matTooltip="IV: {{ candidate.atkIV }}/{{ candidate.defIV }}/{{ candidate.hpIV }}"
-          matTooltipPosition="above"
-          #tooltip="matTooltip"
-          (click)="tooltip.toggle()">
-          💎
-          <strong
-            ><u>{{ candidate.atkIV + candidate.defIV + candidate.hpIV | ivPercentage }}%</u></strong
-          >
-        </div>
-      </div>
-      <div class="stat-row">
-        <div *ngIf="pokemonCardType === PokemonCardTypeEnum.Attacker && candidate.maxPhaseDamageDetails.length" class="stat" title="Obrażenia)">
-          💥
-          <strong>{{ candidate.maxPhaseDamageDetails[0].damage }}</strong>
-        </div>
-
-        <div *ngIf="pokemonCardType === PokemonCardTypeEnum.Tank" class="stat" title="Średnie obrażenia (bazowe + procentowe)">
-          💥
-          <strong>{{ candidate.avgDamageTaken.toFixed(1) }} ({{ candidate.avgDamageTakenPercentage.toFixed(1) }}%)</strong>
-        </div>
-
-        <div *ngIf="pokemonCardType === PokemonCardTypeEnum.Healer" class="stat" title="Leczenie (3x Max Heal)">
-          🩹 <strong>{{ candidate.heal.toFixed(0) }}</strong>
-        </div>
-
-        <div
-          *ngIf="pokemonCardType === PokemonCardTypeEnum.Healer"
-          class="stat"
-          title="Ile procentowo obrażeń nie będzie w stanie wyleczyć przeciwko wszystkim atakom bossa">
-          🩸 <strong>{{ candidate.totalUnhealedDamagePercentage.toFixed(2) }}</strong>
-        </div>
-
-        <div class="stat atk" title="Atak fizyczny (ATK)">
-          ⚔️ <strong>{{ candidate.atk.toFixed(0) }}</strong>
-        </div>
-
-        <div class="stat def" title="Obrona fizyczna (DEF)">
-          🛡️ <strong>{{ candidate.def.toFixed(0) }}</strong>
-        </div>
-
-        <div class="stat hp" title="Punkty życia (HP)">
-          ❤️ <strong>{{ candidate.hp }}</strong>
-        </div>
-      </div>
-    </div>
-    <div class="actions">
-      <div class="action" *ngIf="candidate.damageTakenDetails && candidate.damageTakenDetails.length !== 0">
-        <button (click)="toggleDetails()" class="icon-button" title="Pokaż/ukryj szczegóły obrażeń">
-          {{ showDetails ? '🚫' : '👁️' }}
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div class="damage-details" *ngIf="showDetails">
-    <div class="damage-details-section" *ngIf="pokemonCardType === PokemonCardTypeEnum.Attacker">
-      <span class="damage-details-section-name">👾 Max Phase Damage</span>
-      <div class="damage-details-table-wrapper">
-        <table class="damage-details-table">
-          <tr *ngFor="let entry of candidate.maxPhaseDamageDetails">
-            <td>
-              <div class="type-bg {{ entry.move.type.toLowerCase() }}">
-                {{ entry.move.name }} <span class="sup" *ngIf="entry.move.special === 'elite'">E</span>
-              </div>
-            </td>
-            <td title="Damage">💥 {{ entry.damage.toFixed(0) }}</td>
-            <td title="Power">💪 {{ entry.move.power }}</td>
-            <td
-              matTooltip="🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% 🧬 {{ entry.damageModifiers.stab }}"
-              matTooltipPosition="above"
-              #tooltip="matTooltip"
-              (click)="tooltip.toggle()">
-              🔍
-            </td>
-            <td></td>
-          </tr>
-        </table>
-      </div>
-    </div>
-    <div class="damage-details-section">
-      <span class="damage-details-section-name">⚔️ Fast Attacks</span>
-      <div class="damage-details-table-wrapper">
-        <table class="damage-details-table">
-          <tr *ngFor="let entry of candidate.fastAttackDamageDetails">
-            <td>
-              <div class="type-bg {{ entry.move.type.toLowerCase() }}">
-                {{ entry.move.name }} <span class="sup" *ngIf="entry.move.special === 'elite'">E</span>
-              </div>
-            </td>
-            <td title="Damage">💥 {{ entry.damage.toFixed(0) }}</td>
-            <td title="Move duration" [ngStyle]="{ color: getFastAttackDurationColor(entry.move.duration) }">⏱️ {{ entry.move.duration }}s</td>
-            <td title="Max Energy">🌀 {{ entry.maxEnergy }}</td>
-            <td title="Power">💪 {{ entry.move.power }}</td>
-            <td
-              matTooltip="🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% 🧬 {{ entry.damageModifiers.stab }}"
-              matTooltipPosition="above"
-              #tooltip="matTooltip"
-              (click)="tooltip.toggle()">
-              🔍
-            </td>
-            <td></td>
-          </tr>
-        </table>
-      </div>
-    </div>
-    <div class="damage-details-section" *ngIf="pokemonCardType !== PokemonCardTypeEnum.Attacker">
-      <span class="damage-details-section-name">🛡️ Damage taken</span>
-      <div class="damage-details-table-wrapper">
-        <table class="damage-details-table">
-          <tr *ngFor="let entry of candidate.damageTakenDetails">
-            <td>
-              <div class="type-bg {{ entry.move.type.toLowerCase() }}">
-                {{ entry.move.name }}
-              </div>
-            </td>
-            <td title="Damage">
-              <span [ngStyle]="{ color: getDamagePercentageColor(entry.damagePercentage) }">
-                💥 {{ entry.damage.toFixed(0) }} ({{ entry.damagePercentage.toFixed(1) }}%)
-              </span>
-            </td>
-            <td title="Power">💪 {{ entry.move.power }}</td>
-            <td
-              matTooltip="🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% 🧬 {{ entry.damageModifiers.stab }}"
-              matTooltipPosition="above"
-              #tooltip="matTooltip"
-              (click)="tooltip.toggle()">
-              🔍
-            </td>
-            <td></td>
-          </tr>
-        </table>
-      </div>
-    </div>
-    <!-- TODO: this is bloating the screen too much, need to think of another way of displaying it -->
-    <!-- <div class="damage-details-section">
+      }
+      <!-- TODO: this is bloating the screen too much, need to think of another way of displaying it -->
+      <!-- <div class="damage-details-section">
       <span class="damage-details-section-name">💣 Charged Attacks</span>
       <div class="damage-details-table-wrapper">
         <table class="damage-details-table">
@@ -188,4 +210,5 @@
       </div>
     </div> -->
   </div>
+}
 </div>

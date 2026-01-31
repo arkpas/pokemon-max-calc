@@ -4,7 +4,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { BattleConfiguration, Candidate, Pokemon } from '../../../types/types';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
-import { CommonModule } from '@angular/common';
+
 import { Observable, Subscription } from 'rxjs';
 import { PokemonCardComponent, PokemonCardTypeEnum } from '../../shared/cards/pokemon-card/pokemon-card.component';
 import { OpponentCardComponent } from '../../shared/cards/opponent-card/opponent-card.component';
@@ -16,7 +16,7 @@ import { configDotenv } from 'dotenv';
   selector: 'app-results',
   templateUrl: './results.component.html',
   styleUrl: './results.component.scss',
-  imports: [MatTabsModule, MatPaginatorModule, MatTableModule, PokemonCardComponent, CommonModule, OpponentCardComponent],
+  imports: [MatTabsModule, MatPaginatorModule, MatTableModule, PokemonCardComponent, OpponentCardComponent],
 })
 export class ResultsComponent implements OnInit, OnDestroy {
   private maxCalculatorService = inject(MaxCalculatorService);

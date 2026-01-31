@@ -1,10 +1,11 @@
 <div class="results">
   <div class="pokemon-cards">
-    <app-my-pokemon-card
-      class="pokemon-card"
-      *ngFor="let myPokemon of myPokemons"
-      [myPokemon]="myPokemon"
-      (myPokemonRemovedEvent)="refreshMyPokemons()">
-    </app-my-pokemon-card>
+    @for (myPokemon of myPokemons; track myPokemon) {
+      <app-my-pokemon-card
+        class="pokemon-card"
+        [myPokemon]="myPokemon"
+        (myPokemonRemovedEvent)="refreshMyPokemons()">
+      </app-my-pokemon-card>
+    }
   </div>
 </div>
