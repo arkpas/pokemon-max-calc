@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, inject, Output, ViewChild } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,6 +15,7 @@ import moment from 'moment';
 import { SPECIFIC_CONFIGS, GENERAL_CONFIGS } from '../../../constants/configurations.costants';
 import { Router } from '@angular/router';
 import { MatExpansionModule, MatExpansionPanel } from '@angular/material/expansion';
+import { MtxSelectModule } from '@ng-matero/extensions/select';
 
 @Component({
   selector: 'app-menu',
@@ -28,6 +29,7 @@ import { MatExpansionModule, MatExpansionPanel } from '@angular/material/expansi
     CommonModule,
     MatSelectModule,
     MatExpansionModule,
+    MtxSelectModule,
   ],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',
@@ -98,8 +100,12 @@ export class MenuComponent {
     return this.pokemonOptions.filter(o => o.toLowerCase().includes(filterValue));
   }
 
-  preconfigureOpponent(event: MatAutocompleteSelectedEvent) {
-    const preConfiguration = SPECIFIC_CONFIGS.find(config => config.opponentName.toLowerCase() === event.option.value.toLowerCase());
+  preconfigureOpponent(name: string) {
+    if (!name) {
+      return;
+    }
+
+    const preConfiguration = SPECIFIC_CONFIGS.find(config => config.opponentName.toLowerCase() === name.toLowerCase());
 
     if (preConfiguration) {
       this.battleConfigurationForm.controls.opponentCpm.setValue(preConfiguration.opponentCpm);
@@ -116,7 +122,7 @@ export class MenuComponent {
     this.generalConfigSelect.value = 'Custom';
 
     // Set default battle date
-    this.battleConfigurationForm.controls.date.setValue(this.determineDefaultBattleDate(event.option.value));
+    this.battleConfigurationForm.controls.date.setValue(this.determineDefaultBattleDate(name));
   }
 
   submit(): void {

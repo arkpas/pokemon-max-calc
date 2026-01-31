@@ -19,17 +19,10 @@
     </div>
 
     <div>
-      <mat-form-field appearance="outline" (click)="this.myPokemonForm.controls.pokemon.setValue(null)">
+      <mat-form-field appearance="outline">
         <mat-label>Pokemon</mat-label>
-        <input placeholder="Select Pokemon" matInput [formControl]="myPokemonForm.controls.pokemon" [matAutocomplete]="raidBossAuto" />
-        <mat-autocomplete #raidBossAuto="matAutocomplete">
-          @for (option of filteredPokemonOptions | async; track option) {
-            <mat-option [value]="option">{{ option }}</mat-option>
-          }
-        </mat-autocomplete>
-        @if (myPokemonForm.controls.pokemon.invalid) {
-          <mat-error> Please provide valid Pokemon name! </mat-error>
-        }
+        <mtx-select [items]="pokemonOptions" [required]="true" [formControl]="myPokemonForm.controls.pokemon"></mtx-select>
+        <mat-error> Please provide valid Pokemon name! </mat-error>
       </mat-form-field>
     </div>
     <div>
