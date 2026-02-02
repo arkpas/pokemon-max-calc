@@ -1,46 +1,63 @@
 name: Update application data
-
 on:
   schedule:
     - cron: '25 20 * * *'
-  workflow_dispatch:
-
+  workflow_dispatch: # Allows to be run manually from GitHub
 permissions:
   contents: write
-
 jobs:
-  build:
+  check-data:
+    name: Check for new data
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+      - name: Clean install dependencies
+        run: npm ci
+      - name: Download excel data and game master
+        run: node ./scripts/dataDownload.js
+        env:
+          POKEMON_DATA_URL: ${{ vars.POKEMON_DATA_URL }}
+          GAME_MASTER_URL: ${{ vars.GAME_MASTER_URL }}
+      - name: Update excel data with game master data
+        run: node ./scripts/gameMasterParser.js
+      - name: Check excel data difference
+        id: check_diff
+        run: git diff --exit-code ./public/pokemons.tsv
+        continue-on-error: true
+      - name: Upload test results
+        if: ${{ steps.check_diff.outcome != 'success' }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: pokemons-data
+          path: data/pokemons.tsv
+          retention-days: 1
+  tests:
+    name: Playwright Tests
+    needs: check-data
+    if: ${{ needs.check-data.check_diff.outcome != 'success' }} # Run only if there is diff
+    uses: ./.github/workflows/playwright.yaml
+    with:
+      artifact: pokemons-data
+  push-data:
+    name: Push new data
+    needs: [check-data, tests]
+    if: ${{ needs.check-data.check_diff.outcome != 'success' }} # Run only if there is diff
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          token: ${{ secrets.GH_TOKEN }}
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+          token: ${{ secrets.GH_TOKEN }} # Use PAT instead of standard GH token, so other workflows are triggered
+      - name: Download artifacts
+        uses: actions/download-artifact@v7
         with:
-          node-version: '22.x'
-      - name: Install dependencies
-        run: npm ci
-      - name: Download data
-        run: node ./scripts/dataDownload.js
-        env:
-          POKEMON_DATA_URL: ${{ vars.POKEMON_DATA_URL }}
-          GAME_MASTER_URL: ${{ vars.GAME_MASTER_URL }}
-      - name: Update Pokemon data
-        run: node ./scripts/gameMasterParser.js
-      - name: Check data diff
-        id: check_diff
-        run: git diff --exit-code ./public/pokemons.tsv
-        continue-on-error: true
-      - name: Install Playwright Browsers
-        if: steps.check_diff.outcome != 'success'
-        run: npx playwright install --with-deps
-      - name: Run Playwright tests
-        if: steps.check_diff.outcome != 'success'
-        run: npx playwright test
+          name: pokemons-data
       - name: Push new data
-        if: steps.check_diff.outcome != 'success'
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
