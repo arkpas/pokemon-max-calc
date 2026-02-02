@@ -9,6 +9,8 @@ jobs:
   check-data:
     name: Check for new data
     runs-on: ubuntu-latest
+    outputs:
+      data-diff: ${{ steps.check_diff.outputs.data-diff }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -27,26 +29,33 @@ jobs:
         run: node ./scripts/gameMasterParser.js
       - name: Check excel data difference
         id: check_diff
-        run: git diff --exit-code ./public/pokemons.tsv
-        continue-on-error: true
+        shell: bash
+        run: |
+          diffResult=$(git diff --name-only ./public/pokemons.tsv)
+          if [ -z ${diffResult} ]; then
+            echo "data-diff=false" >> $GITHUB_OUTPUT;
+          else
+            echo "data-diff=true" >> $GITHUB_OUTPUT;
+          fi
       - name: Upload test results
-        if: ${{ steps.check_diff.outcome != 'success' }}
+        if: ${{ steps.check_diff.outputs.data-diff == 'true' }} # Run only if there is diff
         uses: actions/upload-artifact@v6
         with:
           name: pokemons-data
-          path: data/pokemons.tsv
+          path: ./public/pokemons.tsv
           retention-days: 1
   tests:
     name: Playwright Tests
+    if: ${{ needs.check-data.outputs.data-diff == 'true' }} # Run only if there is diff
     needs: check-data
-    if: ${{ needs.check-data.check_diff.outcome != 'success' }} # Run only if there is diff
     uses: ./.github/workflows/playwright.yaml
     with:
-      artifact: pokemons-data
+      artifact-name: pokemons-data
+      artifact-path: ./public
   push-data:
     name: Push new data
     needs: [check-data, tests]
-    if: ${{ needs.check-data.check_diff.outcome != 'success' }} # Run only if there is diff
+    if: ${{ needs.check-data.outputs.data-diff == 'true' }} # Run only if there is diff
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -57,6 +66,7 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           name: pokemons-data
+          path: ./public
       - name: Push new data
         run: |
           git config user.name "GitHub Actions Bot"

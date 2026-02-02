@@ -2,9 +2,12 @@ name: Playwright Tests
 on:
   workflow_call: # Allows to be called from another workflow
     inputs:
-      artifact:
+      artifact-name:
         type: string
         description: Artifact name to download before tests
+      artifact-path:
+        type: string
+        description: Path where to extract artifact
   pull_request:
     branches: [main]
 jobs:
@@ -23,10 +26,11 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
       - name: (Optional) Download artifacts
-        if: ${{ github.event.inputs.artifact }}
+        if: ${{ inputs.artifact-name != '' }}
         uses: actions/download-artifact@v7
         with:
-          name: ${{ github.event.inputs.artifact }}
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.artifact-path }}
       - name: Run Playwright tests
         run: npx playwright test
       - name: Upload test results
