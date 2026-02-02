@@ -23,7 +23,7 @@ LP	Name	Pokedex Nr.	Primary type	Secondary type	Dynamax	Gigantamax	Dynamax type	
 22	Dubwool	832	Normal		TRUE	FALSE			Tackle [Normal 5 5 0.5] | Take Down [Normal 7 8 1.0] | Double Kick [Fighting 10 13 1.0]	159	198	176	Body Slam [Normal 50 33 2.0] | Payback [Dark 95 100 2.0] | Wild Charge [Electric 90 50 2.5]
 23	Grookey	810	Grass		TRUE	FALSE			Scratch [Normal 6 4 0.5] | Razor Leaf [Grass 13 7 1.0]	122	91	137	Grass Knot [Grass 90 50 2.5] | Energy Ball [Grass 90 50 4.0]
 24	Thwackey	811	Grass		TRUE	FALSE			Scratch [Normal 6 4 0.5] | Razor Leaf [Grass 13 7 1.0]	165	134	172	Grass Knot [Grass 90 50 2.5] | Energy Ball [Grass 90 50 4.0]
-25	Rillaboom	812	Grass		TRUE	31.05.2025		Grass	Scratch [Normal 6 4 0.5] | Razor Leaf [Grass 13 7 1.0]	239	168	225	Grass Knot [Grass 90 50 2.5] | Earth Power [Ground 100 50 3.5] | Energy Ball [Grass 90 50 4.0] | Drum Beating [Grass 115 33 4.5]
+25	Rillaboom	812	Grass		TRUE	31.05.2025		Grass	Scratch [Normal 6 4 0.5] | Razor Leaf [Grass 13 7 1.0]	239	168	225	Grass Knot [Grass 90 50 2.5] | Frenzy Plant [Grass 100 50 2.5 elite] | Earth Power [Ground 100 50 3.5] | Energy Ball [Grass 90 50 4.0] | Drum Beating [Grass 115 33 4.5]
 26	Scorbunny	813	Fire		TRUE	FALSE			Tackle [Normal 5 5 0.5] | Fire Spin [Fire 13 9 1.0]	132	79	137	Flamethrower [Fire 65 50 2.0] | Flame Charge [Fire 70 33 4.0]
 27	Raboot	814	Fire		TRUE	FALSE			Tackle [Normal 5 5 0.5] | Fire Spin [Fire 13 9 1.0]	170	125	163	Flamethrower [Fire 65 50 2.0] | Flame Charge [Fire 70 33 4.0]
 28	Cinderace	815	Fire		TRUE	07.06.2025		Fire	Tackle [Normal 5 5 0.5] | Fire Spin [Fire 13 9 1.0]	238	163	190	Flamethrower [Fire 65 50 2.0] | Focus Blast [Fighting 140 100 3.5] | Flame Charge [Fire 70 33 4.0]
