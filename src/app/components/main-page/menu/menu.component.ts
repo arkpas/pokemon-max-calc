@@ -1,6 +1,6 @@
-import { Component, ElementRef, EventEmitter, inject, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, inject, Output, ViewChild } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -8,7 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelect, MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { ImportServiceService } from '../../../services/import-service/import-service.service';
 import { POKEMON_CPMS, Cpm } from '../../../constants/cpm.constants';
-import { first, map, Observable } from 'rxjs';
+import { first } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { BattleConfiguration, OpponentConfiguration, TeamOption } from '../../../types/types';
 import moment from 'moment';
@@ -16,6 +16,7 @@ import { SPECIFIC_CONFIGS, GENERAL_CONFIGS } from '../../../constants/configurat
 import { Router } from '@angular/router';
 import { MatExpansionModule, MatExpansionPanel } from '@angular/material/expansion';
 import { MtxSelectModule } from '@ng-matero/extensions/select';
+import { WEATHERS, Weather } from '../../../constants/weather.constants';
 
 @Component({
   selector: 'app-menu',
@@ -40,32 +41,31 @@ export class MenuComponent {
   private router = inject(Router);
 
   @Output() configurationSubmitEvent = new EventEmitter<BattleConfiguration>();
-  @ViewChild('advancedPanel') advancedPanel!: MatExpansionPanel;
+  @ViewChild('opponentAdvancedPanel') opponentAdvancedPanel!: MatExpansionPanel;
   @ViewChild('generalConfigSelect') generalConfigSelect!: MatSelect;
 
   isCollapsed = false;
   isSubmittedAtLeastOnce = false;
 
   battleConfigurationForm = this.formBuilder.group({
-    // TODO: validate if opponent with that name exists
     opponentName: ['', Validators.required],
-    // TODO: validate if number
     opponentCpm: [0, Validators.required],
     opponentHp: [0, Validators.required],
     opponentAtkMod: [1, Validators.required],
     opponentDefMod: [1, Validators.required],
     date: [new Date(), Validators.required],
     teamOption: [TeamOption.allPokemons, Validators.required],
-    // TODO: validate if number
     allyCpm: [0.7903, Validators.required],
     allyAtkIV: [15, Validators.required],
     allyDefIV: [15, Validators.required],
     allyHpIV: [15, Validators.required],
+    weather: ['No boost', Validators.required],
   });
 
   pokemonOptions: string[] = [];
   generalConfigs: OpponentConfiguration[] = [...GENERAL_CONFIGS];
   pokemonCpms: Cpm[] = POKEMON_CPMS;
+  weathers: Weather[] = WEATHERS;
 
   teamOptions = [TeamOption.allPokemons, TeamOption.onlyMyPokemons, TeamOption.onlyDefaultPokemons];
 
@@ -122,6 +122,9 @@ export class MenuComponent {
       return;
     }
 
+    let weatherBoost = WEATHERS.find(weather => weather.name === this.battleConfigurationForm.controls.weather.value);
+    battleConfiguration.weatherBoostedTypes = weatherBoost ? weatherBoost.boostedTypes : [];
+
     battleConfiguration.date = moment(battleConfiguration.date);
 
     this.configurationSubmitEvent.emit(battleConfiguration);
@@ -156,7 +159,7 @@ export class MenuComponent {
 
       if (generalConfig.opponentName === 'Custom') {
         // expand Advanced section to provide custom values
-        this.advancedPanel.open();
+        this.opponentAdvancedPanel.open();
       }
     }
   }

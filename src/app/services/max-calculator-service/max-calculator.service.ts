@@ -45,23 +45,23 @@ export class MaxCalculatorService {
     }
 
     // Run the simulation
-    return this.calculate(allies, opponent, config.date);
+    return this.calculate(allies, opponent, config);
   }
 
-  public calculate(pokemons: Pokemon[], boss: Pokemon, date: Moment) {
+  public calculate(pokemons: Pokemon[], boss: Pokemon, config: BattleConfiguration) {
     const candidates: Candidate[] = [];
 
     pokemons.forEach(pokemon => {
       // Offensive
-      const maxPhaseDamageDetails = this.calculateMaxPhaseDamageDetails(pokemon, boss, date);
-      const fastAttackDamageDetails = this.calculateFastAttackDamageDetails(pokemon, boss, false);
-      const chargedAttackDamageDetails = this.calculateChargedAttackDamageDetails(pokemon, boss);
+      const maxPhaseDamageDetails = this.calculateMaxPhaseDamageDetails(pokemon, boss, config);
+      const fastAttackDamageDetails = this.calculateFastAttackDamageDetails(pokemon, boss, false, config);
+      const chargedAttackDamageDetails = this.calculateChargedAttackDamageDetails(pokemon, boss, config);
 
       // TODO: use it!
       // const onFieldDamageCombos = this.calculateOnFieldDamageCombos(pokemon, boss, date);
 
       // Defensive
-      const damageTakenDetails = this.calculateDamageTakenDetails(boss, pokemon);
+      const damageTakenDetails = this.calculateDamageTakenDetails(boss, pokemon, config);
       const avgDamageTaken = damageTakenDetails.reduce((a, b) => a + b.damage, 0) / damageTakenDetails.length;
       const avgDamageTakenPercentage = (avgDamageTaken / pokemon.hp) * 100;
       const heal = pokemon.hp * 0.48;
@@ -83,7 +83,7 @@ export class MaxCalculatorService {
     return candidates;
   }
 
-  private calculateMaxPhaseDamageDetails(ally: Pokemon, opponent: Pokemon, date: Moment): DamageDetails[] {
+  private calculateMaxPhaseDamageDetails(ally: Pokemon, opponent: Pokemon, config: BattleConfiguration): DamageDetails[] {
     const damageDetails: DamageDetails[] = [];
     const staticDamageModifiers: StaticDamageModifiers = {
       friendship: 1,
@@ -97,7 +97,7 @@ export class MaxCalculatorService {
     };
 
     // Standard G-MAX
-    if (ally.gigantamaxDate.isBefore(date)) {
+    if (ally.gigantamaxDate.isBefore(config.date)) {
       const move: Attack = {
         name: GMAX + ' ' + ally.gigantamaxType,
         type: ally.gigantamaxType,
@@ -111,14 +111,14 @@ export class MaxCalculatorService {
       const dynamicDamageModifiers: DynamicDamageModifiers = {
         typeEffectiveness: this.calculateTypeEffectiveness(ally.gigantamaxType, opponent),
         stab: this.calculateStab(ally.gigantamaxType, ally),
-        weather: 1,
+        weather: this.calculateWeatherBoost(ally.gigantamaxType, config.weatherBoostedTypes),
       };
 
       damageDetails.push(this.calculateDamage(move, ally, opponent, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
     }
 
     // Standard D-MAX
-    if (ally.dynamaxDate.isBefore(date) && !ally.dynamaxType) {
+    if (ally.dynamaxDate.isBefore(config.date) && !ally.dynamaxType) {
       const dmaxDamageByTypeMap = new Map<Type, DamageDetails>();
 
       ally.fastAttacks.forEach(fastAttack => {
@@ -140,7 +140,7 @@ export class MaxCalculatorService {
         const dynamicDamageModifiers: DynamicDamageModifiers = {
           typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, opponent),
           stab: this.calculateStab(fastAttack.type, ally),
-          weather: 1,
+          weather: this.calculateWeatherBoost(fastAttack.type, config.weatherBoostedTypes),
         };
 
         dmaxDamageByTypeMap.set(fastAttack.type, this.calculateDamage(move, ally, opponent, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
@@ -150,7 +150,7 @@ export class MaxCalculatorService {
     }
 
     // D-MAX with fixed attack type (like Zacian or Zamazenta)
-    if (ally.dynamaxDate.isBefore(date) && ally.dynamaxType) {
+    if (ally.dynamaxDate.isBefore(config.date) && ally.dynamaxType) {
       const move: Attack = {
         name: DMAX + ' ' + ally.dynamaxType,
         type: ally.dynamaxType,
@@ -164,7 +164,7 @@ export class MaxCalculatorService {
       const dynamicDamageModifiers: DynamicDamageModifiers = {
         typeEffectiveness: this.calculateTypeEffectiveness(ally.dynamaxType, opponent),
         stab: this.calculateStab(ally.dynamaxType, ally),
-        weather: 1,
+        weather: this.calculateWeatherBoost(ally.dynamaxType, config.weatherBoostedTypes),
       };
 
       damageDetails.push(this.calculateDamage(move, ally, opponent, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
@@ -173,7 +173,12 @@ export class MaxCalculatorService {
     return damageDetails;
   }
 
-  private calculateFastAttackDamageDetails(attacker: Pokemon, defender: Pokemon, onlyHalfSecond: boolean): DamageDetails[] {
+  private calculateFastAttackDamageDetails(
+    attacker: Pokemon,
+    defender: Pokemon,
+    onlyHalfSecond: boolean,
+    config: BattleConfiguration
+  ): DamageDetails[] {
     const fastAttackDamageDetails: DamageDetails[] = [];
     const staticDamageModifiers: StaticDamageModifiers = {
       friendship: 1,
@@ -193,7 +198,7 @@ export class MaxCalculatorService {
         const dynamicDamageModifiers: DynamicDamageModifiers = {
           typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, defender),
           stab: this.calculateStab(fastAttack.type, attacker),
-          weather: 1,
+          weather: this.calculateWeatherBoost(fastAttack.type, config.weatherBoostedTypes),
         };
 
         fastAttackDamageDetails.push(this.calculateDamage(fastAttack, attacker, defender, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
@@ -205,7 +210,7 @@ export class MaxCalculatorService {
     return fastAttackDamageDetails;
   }
 
-  private calculateChargedAttackDamageDetails(attacker: Pokemon, defender: Pokemon): DamageDetails[] {
+  private calculateChargedAttackDamageDetails(attacker: Pokemon, defender: Pokemon, config: BattleConfiguration): DamageDetails[] {
     const chargedAttackDamageDetails: DamageDetails[] = [];
     const staticDamageModifiers: StaticDamageModifiers = {
       friendship: 1,
@@ -222,7 +227,7 @@ export class MaxCalculatorService {
       const dynamicDamageModifiers: DynamicDamageModifiers = {
         typeEffectiveness: this.calculateTypeEffectiveness(chargedAttack.type, defender),
         stab: this.calculateStab(chargedAttack.type, attacker),
-        weather: 1,
+        weather: this.calculateWeatherBoost(chargedAttack.type, config.weatherBoostedTypes),
       };
 
       chargedAttackDamageDetails.push(
@@ -235,7 +240,7 @@ export class MaxCalculatorService {
     return chargedAttackDamageDetails;
   }
 
-  private calculateDamageTakenDetails(attacker: Pokemon, defender: Pokemon): DamageDetails[] {
+  private calculateDamageTakenDetails(attacker: Pokemon, defender: Pokemon, config: BattleConfiguration): DamageDetails[] {
     const damageTakenDetails: DamageDetails[] = [];
     const staticDamageModifiers: StaticDamageModifiers = {
       friendship: 1,
@@ -252,7 +257,7 @@ export class MaxCalculatorService {
       const dynamicDamageModifiers: DynamicDamageModifiers = {
         typeEffectiveness: this.calculateTypeEffectiveness(attack.type, defender),
         stab: this.calculateStab(attack.type, attacker),
-        weather: 1,
+        weather: this.calculateWeatherBoost(attack.type, config.weatherBoostedTypes),
       };
 
       damageTakenDetails.push(this.calculateDamage(attack, attacker, defender, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
@@ -261,9 +266,9 @@ export class MaxCalculatorService {
     return damageTakenDetails;
   }
 
-  private calculateOnFieldDamageCombos(attacker: Pokemon, defender: Pokemon, date: Moment): ComboDamageConfiguration[] {
+  private calculateOnFieldDamageCombos(attacker: Pokemon, defender: Pokemon, config: BattleConfiguration): ComboDamageConfiguration[] {
     // No DMax or GMax = we can't use this pokemon yet
-    if (!attacker.dynamaxDate.isBefore(date) && !attacker.gigantamaxDate.isBefore(date)) {
+    if (!attacker.dynamaxDate.isBefore(config.date) && !attacker.gigantamaxDate.isBefore(config.date)) {
       return [];
     }
 
@@ -285,7 +290,7 @@ export class MaxCalculatorService {
       const dynamicDamageModifiers: DynamicDamageModifiers = {
         typeEffectiveness: this.calculateTypeEffectiveness(fastAttack.type, defender),
         stab: this.calculateStab(fastAttack.type, attacker),
-        weather: 1,
+        weather: this.calculateWeatherBoost(fastAttack.type, config.weatherBoostedTypes),
       };
 
       faDamageDetailsList.push(this.calculateDamage(fastAttack, attacker, defender, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
@@ -295,7 +300,7 @@ export class MaxCalculatorService {
       const dynamicDamageModifiers: DynamicDamageModifiers = {
         typeEffectiveness: this.calculateTypeEffectiveness(chargedAttack.type, defender),
         stab: this.calculateStab(chargedAttack.type, attacker),
-        weather: 1,
+        weather: this.calculateWeatherBoost(chargedAttack.type, config.weatherBoostedTypes),
       };
 
       caDamageDetailsList.push(this.calculateDamage(chargedAttack, attacker, defender, { ...staticDamageModifiers, ...dynamicDamageModifiers }));
@@ -415,6 +420,10 @@ export class MaxCalculatorService {
 
   private calculateStab(type: Type, pokemon: Pokemon) {
     return type === pokemon.primaryType || type === pokemon.secondaryType ? 1.2 : 1;
+  }
+
+  private calculateWeatherBoost(type: Type, boostedTypes: Type[]) {
+    return boostedTypes && boostedTypes.includes(type) ? 1.2 : 1;
   }
 
   private calculateDamage(move: Attack, attacker: PokemonStats, defender: PokemonStats, damageModifiers: DamageModifiers): DamageDetails {

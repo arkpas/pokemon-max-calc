@@ -48,7 +48,7 @@
       <mat-form-field appearance="outline">
         <mat-label>Pokemon LVL</mat-label>
         <mtx-select [required]="true" [formControl]="battleConfigurationForm.controls.allyCpm">
-          @for (pokemonCpm of pokemonCpms; track battleConfigurationForm.controls.allyCpm) {
+          @for (pokemonCpm of pokemonCpms; track pokemonCpm) {
           <mtx-option [value]="pokemonCpm.value">
             {{ pokemonCpm.level }} LVL | <small>{{ pokemonCpm.value}} CPM</small>
           </mtx-option>
@@ -69,9 +69,9 @@
         </mat-select>
       </mat-form-field>
     </div>
-    <mat-expansion-panel #advancedPanel>
+    <mat-expansion-panel #opponentAdvancedPanel>
       <mat-expansion-panel-header>
-        <mat-panel-title> Advanced </mat-panel-title>
+        <mat-panel-title> Opponent - Advanced options </mat-panel-title>
       </mat-expansion-panel-header>
 
       <div>
@@ -114,6 +114,27 @@
           }
         </mat-form-field>
       </div>
+    </mat-expansion-panel>
+    <mat-expansion-panel #otherOptionsPanel>
+      <mat-expansion-panel-header>
+        <mat-panel-title> Other options</mat-panel-title>
+      </mat-expansion-panel-header>
+      <div>
+        <mat-form-field appearance="outline">
+          <mat-label>Weather</mat-label>
+          <mtx-select [required]="true" [formControl]="battleConfigurationForm.controls.weather">
+            @for (weather of weathers; track weather.name) {
+            <mtx-option [value]="weather.name">
+              {{ weather.name }} @if (weather.boostedTypes.length) {
+              | <small><i>{{ weather.boostedTypes.join(", ") }}</i></small>
+              }
+            </mtx-option>
+            }
+          </mtx-select>
+          <mat-error>Please provide valid weather!</mat-error>
+        </mat-form-field>
+      </div>
+
     </mat-expansion-panel>
     <div class="form-buttons">
       <button mat-flat-button type="submit">Calculate</button>
