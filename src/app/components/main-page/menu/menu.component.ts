@@ -67,21 +67,11 @@ export class MenuComponent {
   generalConfigs: OpponentConfiguration[] = [...GENERAL_CONFIGS];
   pokemonCpms: Cpm[] = POKEMON_CPMS;
 
-  filteredPokemonOptions: Observable<string[]>;
-  filteredPokemonCpms: Observable<Cpm[]>;
-
   teamOptions = [TeamOption.allPokemons, TeamOption.onlyMyPokemons, TeamOption.onlyDefaultPokemons];
 
   constructor() {
     // Pokemon names
     this.pokemonOptions = this.importService.getPokemonNames();
-    this.filteredPokemonOptions = this.battleConfigurationForm.controls.opponentName.valueChanges.pipe(
-      map(name => (name ? this.filterPokemonNames(name) : this.pokemonOptions.slice()))
-    );
-    // Ally CPMs
-    this.filteredPokemonCpms = this.battleConfigurationForm.controls.allyCpm.valueChanges.pipe(
-      map(cpm => (cpm ? this._filterPokemonCpms(cpm) : this.pokemonCpms.slice()))
-    );
 
     // Add custom option to general configs
     this.generalConfigs.push({
@@ -169,12 +159,6 @@ export class MenuComponent {
         this.advancedPanel.open();
       }
     }
-  }
-
-  private _filterPokemonCpms(level: number): Cpm[] {
-    const filterValue = level.toString().toLowerCase();
-
-    return this.pokemonCpms.filter(cpm => cpm.description.toString().toLowerCase().includes(filterValue));
   }
 
   private determineDefaultBattleDate(pokemonName: string): Date {

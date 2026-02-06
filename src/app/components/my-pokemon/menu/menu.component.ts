@@ -1,16 +1,14 @@
-import { Component, ElementRef, EventEmitter, inject, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { ImportServiceService } from '../../../services/import-service/import-service.service';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MyPokemonService } from '../../../services/my-pokemon-service/my-pokemon.service';
-import { POKEMON_CPMS } from '../../../constants/cpm.constants';
-import { map, Observable } from 'rxjs';
+import { Cpm, POKEMON_CPMS } from '../../../constants/cpm.constants';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { CommonModule } from '@angular/common';
-import { pokemonLevelValidator } from '../../../validators/pokemonLevel.directive';
 import { MtxSelectModule } from '@ng-matero/extensions/select';
 
 @Component({
@@ -34,26 +32,28 @@ export class MenuComponent {
   private myPokemonService = inject(MyPokemonService);
   private formBuilder = inject(FormBuilder);
 
+  private static DEFAULT_CPM: number = 0.7903;
+  private static DEFAULT_ATK_IV: number = 10;
+  private static DEFAULT_DEF_IV: number = 10;
+  private static DEFAULT_HP_IV: number = 10;
+
   @Output() myPokemonAddedEvent = new EventEmitter<boolean>();
 
   myPokemonForm = this.formBuilder.group({
     pokemon: ['', Validators.required],
-    level: [1, [Validators.required, pokemonLevelValidator()]],
-    atkIV: [0, Validators.required],
-    defIV: [0, Validators.required],
-    hpIV: [0, Validators.required],
+    cpm: [MenuComponent.DEFAULT_CPM, [Validators.required]],
+    atkIV: [MenuComponent.DEFAULT_ATK_IV, Validators.required],
+    defIV: [MenuComponent.DEFAULT_DEF_IV, Validators.required],
+    hpIV: [MenuComponent.DEFAULT_HP_IV, Validators.required],
   });
 
   pokemonOptions: string[] = [];
-  filteredPokemonOptions: Observable<string[]>;
+  pokemonCpms: Cpm[] = POKEMON_CPMS;
   isCollapsed = true;
 
   constructor() {
     // Pokemon names
     this.pokemonOptions = this.importService.getPokemonNames();
-    this.filteredPokemonOptions = this.myPokemonForm.controls.pokemon.valueChanges.pipe(
-      map(name => (name ? this.filterPokemonNames(name) : this.pokemonOptions.slice()))
-    );
   }
 
   filterPokemonNames(name: string): string[] {
@@ -74,16 +74,10 @@ export class MenuComponent {
       return;
     }
 
-    const cpm = POKEMON_CPMS.find(cpmObject => cpmObject.level === this.myPokemonForm.controls.level.value!);
-
-    if (!cpm) {
-      throw new Error(`Unable to find CPM for level: [${this.myPokemonForm.controls.level.value}]`);
-    }
-
     this.myPokemonService.addMyPokemon({
       id: '',
       name: this.myPokemonForm.controls.pokemon.value!,
-      cpm: cpm.value,
+      cpm: this.myPokemonForm.controls.cpm.value!,
       atkIV: this.myPokemonForm.controls.atkIV.value!,
       defIV: this.myPokemonForm.controls.defIV.value!,
       hpIV: this.myPokemonForm.controls.hpIV.value!,
@@ -96,10 +90,10 @@ export class MenuComponent {
   resetForm() {
     this.myPokemonForm.controls.pokemon.setValue('');
     this.myPokemonForm.controls.pokemon.setErrors(null);
-    this.myPokemonForm.controls.level.setValue(1);
-    this.myPokemonForm.controls.atkIV.setValue(0);
-    this.myPokemonForm.controls.defIV.setValue(0);
-    this.myPokemonForm.controls.hpIV.setValue(0);
+    this.myPokemonForm.controls.cpm.setValue(MenuComponent.DEFAULT_CPM);
+    this.myPokemonForm.controls.atkIV.setValue(MenuComponent.DEFAULT_ATK_IV);
+    this.myPokemonForm.controls.defIV.setValue(MenuComponent.DEFAULT_DEF_IV);
+    this.myPokemonForm.controls.hpIV.setValue(MenuComponent.DEFAULT_HP_IV);
   }
 
   navigateToMain(): void {

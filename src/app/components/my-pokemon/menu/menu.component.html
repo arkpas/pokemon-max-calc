@@ -1,14 +1,14 @@
 <div [ngClass]="isCollapsed ? 'menu menu-collapsed' : 'menu'">
   @if (isCollapsed) {
-    <div class="menu-button">
-      <button (click)="showForm()">+</button>
-    </div>
+  <div class="menu-button">
+    <button (click)="showForm()">+</button>
+  </div>
   }
 
   @if (isCollapsed) {
-    <div class="menu-button">
-      <button (click)="navigateToMain()">🏠︎</button>
-    </div>
+  <div class="menu-button">
+    <button (click)="navigateToMain()">🏠︎</button>
+  </div>
   }
 
   <form [formGroup]="myPokemonForm" (ngSubmit)="submit()">
@@ -21,43 +21,51 @@
     <div>
       <mat-form-field appearance="outline">
         <mat-label>Pokemon</mat-label>
-        <mtx-select [items]="pokemonOptions" [required]="true" [formControl]="myPokemonForm.controls.pokemon"></mtx-select>
+        <mtx-select [items]="pokemonOptions" [required]="true"
+          [formControl]="myPokemonForm.controls.pokemon"></mtx-select>
         <mat-error> Please provide valid Pokemon name! </mat-error>
       </mat-form-field>
     </div>
     <div>
       <mat-form-field appearance="outline">
         <mat-label>Pokemon LVL</mat-label>
-        <input matInput placeholder="Level" id="level" type="number" step="0.5" min="1" max="51" [formControl]="myPokemonForm.controls.level" />
-        @if (myPokemonForm.controls.level.invalid) {
-          <mat-error> Please provide valid level! </mat-error>
-        }
+        <mtx-select [required]="true" [formControl]="myPokemonForm.controls.cpm">
+          @for (pokemonCpm of pokemonCpms; track myPokemonForm.controls.cpm) {
+          <mtx-option [value]="pokemonCpm.value">
+            {{ pokemonCpm.level }} LVL | <small>{{ pokemonCpm.value}} CPM</small>
+          </mtx-option>
+          }
+        </mtx-select>
+        <mat-error>Please provide valid Pokemon LVL!</mat-error>
       </mat-form-field>
     </div>
     <div>
       <mat-form-field appearance="outline">
         <mat-label>Attack IV</mat-label>
-        <input matInput placeholder="Attack IV" id="atkIv" type="number" min="0" max="15" [formControl]="myPokemonForm.controls.atkIV" />
+        <input matInput placeholder="Attack IV" id="atkIv" type="number" min="0" max="15"
+          [formControl]="myPokemonForm.controls.atkIV" />
         @if (myPokemonForm.controls.atkIV.invalid) {
-          <mat-error> Please provide valid attack IV value! </mat-error>
+        <mat-error> Please provide valid attack IV value! </mat-error>
         }
       </mat-form-field>
     </div>
     <div>
       <mat-form-field appearance="outline">
         <mat-label>Defense IV</mat-label>
-        <input matInput placeholder="Defense IV" id="defIv" type="number" min="0" max="15" [formControl]="myPokemonForm.controls.defIV" />
+        <input matInput placeholder="Defense IV" id="defIv" type="number" min="0" max="15"
+          [formControl]="myPokemonForm.controls.defIV" />
         @if (myPokemonForm.controls.defIV.invalid) {
-          <mat-error> Please provide valid defense IV value! </mat-error>
+        <mat-error> Please provide valid defense IV value! </mat-error>
         }
       </mat-form-field>
     </div>
     <div>
       <mat-form-field appearance="outline">
         <mat-label>HP IV</mat-label>
-        <input matInput placeholder="HP IV" id="hpIv" type="number" min="0" max="15" [formControl]="myPokemonForm.controls.hpIV" />
+        <input matInput placeholder="HP IV" id="hpIv" type="number" min="0" max="15"
+          [formControl]="myPokemonForm.controls.hpIV" />
         @if (myPokemonForm.controls.hpIV.invalid) {
-          <mat-error> Please provide valid HP IV value! </mat-error>
+        <mat-error> Please provide valid HP IV value! </mat-error>
         }
       </mat-form-field>
     </div>
