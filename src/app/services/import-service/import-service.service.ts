@@ -234,13 +234,15 @@ export class ImportServiceService {
       const openBracket = attack.indexOf('[');
       const closeBracket = attack.indexOf(']');
       const attackStats = attack.slice(openBracket + 1, closeBracket).split(' ');
+      const durationStats = attackStats[3].split('-');
 
       result.push({
         name: attack.slice(0, openBracket - 1),
         type: Type[attackStats[0] as keyof typeof Type],
         power: parseInt(attackStats[1]),
         energy: parseInt(attackStats[2]),
-        duration: parseFloat(attackStats[3]),
+        duration: parseFloat(durationStats[0]),
+        damageWindowStart: parseFloat(durationStats[1]),
         special: attackStats.length > 4 ? attackStats[4] : '',
       });
     });

@@ -26,6 +26,7 @@ export interface Attack {
   power: number;
   energy: number;
   duration: number;
+  damageWindowStart: number;
   special: string;
 }
 

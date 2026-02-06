@@ -1,24 +1,19 @@
 <div class="results">
   @if (opponent) {
-    <div class="opponent">
-      <app-opponent-card
-        [name]="opponent.name"
-        [atk]="opponent.atk"
-        [hp]="opponent.hp"
-        [def]="opponent.def"
-        [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + opponent.pokedexNumber + '.png'"
-        [primaryType]="opponent.primaryType"
-        [secondaryType]="opponent.secondaryType">
-      </app-opponent-card>
-    </div>
+  <div class="opponent">
+    <app-opponent-card [name]="opponent.name" [atk]="opponent.atk" [hp]="opponent.hp" [def]="opponent.def"
+      [imageUrl]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + opponent.pokedexNumber + '.png'"
+      [primaryType]="opponent.primaryType" [secondaryType]="opponent.secondaryType">
+    </app-opponent-card>
+  </div>
   }
   <mat-tab-group>
     <mat-tab label="⚔️ Attackers">
       <div class="mat-elevation-z8">
         <div class="pokemon-cards">
           @for (attacker of attackers; track attacker) {
-            <app-pokemon-card [candidate]="attacker" [pokemonCardType]="PokemonCardTypeEnum.Attacker">
-            </app-pokemon-card>
+          <app-pokemon-card [candidate]="attacker" [pokemonCardType]="PokemonCardTypeEnum.Attacker">
+          </app-pokemon-card>
           }
         </div>
       </div>
@@ -29,16 +24,16 @@
           <div class="mat-elevation-z8">
             <div class="pokemon-cards">
               @for (tank of tanks; track tank) {
-                <app-pokemon-card [candidate]="tank" [pokemonCardType]="PokemonCardTypeEnum.Tank"> </app-pokemon-card>
+              <app-pokemon-card [candidate]="tank" [pokemonCardType]="PokemonCardTypeEnum.Tank"> </app-pokemon-card>
               }
             </div>
           </div>
         </mat-tab>
-        <mat-tab label="🔻 Hot-swaps">
+        <mat-tab label="🔁 Hot-swaps">
           <div class="mat-elevation-z8">
             <div class="pokemon-cards">
               @for (sponge of sponges; track sponge) {
-                <app-pokemon-card [candidate]="sponge" [pokemonCardType]="PokemonCardTypeEnum.Tank"> </app-pokemon-card>
+              <app-pokemon-card [candidate]="sponge" [pokemonCardType]="PokemonCardTypeEnum.Tank"> </app-pokemon-card>
               }
             </div>
           </div>
@@ -48,7 +43,7 @@
     <mat-tab label="💚 Healers">
       <div class="pokemon-cards">
         @for (healer of healers; track healer) {
-          <app-pokemon-card [candidate]="healer" [pokemonCardType]="PokemonCardTypeEnum.Healer"> </app-pokemon-card>
+        <app-pokemon-card [candidate]="healer" [pokemonCardType]="PokemonCardTypeEnum.Healer"> </app-pokemon-card>
         }
       </div>
     </mat-tab>

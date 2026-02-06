@@ -104,6 +104,7 @@ export class MaxCalculatorService {
         power: 450,
         energy: 0,
         duration: 0,
+        damageWindowStart: 0,
         special: GMAX,
       };
 
@@ -132,6 +133,7 @@ export class MaxCalculatorService {
           power: 350,
           energy: 0,
           duration: 0,
+          damageWindowStart: 0,
           special: DMAX,
         };
 
@@ -155,6 +157,7 @@ export class MaxCalculatorService {
         power: 350,
         energy: 0,
         duration: 0,
+        damageWindowStart: 0,
         special: DMAX,
       };
 

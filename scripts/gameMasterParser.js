@@ -148,6 +148,7 @@ function convertAttack(moveApiData, isElite) {
     power: moveApiData.power ?? 0,
     energy: Math.abs(moveApiData.energyDelta ?? 0),
     duration: moveApiData.durationMs / 1000,
+    damageWindowStart: moveApiData.damageWindowStartMs / 1000,
     elite: isElite,
   };
 }
@@ -220,6 +221,9 @@ function convertPokemonsDataToTsv(pokemonsData) {
 
 function convertMovesToString(moves) {
   return moves
-    .map(attack => `${attack.name} [${attack.type} ${attack.power} ${attack.energy} ${attack.duration.toFixed(1)}${attack.elite ? ' elite' : ''}]`)
+    .map(
+      attack =>
+        `${attack.name} [${attack.type} ${attack.power} ${attack.energy} ${attack.duration.toFixed(1)}-${attack.damageWindowStart.toFixed(1)}${attack.elite ? ' elite' : ''}]`
+    )
     .join(' | ');
 }
