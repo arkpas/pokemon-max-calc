@@ -5,6 +5,11 @@ export interface Weather {
   boostedTypes: Type[];
 }
 
+export interface Friendship {
+  name: string;
+  modifier: number;
+}
+
 export const WEATHERS: Weather[] = [
   {
     name: 'No boost',
@@ -60,5 +65,32 @@ export const WEATHERS: Weather[] = [
       Type.Dark,
       Type.Fairy,
     ],
+  },
+];
+
+export const FRIENDSHIPS: Friendship[] = [
+  {
+    name: 'None',
+    modifier: 1,
+  },
+  {
+    name: 'Good Friends',
+    modifier: 1.03,
+  },
+  {
+    name: 'Great Friends',
+    modifier: 1.05,
+  },
+  {
+    name: 'Ultra Friends',
+    modifier: 1.07,
+  },
+  {
+    name: 'Best Friends',
+    modifier: 1.1,
+  },
+  {
+    name: 'Forever Friends',
+    modifier: 1.12,
   },
 ];

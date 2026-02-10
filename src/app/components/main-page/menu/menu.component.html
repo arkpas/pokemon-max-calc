@@ -122,20 +122,36 @@
       <div>
         <mat-form-field appearance="outline">
           <mat-label>Weather</mat-label>
-          <mtx-select [required]="true" [formControl]="battleConfigurationForm.controls.weather">
+          <mat-select [required]="true" [formControl]="battleConfigurationForm.controls.weather">
+            <mat-select-trigger>{{ battleConfigurationForm.controls.weather.value }}</mat-select-trigger>
             @for (weather of weathers; track weather.name) {
-            <mtx-option [value]="weather.name">
+            <mat-option [value]="weather.name">
               {{ weather.name }} @if (weather.boostedTypes.length) {
               | <small><i>{{ weather.boostedTypes.join(", ") }}</i></small>
               }
-            </mtx-option>
+            </mat-option>
             }
-          </mtx-select>
+          </mat-select>
           <mat-error>Please provide valid weather!</mat-error>
         </mat-form-field>
       </div>
 
+      <div>
+        <mat-form-field appearance="outline">
+          <mat-label>Friendship</mat-label>
+          <mat-select [required]="true" [formControl]="battleConfigurationForm.controls.friendship">
+            <mat-select-trigger>{{ battleConfigurationForm.controls.friendship.value }}</mat-select-trigger>
+            @for (friendship of friendships; track friendship.name) {
+            <mat-option [value]="friendship.name">
+              {{ friendship.name }} | <small><i>x{{ friendship.modifier.toFixed(2) }}</i></small>
+            </mat-option>
+            }
+          </mat-select>
+          <mat-error>Please provide valid friendship level!</mat-error>
+        </mat-form-field>
+      </div>
     </mat-expansion-panel>
+
     <div class="form-buttons">
       <button mat-flat-button type="submit">Calculate</button>
       <button mat-stroked-button type="button" (click)="navigateToMyPokemon()">My Pokemon</button>

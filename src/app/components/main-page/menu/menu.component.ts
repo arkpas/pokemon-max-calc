@@ -1,6 +1,5 @@
 import { Component, EventEmitter, inject, Output, ViewChild } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,7 +15,7 @@ import { SPECIFIC_CONFIGS, GENERAL_CONFIGS } from '../../../constants/configurat
 import { Router } from '@angular/router';
 import { MatExpansionModule, MatExpansionPanel } from '@angular/material/expansion';
 import { MtxSelectModule } from '@ng-matero/extensions/select';
-import { WEATHERS, Weather } from '../../../constants/weather.constants';
+import { FRIENDSHIPS, Friendship, WEATHERS, Weather } from '../../../constants/damage-modifiers.constants';
 
 @Component({
   selector: 'app-menu',
@@ -25,7 +24,6 @@ import { WEATHERS, Weather } from '../../../constants/weather.constants';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatAutocompleteModule,
     MatDatepickerModule,
     CommonModule,
     MatSelectModule,
@@ -60,12 +58,14 @@ export class MenuComponent {
     allyDefIV: [15, Validators.required],
     allyHpIV: [15, Validators.required],
     weather: ['No boost', Validators.required],
+    friendship: ['None', Validators.required],
   });
 
   pokemonOptions: string[] = [];
   generalConfigs: OpponentConfiguration[] = [...GENERAL_CONFIGS];
   pokemonCpms: Cpm[] = POKEMON_CPMS;
   weathers: Weather[] = WEATHERS;
+  friendships: Friendship[] = FRIENDSHIPS;
 
   teamOptions = [TeamOption.allPokemons, TeamOption.onlyMyPokemons, TeamOption.onlyDefaultPokemons];
 
@@ -124,6 +124,10 @@ export class MenuComponent {
 
     let weatherBoost = WEATHERS.find(weather => weather.name === this.battleConfigurationForm.controls.weather.value);
     battleConfiguration.weatherBoostedTypes = weatherBoost ? weatherBoost.boostedTypes : [];
+
+    battleConfiguration.friendshipModifier = FRIENDSHIPS.find(
+      friendship => friendship.name === this.battleConfigurationForm.controls.friendship.value
+    )!.modifier;
 
     battleConfiguration.date = moment(battleConfiguration.date);
 

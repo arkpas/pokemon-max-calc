@@ -19,6 +19,7 @@ export interface BattleConfiguration extends OpponentConfiguration, AllyConfigur
   date: Moment;
   teamOption: TeamOption;
   weatherBoostedTypes: Type[];
+  friendshipModifier: number;
 }
 
 export interface Attack {

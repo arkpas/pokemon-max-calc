@@ -86,7 +86,7 @@ export class MaxCalculatorService {
   private calculateMaxPhaseDamageDetails(ally: Pokemon, opponent: Pokemon, config: BattleConfiguration): DamageDetails[] {
     const damageDetails: DamageDetails[] = [];
     const staticDamageModifiers: StaticDamageModifiers = {
-      friendship: 1,
+      friendship: config.friendshipModifier,
       dodged: 1,
       mega: 1,
       trainer: 1,
@@ -181,7 +181,7 @@ export class MaxCalculatorService {
   ): DamageDetails[] {
     const fastAttackDamageDetails: DamageDetails[] = [];
     const staticDamageModifiers: StaticDamageModifiers = {
-      friendship: 1,
+      friendship: config.friendshipModifier,
       dodged: 1,
       mega: 1,
       trainer: 1,
@@ -213,7 +213,7 @@ export class MaxCalculatorService {
   private calculateChargedAttackDamageDetails(attacker: Pokemon, defender: Pokemon, config: BattleConfiguration): DamageDetails[] {
     const chargedAttackDamageDetails: DamageDetails[] = [];
     const staticDamageModifiers: StaticDamageModifiers = {
-      friendship: 1,
+      friendship: config.friendshipModifier,
       dodged: 1,
       mega: 1,
       trainer: 1,
@@ -273,7 +273,7 @@ export class MaxCalculatorService {
     }
 
     const staticDamageModifiers: StaticDamageModifiers = {
-      friendship: 1,
+      friendship: config.friendshipModifier,
       dodged: 1,
       mega: 1,
       trainer: 1,
