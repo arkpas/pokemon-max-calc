@@ -4,13 +4,11 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { BattleConfiguration, Candidate, Pokemon } from '../../../types/types';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
-
 import { Observable, Subscription } from 'rxjs';
 import { PokemonCardComponent, PokemonCardTypeEnum } from '../../shared/cards/pokemon-card/pokemon-card.component';
 import { OpponentCardComponent } from '../../shared/cards/opponent-card/opponent-card.component';
 import { sortAttackers, sortHealers, sortTanks } from '../../../util/sorting.util';
 import { ImportServiceService } from '../../../services/import-service/import-service.service';
-import { configDotenv } from 'dotenv';
 
 @Component({
   selector: 'app-results',
@@ -50,8 +48,6 @@ export class ResultsComponent implements OnInit, OnDestroy {
     this.healers = [...this.candidates.filter(candidate => candidate.hasHalfSecondAttack)].sort(sortHealers);
 
     this.opponent = this.importService.getOpponent(config);
-
-    console.log(this.attackers);
   }
 
   groupAttackers(candidates: Candidate[]): Candidate[] {

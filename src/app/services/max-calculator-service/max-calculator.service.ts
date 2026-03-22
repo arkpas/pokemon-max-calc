@@ -14,7 +14,6 @@ import {
   Candidate,
 } from '../../types/types';
 import { ImportServiceService } from '../import-service/import-service.service';
-import { Moment } from 'moment';
 import { MyPokemonService } from '../my-pokemon-service/my-pokemon.service';
 
 const TURN_DURATION = 0.5;

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { AllyConfiguration, Attack, MyPokemon, OpponentConfiguration, Pokemon, Type } from '../../types/types';
+import { Attack, BattleConfiguration, MyPokemon, OpponentConfiguration, Pokemon, Type } from '../../types/types';
 import moment, { Moment } from 'moment';
 
 type DefendingTypeEffectiveness = Record<string, number>;
@@ -52,9 +52,9 @@ export class ImportServiceService {
     return this.pokemons.map(pokemon => this.deepCopyPokemon(pokemon));
   }
 
-  public getPokemonsWithConfig(config: AllyConfiguration): Pokemon[] {
+  public getPokemonsWithConfig(config: BattleConfiguration): Pokemon[] {
     // Copy the pokemons and return them, so we still have "clean" version of them in service
-    const pokemons = this.getPokemons();
+    const pokemons = this.getPokemons().filter(pokemon => pokemon.dynamaxDate.isBefore(config.date) || pokemon.gigantamaxDate.isBefore(config.date));
 
     // Calculate final stats
     pokemons.forEach(pokemon => {
