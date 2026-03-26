@@ -116,7 +116,7 @@ function filterApiData(pokemons, apiData) {
   const pokemonNames = pokemons.map(pokemon => pokemon.name.toLowerCase().replaceAll('-', ' '));
 
   return apiData.filter(pokemonFromApi => {
-    const pokemonFromApiName = pokemonFromApi.pokemonId.toLowerCase().replaceAll('_', ' ');
+    const pokemonFromApiName = pokemonFromApi.pokemonId.toString().toLowerCase().replaceAll('_', ' ');
 
     return pokemonNames.includes(pokemonFromApiName);
   });
@@ -124,6 +124,9 @@ function filterApiData(pokemons, apiData) {
 
 function enhanceApiData(pokemons, apiData) {
   for (const pokemonApiData of apiData) {
+    // Apparently some ids started to come as numbers - convert to string just to be safe
+    pokemonApiData.pokemonId = pokemonApiData.pokemonId.toString();
+
     const pokemonFromTsv = pokemons.find(
       pokemon => pokemon.name.toLowerCase().replaceAll('-', ' ') === pokemonApiData.pokemonId.toLowerCase().replaceAll('_', ' ')
     );
