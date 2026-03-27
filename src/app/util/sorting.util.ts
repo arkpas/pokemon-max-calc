@@ -4,7 +4,13 @@ export const sortAttackers = (a: Candidate, b: Candidate) => {
   const aTopDamage = Math.max(...a.maxPhaseDamageDetails.map(damageDetails => damageDetails.damage));
   const bTopDamage = Math.max(...b.maxPhaseDamageDetails.map(damageDetails => damageDetails.damage));
 
-  return bTopDamage - aTopDamage;
+  const damageDiff = bTopDamage - aTopDamage;
+
+  if (damageDiff != 0) {
+    return damageDiff;
+  }
+
+  return b.atk - a.atk;
 };
 
 export const sortTanks = (a: Candidate, b: Candidate) => {
