@@ -1,11 +1,9 @@
 <div class="results">
   <div class="pokemon-cards">
     @for (myPokemon of myPokemons; track myPokemon) {
-      <app-my-pokemon-card
-        class="pokemon-card"
-        [myPokemon]="myPokemon"
-        (myPokemonRemovedEvent)="refreshMyPokemons()">
-      </app-my-pokemon-card>
+    <app-my-pokemon-card class="pokemon-card" [myPokemon]="myPokemon" (myPokemonRemovedEvent)="refreshMyPokemons()"
+      (myPokemonEdit)="editMyPokemon($event)">
+    </app-my-pokemon-card>
     }
   </div>
 </div>

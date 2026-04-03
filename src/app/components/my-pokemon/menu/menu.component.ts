@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { CommonModule } from '@angular/common';
 import { MtxSelectModule } from '@ng-matero/extensions/select';
+import { MyPokemon } from '../../../types/types';
 
 @Component({
   selector: 'app-menu',
@@ -40,6 +41,7 @@ export class MenuComponent {
   @Output() myPokemonAddedEvent = new EventEmitter<boolean>();
 
   myPokemonForm = this.formBuilder.group({
+    id: [''],
     pokemon: ['', Validators.required],
     cpm: [MenuComponent.DEFAULT_CPM, [Validators.required]],
     atkIV: [MenuComponent.DEFAULT_ATK_IV, Validators.required],
@@ -75,7 +77,7 @@ export class MenuComponent {
     }
 
     this.myPokemonService.addMyPokemon({
-      id: '',
+      id: this.myPokemonForm.controls.id.value!,
       name: this.myPokemonForm.controls.pokemon.value!,
       cpm: this.myPokemonForm.controls.cpm.value!,
       atkIV: this.myPokemonForm.controls.atkIV.value!,
@@ -94,6 +96,15 @@ export class MenuComponent {
     this.myPokemonForm.controls.atkIV.setValue(MenuComponent.DEFAULT_ATK_IV);
     this.myPokemonForm.controls.defIV.setValue(MenuComponent.DEFAULT_DEF_IV);
     this.myPokemonForm.controls.hpIV.setValue(MenuComponent.DEFAULT_HP_IV);
+  }
+
+  editMyPokemon(myPokemon: MyPokemon) {
+    this.myPokemonForm.controls.pokemon.setValue(myPokemon.id);
+    this.myPokemonForm.controls.pokemon.setErrors(null);
+    this.myPokemonForm.controls.cpm.setValue(myPokemon.cpm);
+    this.myPokemonForm.controls.atkIV.setValue(myPokemon.atkIV);
+    this.myPokemonForm.controls.defIV.setValue(myPokemon.defIV);
+    this.myPokemonForm.controls.hpIV.setValue(myPokemon.hpIV);
   }
 
   navigateToMain(): void {

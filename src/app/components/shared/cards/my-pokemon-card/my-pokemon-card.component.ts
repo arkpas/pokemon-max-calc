@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { getTypeColor } from '../utils';
 import { CpmToLevelPipe } from '../../../../pipes/cpmToLevel.pipe';
 import { IvPercentagePipe } from '../../../../pipes/ivPercentage.pipe';
-import { Pokemon } from '../../../../types/types';
+import { MyPokemon, Pokemon } from '../../../../types/types';
 import { MyPokemonService } from '../../../../services/my-pokemon-service/my-pokemon.service';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
@@ -16,12 +16,17 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class MyPokemonCardComponent {
   @Input() myPokemon!: Pokemon;
   @Output() myPokemonRemovedEvent = new EventEmitter<boolean>();
+  @Output() myPokemonEdit = new EventEmitter<string>();
 
   private myPokemonService = inject(MyPokemonService);
 
   removeMyPokemon() {
     this.myPokemonService.removeMyPokemon(this.myPokemon.myPokemonId);
     this.myPokemonRemovedEvent.emit(true);
+  }
+
+  editMyPokemon() {
+    this.myPokemonEdit.emit(this.myPokemon.myPokemonId);
   }
 
   getTypeColor = getTypeColor;

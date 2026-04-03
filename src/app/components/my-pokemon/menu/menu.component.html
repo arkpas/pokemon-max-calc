@@ -14,9 +14,23 @@
   <form [formGroup]="myPokemonForm" (ngSubmit)="submit()">
     <div class="top-row">
       <div class="title">
+        @if (myPokemonForm.controls.id.value != '') {
+        <span>Edit My Pokemon</span>
+        } @else {
         <span>Add My Pokemon</span>
+        }
       </div>
     </div>
+
+    @if (myPokemonForm.controls.id.value != '') {
+    <div>
+      <mat-form-field appearance="outline">
+        <mat-label>ID</mat-label>
+        <input matInput placeholder="Attack IV" id="id" type="string" [formControl]="myPokemonForm.controls.id"
+          [disabled]="true" />
+      </mat-form-field>
+    </div>
+    }
 
     <div>
       <mat-form-field appearance="outline">

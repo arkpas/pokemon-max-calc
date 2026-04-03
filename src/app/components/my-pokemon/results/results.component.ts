@@ -1,5 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { Pokemon } from '../../../types/types';
+import { Component, EventEmitter, OnInit, Output, inject } from '@angular/core';
+import { MyPokemon, Pokemon } from '../../../types/types';
 
 import { MyPokemonService } from '../../../services/my-pokemon-service/my-pokemon.service';
 import { MyPokemonCardComponent } from '../../shared/cards/my-pokemon-card/my-pokemon-card.component';
@@ -11,6 +11,8 @@ import { MyPokemonCardComponent } from '../../shared/cards/my-pokemon-card/my-po
   styleUrl: './results.component.scss',
 })
 export class ResultsComponent implements OnInit {
+  @Output() myPokemonEdit = new EventEmitter<MyPokemon>();
+
   private myPokemonService = inject(MyPokemonService);
   myPokemons: Pokemon[] = [];
 
@@ -20,5 +22,16 @@ export class ResultsComponent implements OnInit {
 
   refreshMyPokemons() {
     this.myPokemons = this.myPokemonService.getMyPokemons();
+  }
+
+  editMyPokemon(id: string) {
+    const myPokemon = this.myPokemonService.getMyPokemon(id);
+
+    if (!myPokemon) {
+      console.error(`My Pokemon with id ${id} was not found!`);
+      return;
+    }
+
+    this.myPokemonEdit.emit(myPokemon);
   }
 }
