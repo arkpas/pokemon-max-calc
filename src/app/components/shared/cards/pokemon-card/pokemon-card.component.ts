@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { getTypeColor, getTypeBadgeClass, getDamagePercentageColor, getFastAttackDurationColor } from '../utils';
+import { getTypeColor, getTypeBadgeClass, getDamagePercentageColor, getFastAttackDurationColor, getMaxEnergyPerTurnColor } from '../utils';
 import { CpmToLevelPipe } from '../../../../pipes/cpmToLevel.pipe';
 import { IvPercentagePipe } from '../../../../pipes/ivPercentage.pipe';
 import { Candidate } from '../../../../types/types';
@@ -33,4 +33,5 @@ export class PokemonCardComponent {
   getTypeBadgeClass = getTypeBadgeClass;
   getDamagePercentageColor = getDamagePercentageColor;
   getFastAttackDurationColor = getFastAttackDurationColor;
+  getMaxEnergyPerTurnColor = getMaxEnergyPerTurnColor;
 }

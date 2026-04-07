@@ -114,10 +114,20 @@
           }
         </mat-form-field>
       </div>
+      <div>
+        <mat-form-field appearance="outline">
+          <mat-label>Max Energy modificator</mat-label>
+          <input matInput placeholder="Max Energy modificator" id="maxEnergyMod" type="number"
+            [formControl]="battleConfigurationForm.controls.opponentMaxEnergyMod" (focus)="this.selectAll($event)" />
+          @if (battleConfigurationForm.controls.opponentMaxEnergyMod.invalid) {
+          <mat-error> Please provide valid max energy modificator value! </mat-error>
+          }
+        </mat-form-field>
+      </div>
     </mat-expansion-panel>
     <mat-expansion-panel #otherOptionsPanel>
       <mat-expansion-panel-header>
-        <mat-panel-title> Other options</mat-panel-title>
+        <mat-panel-title> Allies - damage boosts</mat-panel-title>
       </mat-expansion-panel-header>
       <div>
         <mat-form-field appearance="outline">
@@ -143,13 +153,46 @@
             <mat-select-trigger>{{ battleConfigurationForm.controls.friendship.value }}</mat-select-trigger>
             @for (friendship of friendships; track friendship.name) {
             <mat-option [value]="friendship.name">
-              {{ friendship.name }} | <small><i>x{{ friendship.modifier.toFixed(2) }}</i></small>
+              {{ friendship.name }} | <small><i>x{{ friendship.value.toFixed(2) }}</i></small>
             </mat-option>
             }
           </mat-select>
           <mat-error>Please provide valid friendship level!</mat-error>
         </mat-form-field>
       </div>
+
+      <div>
+        <mat-form-field appearance="outline">
+          <mat-label>Helpers</mat-label>
+          <mat-select [required]="true" [formControl]="battleConfigurationForm.controls.helpers">
+            <mat-select-trigger>{{ battleConfigurationForm.controls.helpers.value }}</mat-select-trigger>
+            @for (helper of helpers; track helper.name) {
+            <mat-option [value]="helper.name">
+              {{ helper.name }} | <small><i>x{{ helper.value.toFixed(3) }}</i></small>
+            </mat-option>
+            }
+          </mat-select>
+          <mat-error>Please provide valid helpers value!</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-form-field appearance="outline">
+          <mat-label>Adventure Effect</mat-label>
+          <mat-select [required]="true" [formControl]="battleConfigurationForm.controls.adventureEffect">
+            <mat-select-trigger>{{ battleConfigurationForm.controls.adventureEffect.value }}</mat-select-trigger>
+            @for (adventureEffect of adventureEffects; track adventureEffect) {
+            <mat-option [value]="adventureEffect"> {{ adventureEffect }}</mat-option>
+            }
+          </mat-select>
+          <mat-error>Please provide valid adventure effect!</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div>
+        <mat-checkbox [formControl]="battleConfigurationForm.controls.mushroom">Max Mushroom</mat-checkbox>
+      </div>
+
     </mat-expansion-panel>
 
     <div class="form-buttons">

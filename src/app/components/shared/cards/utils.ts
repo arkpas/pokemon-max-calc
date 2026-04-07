@@ -52,3 +52,12 @@ export function getFastAttackDurationColor(duration: number): string {
       return 'red';
   }
 }
+
+export function getMaxEnergyPerTurnColor(maxEnergyPerTurn: number): string {
+  switch (true) {
+    case maxEnergyPerTurn >= 1:
+      return 'green';
+    default:
+      return 'red';
+  }
+}

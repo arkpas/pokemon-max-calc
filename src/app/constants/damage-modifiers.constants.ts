@@ -5,9 +5,9 @@ export interface Weather {
   boostedTypes: Type[];
 }
 
-export interface Friendship {
+export interface Modifier {
   name: string;
-  modifier: number;
+  value: number;
 }
 
 export const WEATHERS: Weather[] = [
@@ -68,29 +68,59 @@ export const WEATHERS: Weather[] = [
   },
 ];
 
-export const FRIENDSHIPS: Friendship[] = [
+export const FRIENDSHIPS: Modifier[] = [
   {
     name: 'None',
-    modifier: 1,
+    value: 1,
   },
   {
     name: 'Good Friends',
-    modifier: 1.03,
+    value: 1.03,
   },
   {
     name: 'Great Friends',
-    modifier: 1.05,
+    value: 1.05,
   },
   {
     name: 'Ultra Friends',
-    modifier: 1.07,
+    value: 1.07,
   },
   {
     name: 'Best Friends',
-    modifier: 1.1,
+    value: 1.1,
   },
   {
     name: 'Forever Friends',
-    modifier: 1.12,
+    value: 1.12,
   },
+];
+
+export enum AdventureEffect {
+  NONE = 'None',
+  BEHEMOTH_BASH = 'Behemoth Bash',
+  BEHEMOTH_BLADE = 'Behemoth Blade',
+  DYNAMAX_CANNON = 'Dynamax Cannon',
+}
+
+export const BEHEMOTH_BASH_MAX_BATTLES_MODIFIER = 0.9523809524;
+export const BEHEMOTH_BLADE_MAX_BATTLES_MODIFIER = 1.05;
+export const DYNAMAX_CANNON_BONUS_POWER = 100;
+
+export const HELPERS: Modifier[] = [
+  { name: '0', value: 1.0 },
+  { name: '1', value: 1.1 },
+  { name: '2', value: 1.15 },
+  { name: '3', value: 1.17 },
+  { name: '4', value: 1.18 },
+  { name: '5', value: 1.187 },
+  { name: '6', value: 1.191 },
+  { name: '7', value: 1.192 },
+  { name: '8', value: 1.193 },
+  { name: '9', value: 1.194 },
+  { name: '10', value: 1.195 },
+  { name: '11', value: 1.196 },
+  { name: '12', value: 1.197 },
+  { name: '13', value: 1.198 },
+  { name: '14', value: 1.199 },
+  { name: '15+', value: 1.2 },
 ];

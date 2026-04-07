@@ -15,7 +15,18 @@ import { SPECIFIC_CONFIGS, GENERAL_CONFIGS } from '../../../constants/configurat
 import { Router } from '@angular/router';
 import { MatExpansionModule, MatExpansionPanel } from '@angular/material/expansion';
 import { MtxSelectModule } from '@ng-matero/extensions/select';
-import { FRIENDSHIPS, Friendship, WEATHERS, Weather } from '../../../constants/damage-modifiers.constants';
+import {
+  AdventureEffect,
+  BEHEMOTH_BASH_MAX_BATTLES_MODIFIER,
+  BEHEMOTH_BLADE_MAX_BATTLES_MODIFIER,
+  DYNAMAX_CANNON_BONUS_POWER,
+  FRIENDSHIPS,
+  Modifier,
+  WEATHERS,
+  Weather,
+  HELPERS,
+} from '../../../constants/damage-modifiers.constants';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-menu',
@@ -29,6 +40,7 @@ import { FRIENDSHIPS, Friendship, WEATHERS, Weather } from '../../../constants/d
     MatSelectModule,
     MatExpansionModule,
     MtxSelectModule,
+    MatCheckboxModule,
   ],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss',
@@ -51,6 +63,7 @@ export class MenuComponent {
     opponentHp: [0, Validators.required],
     opponentAtkMod: [1, Validators.required],
     opponentDefMod: [1, Validators.required],
+    opponentMaxEnergyMod: [1, Validators.required],
     date: [new Date(), Validators.required],
     teamOption: [TeamOption.allPokemons, Validators.required],
     allyCpm: [0.7903, Validators.required],
@@ -59,13 +72,18 @@ export class MenuComponent {
     allyHpIV: [15, Validators.required],
     weather: ['No boost', Validators.required],
     friendship: ['None', Validators.required],
+    helpers: ['0', Validators.required],
+    adventureEffect: ['None', Validators.required],
+    mushroom: [false, Validators.required],
   });
 
   pokemonOptions: string[] = [];
   generalConfigs: OpponentConfiguration[] = [...GENERAL_CONFIGS];
   pokemonCpms: Cpm[] = POKEMON_CPMS;
   weathers: Weather[] = WEATHERS;
-  friendships: Friendship[] = FRIENDSHIPS;
+  friendships: Modifier[] = FRIENDSHIPS;
+  helpers: Modifier[] = HELPERS;
+  adventureEffects: string[] = Object.values(AdventureEffect);
 
   teamOptions = [TeamOption.allPokemons, TeamOption.onlyMyPokemons, TeamOption.onlyDefaultPokemons];
 
@@ -80,6 +98,7 @@ export class MenuComponent {
       opponentCpm: 0,
       opponentHp: 0,
       opponentDefMod: 1,
+      opponentMaxEnergyMod: 1,
     });
 
     this.configurationSubmitEvent.pipe(first()).subscribe(() => (this.isSubmittedAtLeastOnce = true));
@@ -102,11 +121,13 @@ export class MenuComponent {
       this.battleConfigurationForm.controls.opponentAtkMod.setValue(preConfiguration.opponentAtkMod);
       this.battleConfigurationForm.controls.opponentDefMod.setValue(preConfiguration.opponentDefMod);
       this.battleConfigurationForm.controls.opponentHp.setValue(preConfiguration.opponentHp);
+      this.battleConfigurationForm.controls.opponentMaxEnergyMod.setValue(preConfiguration.opponentMaxEnergyMod);
     } else {
       this.battleConfigurationForm.controls.opponentCpm.setValue(0.8);
       this.battleConfigurationForm.controls.opponentAtkMod.setValue(1);
       this.battleConfigurationForm.controls.opponentDefMod.setValue(1);
       this.battleConfigurationForm.controls.opponentHp.setValue(15000);
+      this.battleConfigurationForm.controls.opponentMaxEnergyMod.setValue(1);
     }
 
     this.generalConfigSelect.value = 'Custom';
@@ -127,9 +148,37 @@ export class MenuComponent {
 
     battleConfiguration.friendshipModifier = FRIENDSHIPS.find(
       friendship => friendship.name === this.battleConfigurationForm.controls.friendship.value
-    )!.modifier;
+    )!.value;
+
+    battleConfiguration.helpersModifier = HELPERS.find(helpers => helpers.name === this.battleConfigurationForm.controls.helpers.value)!.value;
 
     battleConfiguration.date = moment(battleConfiguration.date);
+
+    // Adventure effects
+    switch (this.battleConfigurationForm.controls.adventureEffect.value) {
+      case AdventureEffect.BEHEMOTH_BASH:
+        battleConfiguration.behemothBashModifier = BEHEMOTH_BASH_MAX_BATTLES_MODIFIER;
+        battleConfiguration.behemothBladeModifier = 1;
+        battleConfiguration.dynamaxCannonBonusPower = 0;
+        break;
+      case AdventureEffect.BEHEMOTH_BLADE:
+        battleConfiguration.behemothBashModifier = 1;
+        battleConfiguration.behemothBladeModifier = BEHEMOTH_BLADE_MAX_BATTLES_MODIFIER;
+        battleConfiguration.dynamaxCannonBonusPower = 0;
+        break;
+      case AdventureEffect.DYNAMAX_CANNON:
+        battleConfiguration.behemothBashModifier = 1;
+        battleConfiguration.behemothBladeModifier = 1;
+        battleConfiguration.dynamaxCannonBonusPower = DYNAMAX_CANNON_BONUS_POWER;
+        break;
+      default:
+        battleConfiguration.behemothBashModifier = 1;
+        battleConfiguration.behemothBladeModifier = 1;
+        battleConfiguration.dynamaxCannonBonusPower = 0;
+        break;
+    }
+
+    battleConfiguration.mushroomModifier = this.battleConfigurationForm.controls.mushroom.value ? 2 : 1;
 
     this.configurationSubmitEvent.emit(battleConfiguration);
     this.collapseForm();
@@ -160,6 +209,7 @@ export class MenuComponent {
       this.battleConfigurationForm.controls.opponentAtkMod.setValue(generalConfig.opponentAtkMod);
       this.battleConfigurationForm.controls.opponentDefMod.setValue(generalConfig.opponentDefMod);
       this.battleConfigurationForm.controls.opponentHp.setValue(generalConfig.opponentHp);
+      this.battleConfigurationForm.controls.opponentMaxEnergyMod.setValue(generalConfig.opponentMaxEnergyMod);
 
       if (generalConfig.opponentName === 'Custom') {
         // expand Advanced section to provide custom values

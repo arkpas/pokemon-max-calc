@@ -91,8 +91,12 @@ export class MaxCalculatorService {
       trainer: 1,
       charged: 1,
       party: 1,
-      support: 1,
+      support: config.helpersModifier,
       spread: 1,
+      maxEnergyMod: 1,
+      behemothBashMod: 1,
+      behemothBladeMod: config.behemothBladeModifier,
+      mushroomMod: config.mushroomModifier,
     };
 
     // Standard G-MAX
@@ -100,7 +104,7 @@ export class MaxCalculatorService {
       const move: Attack = {
         name: GMAX + ' ' + ally.gigantamaxType,
         type: ally.gigantamaxType,
-        power: 450,
+        power: 450 + config.dynamaxCannonBonusPower,
         energy: 0,
         duration: 0,
         damageWindowStart: 0,
@@ -129,7 +133,7 @@ export class MaxCalculatorService {
         const move: Attack = {
           name: DMAX + ' ' + fastAttack.type,
           type: fastAttack.type,
-          power: 350,
+          power: 350 + config.dynamaxCannonBonusPower,
           energy: 0,
           duration: 0,
           damageWindowStart: 0,
@@ -153,7 +157,7 @@ export class MaxCalculatorService {
       const move: Attack = {
         name: DMAX + ' ' + ally.dynamaxType,
         type: ally.dynamaxType,
-        power: 350,
+        power: 350 + config.dynamaxCannonBonusPower,
         energy: 0,
         duration: 0,
         damageWindowStart: 0,
@@ -186,8 +190,12 @@ export class MaxCalculatorService {
       trainer: 1,
       charged: 1,
       party: 1,
-      support: 1,
+      support: config.helpersModifier,
       spread: 1,
+      maxEnergyMod: config.opponentMaxEnergyMod,
+      behemothBashMod: 1,
+      behemothBladeMod: config.behemothBladeModifier,
+      mushroomMod: config.mushroomModifier,
     };
 
     attacker.fastAttacks.forEach(fastAttack => {
@@ -218,8 +226,12 @@ export class MaxCalculatorService {
       trainer: 1,
       charged: 1,
       party: 1,
-      support: 1,
+      support: config.helpersModifier,
       spread: 1,
+      maxEnergyMod: config.opponentMaxEnergyMod,
+      behemothBashMod: 1,
+      behemothBladeMod: config.behemothBladeModifier,
+      mushroomMod: config.mushroomModifier,
     };
 
     attacker.chargedAttacks.forEach(chargedAttack => {
@@ -250,6 +262,10 @@ export class MaxCalculatorService {
       party: 1,
       support: 1,
       spread: 1,
+      maxEnergyMod: 1,
+      behemothBashMod: config.behemothBashModifier,
+      behemothBladeMod: 1,
+      mushroomMod: 1,
     };
 
     attacker.chargedAttacks.forEach(attack => {
@@ -278,8 +294,12 @@ export class MaxCalculatorService {
       trainer: 1,
       charged: 1,
       party: 1,
-      support: 1,
+      support: config.helpersModifier,
       spread: 1,
+      maxEnergyMod: config.opponentMaxEnergyMod,
+      behemothBashMod: 1,
+      behemothBladeMod: config.behemothBladeModifier,
+      mushroomMod: config.mushroomModifier,
     };
 
     const faDamageDetailsList: DamageDetails[] = [];
@@ -427,7 +447,8 @@ export class MaxCalculatorService {
 
   private calculateDamage(move: Attack, attacker: PokemonStats, defender: PokemonStats, damageModifiers: DamageModifiers): DamageDetails {
     const damage =
-      Math.floor(
+      damageModifiers.mushroomMod *
+      (Math.floor(
         0.5 *
           move.power *
           (attacker.atk / defender.def) *
@@ -440,11 +461,14 @@ export class MaxCalculatorService {
           damageModifiers.trainer *
           damageModifiers.party *
           damageModifiers.support *
-          damageModifiers.spread
-      ) + 1;
+          damageModifiers.spread *
+          damageModifiers.behemothBashMod *
+          damageModifiers.behemothBladeMod
+      ) +
+        1);
     const damagePercentage = (damage / defender.hp) * 100;
     const unhealedDamagePercentage = Math.max(damagePercentage - 48, 0);
-    const maxEnergy = this.calculateMaxEnergy(damagePercentage);
+    const maxEnergy = this.calculateMaxEnergy(damage, defender.hp, damageModifiers.maxEnergyMod);
     const damagePerTurn = damage / (move.duration / TURN_DURATION);
     const maxEnergyPerTurn = maxEnergy / (move.duration / TURN_DURATION);
 
@@ -460,14 +484,20 @@ export class MaxCalculatorService {
     };
   }
 
-  private calculateMaxEnergy(damagePercentage: number) {
-    // Each 0.5% HP of boss damage you deal is 1 Max Energy
-    // We multiply it by 2 to get amount of energy: 0.5%HP * 2 = 1 energy, 1%HP * 2 = 2 energy etc.
-    // and we cut off the decimal place digits by using `Math.floor()`
-    const maxEnergyCalculated = Math.floor(damagePercentage * 2);
-    // And finally with `Math.max()` we pick whichever is higher between our energy calc or 1 energy,
+  private calculateMaxEnergy(damage: number, hp: number, maxEnergyMod: number) {
+    // Right side of equasion - originally each 0.5% HP of boss damage you dealt was 1 Max Energy
+    // So for 100% HP hit you would get 200 Max Energy - we divide HP with this value to get value
+    // of how much damage we need to do to get exactly 1 Max Energy
+    // On the left side obviously we have damage, but also a new concept - max energy mod
+    // which makes it easier to fill max meter on bosses with large HP pools
+    const maxEnergyCalculated = (damage * maxEnergyMod) / (hp / 200);
+
+    // With `Math.max()` we pick whichever is higher between our energy calc or 1 energy,
     // because you can never generate less than 1 energy per attack
-    return Math.max(maxEnergyCalculated, 1);
+    const maxEnergyFinal = Math.max(maxEnergyCalculated, 1);
+
+    // And cut off everything else after 2 decimals
+    return Math.floor(maxEnergyFinal * 100) / 100;
   }
 
   private sortFastAttacks(a: DamageDetails, b: DamageDetails): number {

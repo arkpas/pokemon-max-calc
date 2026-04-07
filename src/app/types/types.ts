@@ -6,6 +6,7 @@ export interface OpponentConfiguration {
   opponentHp: number;
   opponentAtkMod: number;
   opponentDefMod: number;
+  opponentMaxEnergyMod: number;
 }
 
 export interface AllyConfiguration {
@@ -20,6 +21,11 @@ export interface BattleConfiguration extends OpponentConfiguration, AllyConfigur
   teamOption: TeamOption;
   weatherBoostedTypes: Type[];
   friendshipModifier: number;
+  mushroomModifier: number;
+  helpersModifier: number;
+  behemothBladeModifier: number;
+  behemothBashModifier: number;
+  dynamaxCannonBonusPower: number;
 }
 
 export interface Attack {
@@ -122,6 +128,10 @@ export interface StaticDamageModifiers {
   party: number;
   support: number;
   spread: number;
+  maxEnergyMod: number;
+  behemothBashMod: number;
+  behemothBladeMod: number;
+  mushroomMod: number;
 }
 
 export interface DynamicDamageModifiers {

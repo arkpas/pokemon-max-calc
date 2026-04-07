@@ -29,6 +29,34 @@ pokemonMasterData.forEach(pokemon => {
   if (pokemon.form) {
     pokemon.pokemonId = pokemon.form;
   }
+
+  // Some moves need to be pulled from move reassignment object.. for example behemoth blade, behemoth bash
+  if (pokemon.formChange) {
+    for (let form of pokemon.formChange) {
+      if (form.moveReassignment) {
+        pokemon.quickMoves.push(
+          ...(form.moveReassignment.quickMoves
+            ?.flatMap(move => move.existingMoves)
+            ?.map(moveId => moveMasterData.find(move => move.movementId === moveId)) ?? [])
+        );
+        pokemon.cinematicMoves.push(
+          ...(form.moveReassignment.cinematicMoves
+            ?.flatMap(move => move.existingMoves)
+            ?.map(moveId => moveMasterData.find(move => move.movementId === moveId)) ?? [])
+        );
+        pokemon.eliteQuickMoves.push(
+          ...(form.moveReassignment.eliteQuickMove
+            ?.flatMap(move => move.existingMoves)
+            ?.map(moveId => moveMasterData.find(move => move.movementId === moveId)) ?? [])
+        );
+        pokemon.eliteCinematicMoves.push(
+          ...(form.moveReassignment.eliteCinematicMove
+            ?.flatMap(move => move.existingMoves)
+            ?.map(moveId => moveMasterData.find(move => move.movementId === moveId)) ?? [])
+        );
+      }
+    }
+  }
 });
 
 const pokemonsData = extractMoves(pokemons, pokemonMasterData);

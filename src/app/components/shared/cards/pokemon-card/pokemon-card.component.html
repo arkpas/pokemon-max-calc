@@ -122,9 +122,9 @@
               </div>
             </td>
             <td title="Damage">💥 {{ entry.damage.toFixed(0) }}</td>
-            <td title="Move duration" [ngStyle]="{ color: getFastAttackDurationColor(entry.move.duration) }">⏱️ {{
-              entry.move.duration }}s</td>
-            <td title="Max Energy">🌀 {{ entry.maxEnergy }}</td>
+            <td title="Move duration">⏱️ {{entry.move.duration }}s</td>
+            <td title="Max Energy" [ngStyle]="{ color: getMaxEnergyPerTurnColor(entry.maxEnergyPerTurn) }">🌀 {{
+              entry.maxEnergyPerTurn.toFixed(2) }}/T</td>
             <td title="Power">💪 {{ entry.move.power }}</td>
             <td
               matTooltip="🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% 🧬 {{ entry.damageModifiers.stab }}"
@@ -170,7 +170,7 @@
     </div>
     }
     <!-- TODO: this is bloating the screen too much, need to think of another way of displaying it -->
-    <!-- <div class="damage-details-section">
+    <div class="damage-details-section">
       <span class="damage-details-section-name">💣 Charged Attacks</span>
       <div class="damage-details-table-wrapper">
         <table class="damage-details-table">
@@ -182,20 +182,19 @@
             </td>
             <td title="Damage">💥 {{ entry.damage.toFixed(0) }}</td>
             <td title="Move duration">⏱️ {{ entry.move.duration }}s</td>
-            <td title="Max Energy">🌀 {{ entry.maxEnergy }}</td>
+            <td title="Max Energy" [ngStyle]="{ color: getMaxEnergyPerTurnColor(entry.maxEnergyPerTurn) }">🌀 {{
+              entry.maxEnergyPerTurn.toFixed(2) }}/T</td>
             <td title="Power">💪 {{ entry.move.power }}</td>
             <td
               matTooltip="🎯 {{ (entry.damageModifiers.typeEffectiveness * 100).toFixed(1) }}% 🧬 {{ entry.damageModifiers.stab }}"
-              matTooltipPosition="above"
-              #tooltip="matTooltip"
-              (click)="tooltip.toggle()">
+              matTooltipPosition="above" #tooltip="matTooltip" (click)="tooltip.toggle()">
               🔍
             </td>
             <td></td>
           </tr>
         </table>
       </div>
-    </div> -->
+    </div>
   </div>
   }
 </div>
