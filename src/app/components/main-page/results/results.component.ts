@@ -42,12 +42,24 @@ export class ResultsComponent implements OnInit, OnDestroy {
 
   simulateBattle(config: BattleConfiguration): void {
     this.candidates = this.maxCalculatorService.simulateBattle(config);
-    this.attackers = this.groupAttackers(this.candidates).sort(sortAttackers);
-    this.tanks = [...this.candidates.filter(candidate => candidate.hasHalfSecondAttack)].sort(sortTanks);
-    this.sponges = [...this.candidates].sort(sortTanks);
+    this.attackers = this.processAttackers(this.candidates);
+    this.tanks = this.processTanks([...this.candidates.filter(candidate => candidate.hasHalfSecondAttack)]);
+    this.sponges = this.processTanks([...this.candidates]);
     this.healers = [...this.candidates.filter(candidate => candidate.hasHalfSecondAttack)].sort(sortHealers);
 
     this.opponent = this.importService.getOpponent(config);
+  }
+
+  processAttackers(candidates: Candidate[]): Candidate[] {
+    const attackers: Candidate[] = this.groupAttackers(candidates).sort(sortAttackers);
+
+    // Calculate score compared to top performing attacker
+    const topAttacker = attackers[0];
+    attackers.forEach(
+      attacker => (attacker.performanceScore = (attacker.maxPhaseDamageDetails[0].damage / topAttacker.maxPhaseDamageDetails[0].damage) * 100)
+    );
+
+    return attackers;
   }
 
   groupAttackers(candidates: Candidate[]): Candidate[] {
@@ -72,5 +84,22 @@ export class ResultsComponent implements OnInit, OnDestroy {
     });
 
     return attackers;
+  }
+
+  processTanks(candidates: Candidate[]): Candidate[] {
+    const tanks: Candidate[] = [];
+    candidates.sort(sortTanks);
+
+    // Calculate score compared to top performing tank
+    const topTank = candidates[0];
+    candidates.forEach(tank => {
+      // We gotta shallow copy the tank to not have the performance score on original candidates
+      tanks.push({
+        ...tank,
+        performanceScore: (topTank.avgDamageTaken / tank.avgDamageTaken) * 100,
+      });
+    });
+
+    return tanks;
   }
 }

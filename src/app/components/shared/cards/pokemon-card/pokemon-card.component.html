@@ -30,6 +30,9 @@
           💎
           <strong><u>{{ candidate.atkIV + candidate.defIV + candidate.hpIV | ivPercentage }}%</u></strong>
         </div>
+        @if (candidate.performanceScore != undefined) {
+        <div class="stat" title="Performance score">🏆 {{ candidate.performanceScore.toFixed(0) }}%</div>
+        }
       </div>
       <div class="stat-row">
         @if (pokemonCardType === PokemonCardTypeEnum.Attacker && candidate.maxPhaseDamageDetails.length) {

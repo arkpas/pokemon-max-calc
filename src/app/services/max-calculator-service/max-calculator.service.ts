@@ -76,6 +76,7 @@ export class MaxCalculatorService {
         totalUnhealedDamagePercentage,
         heal,
         maxPhaseDamageDetails,
+        performanceScore: undefined,
       });
     });
 

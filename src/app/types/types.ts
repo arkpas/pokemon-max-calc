@@ -162,4 +162,5 @@ export interface Candidate extends Pokemon {
   avgDamageTakenPercentage: number;
   heal: number;
   totalUnhealedDamagePercentage: number;
+  performanceScore: number | undefined;
 }
