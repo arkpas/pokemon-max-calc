@@ -134,4 +134,5 @@ export const SPECIFIC_CONFIGS: OpponentConfiguration[] = [
   { opponentName: 'Regice', opponentCpm: 0.8, opponentHp: 20000, opponentAtkMod: 2, opponentDefMod: 1, opponentMaxEnergyMod: T5_MAX_ENERGY_MOD },
   { opponentName: 'Pikachu', opponentCpm: 1.7, opponentHp: 80000, opponentAtkMod: 1, opponentDefMod: 1, opponentMaxEnergyMod: T6_MAX_ENERGY_MOD },
   { opponentName: 'Regirock', opponentCpm: 0.8, opponentHp: 20000, opponentAtkMod: 2, opponentDefMod: 1, opponentMaxEnergyMod: T5_MAX_ENERGY_MOD },
+  { opponentName: 'Registeel', opponentCpm: 0.8, opponentHp: 20000, opponentAtkMod: 2, opponentDefMod: 1, opponentMaxEnergyMod: T5_MAX_ENERGY_MOD },
 ];
