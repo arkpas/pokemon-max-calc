@@ -256,7 +256,8 @@ export class ImportServiceService {
 
   private convertToPremiereDate(dateOrBool: string): Moment {
     if (!dateOrBool) {
-      throw new Error(`Bad value, expected boolean or date, got: ${dateOrBool}`);
+      // For bad values assume the pokemon did not have premiere in max battles yet
+      return moment('01.01.9999', 'DD.MM.YYYY');
     }
 
     const date = moment(dateOrBool, 'DD.MM.YYYY');
@@ -271,7 +272,6 @@ export class ImportServiceService {
       return moment('01.01.1970', 'DD.MM.YYYY');
     }
     // If nothing above works, assume the pokemon did not have premiere in max battles yet
-    // and set the date to far future
     else {
       return moment('01.01.9999', 'DD.MM.YYYY');
     }
