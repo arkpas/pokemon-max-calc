@@ -11,7 +11,7 @@ import { first } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { BattleConfiguration, OpponentConfiguration, TeamOption } from '../../../types/types';
 import moment from 'moment';
-import { SPECIFIC_CONFIGS, GENERAL_CONFIGS } from '../../../constants/configurations.costants';
+import { SPECIFIC_CONFIGS, GENERAL_CONFIGS, DEFAULT_CONFIG } from '../../../constants/configurations.costants';
 import { Router } from '@angular/router';
 import { MatExpansionModule, MatExpansionPanel } from '@angular/material/expansion';
 import { MtxSelectModule } from '@ng-matero/extensions/select';
@@ -122,15 +122,15 @@ export class MenuComponent {
       this.battleConfigurationForm.controls.opponentDefMod.setValue(preConfiguration.opponentDefMod);
       this.battleConfigurationForm.controls.opponentHp.setValue(preConfiguration.opponentHp);
       this.battleConfigurationForm.controls.opponentMaxEnergyMod.setValue(preConfiguration.opponentMaxEnergyMod);
+      this.generalConfigSelect.value = 'Custom';
     } else {
-      this.battleConfigurationForm.controls.opponentCpm.setValue(0.8);
-      this.battleConfigurationForm.controls.opponentAtkMod.setValue(1);
-      this.battleConfigurationForm.controls.opponentDefMod.setValue(1);
-      this.battleConfigurationForm.controls.opponentHp.setValue(15000);
-      this.battleConfigurationForm.controls.opponentMaxEnergyMod.setValue(1);
+      this.battleConfigurationForm.controls.opponentCpm.setValue(DEFAULT_CONFIG.opponentCpm);
+      this.battleConfigurationForm.controls.opponentAtkMod.setValue(DEFAULT_CONFIG.opponentAtkMod);
+      this.battleConfigurationForm.controls.opponentDefMod.setValue(DEFAULT_CONFIG.opponentDefMod);
+      this.battleConfigurationForm.controls.opponentHp.setValue(DEFAULT_CONFIG.opponentHp);
+      this.battleConfigurationForm.controls.opponentMaxEnergyMod.setValue(DEFAULT_CONFIG.opponentMaxEnergyMod);
+      this.generalConfigSelect.value = DEFAULT_CONFIG.opponentName;
     }
-
-    this.generalConfigSelect.value = 'Custom';
 
     // Set default battle date
     this.battleConfigurationForm.controls.date.setValue(this.determineDefaultBattleDate(name));

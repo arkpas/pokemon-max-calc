@@ -4,6 +4,15 @@ export const DEFAULT_ENERGY_MOD = 1;
 export const T5_MAX_ENERGY_MOD = 2;
 export const T6_MAX_ENERGY_MOD = 15;
 
+export const DEFAULT_CONFIG: OpponentConfiguration = {
+  opponentCpm: 0.75,
+  opponentHp: 22000,
+  opponentAtkMod: 2,
+  opponentDefMod: 1,
+  opponentName: 'T5 Dynamax (Averaged)',
+  opponentMaxEnergyMod: T5_MAX_ENERGY_MOD,
+};
+
 export const GENERAL_CONFIGS: OpponentConfiguration[] = [
   {
     opponentCpm: 0.15,
@@ -37,14 +46,7 @@ export const GENERAL_CONFIGS: OpponentConfiguration[] = [
     opponentName: 'T4 Dynamax',
     opponentMaxEnergyMod: DEFAULT_ENERGY_MOD,
   },
-  {
-    opponentCpm: 0.75,
-    opponentHp: 22000,
-    opponentAtkMod: 2,
-    opponentDefMod: 1,
-    opponentName: 'T5 Dynamax (Averaged)',
-    opponentMaxEnergyMod: T5_MAX_ENERGY_MOD,
-  },
+  DEFAULT_CONFIG,
   {
     opponentCpm: 0.9,
     opponentHp: 90000,
